@@ -24,4 +24,13 @@ public class ApplicationDbContext : DbContext
     public DbSet<ReportTag> ReportTags { get; set; } = default!;
     public DbSet<Tag> Tags { get; set; } = default!;
     public DbSet<Course> Courses { get; set; } = default!;
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<ReportTag>()
+            .HasKey(rt => new { rt.ReportId, rt.TagId });
+    }
+
 }

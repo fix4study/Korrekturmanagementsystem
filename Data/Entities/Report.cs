@@ -13,9 +13,9 @@ public class Report
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 
-    public ReportType ReportType { get; set; }
-    public Material Material { get; set; }
-    public Status Status { get; set; }
+    public ReportType ReportType { get; set; } = default!;
+    public Material Material { get; set; } = default!;
+    public Status Status { get; set; } = default!;
     public Priority Priority { get; set; } = default!;
     public User CreatedBy { get; set; } = default!;
     public ICollection<ReportHistory> History { get; set; } = default!;

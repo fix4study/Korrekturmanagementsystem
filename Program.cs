@@ -12,6 +12,13 @@ public class Program
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents();
 
+        var configuration = builder.Configuration;
+
+        builder.Services
+            .AddApplicationServices(configuration)
+            .AddRepositories(configuration)
+            .AddDatabase(configuration);
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.

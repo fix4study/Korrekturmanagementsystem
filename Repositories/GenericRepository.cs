@@ -17,24 +17,23 @@ public class GenericRepository<TEntity> : IRepository<TEntity> where TEntity : c
     }
 
     public virtual async Task<IEnumerable<TEntity>> GetAsync(
-        Expression<Func<TEntity, bool>> filter = null,
-        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-        string includeProperties = "")
+        Expression<Func<TEntity, bool>>? filter = null,
+        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+        params Expression<Func<TEntity, object>>[] includes)
     {
         IQueryable<TEntity> query = dbSet;
 
         if (filter != null)
-        {
             query = query.Where(filter);
-        }
 
-        foreach (var includeProperty in includeProperties.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-        {
-            query = query.Include(includeProperty);
-        }
+        foreach (var include in includes)
+            query = query.Include(include);
 
-        return orderBy != null ? await orderBy(query).ToListAsync() : await query.ToListAsync();
+        return orderBy != null
+            ? await orderBy(query).ToListAsync()
+            : await query.ToListAsync();
     }
+
 
     public virtual async Task<TEntity> GetByIdAsync(object id)
     {
