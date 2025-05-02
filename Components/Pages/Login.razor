@@ -1,0 +1,40 @@
+﻿@page "/account/login"
+@using Korrekturmanagementsystem.Services.Interfaces
+@using System.Net.Http.Json
+@using Korrekturmanagementsystem.Dtos
+@inject NavigationManager Navigation
+@inject IPasswordService passwordService
+@inject IUserService userService
+@rendermode InteractiveServer
+
+<h3>Login</h3>
+
+<div>
+    <input @bind="username" placeholder="Benutzername" class="form-control" />
+    <input @bind="password" placeholder="Passwort" type="password" class="form-control" />
+    <button @onclick="LoginUser" class="btn btn-primary mt-2">Anmelden</button>
+
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <div class="alert alert-info">@message</div>
+    }
+</div>
+
+@code {
+    private string username = "";
+    private string password = "";
+    private string message = "";
+
+    private async Task LoginUser()
+    {
+        var user = await userService.GetUserByUsernameAsync(username);
+        if (user != null && passwordService.VerifyPassword(user.HashedPassword, password))
+        {
+            message = "Login erfolgreich.";
+        }
+        else
+        {
+            message = "Login fehlgeschlagen.";
+        }
+    }
+}

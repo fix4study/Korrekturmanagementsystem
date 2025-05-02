@@ -1,0 +1,78 @@
+﻿@page "/register"
+@using Korrekturmanagementsystem.Dtos
+@using Korrekturmanagementsystem.Services.Interfaces
+@inject NavigationManager Navigation
+@inject IPasswordService passwordService
+@inject IUserService userService
+@rendermode InteractiveServer
+
+<h3>Registrierung</h3>
+
+<div>
+    <input @bind="username" placeholder="Benutzername" class="form-control" />
+    <input @bind="email" placeholder="Email" type="email" class="form-control" />
+    <input @bind="password" placeholder="Passwort" type="password" class="form-control" />
+
+    @if (roles is not null && roles.Any())
+    {
+        <select @bind="SelectedRoleString" class="form-select">
+            <option value="">Bitte Rolle wählen...</option>
+            @foreach (var role in roles)
+            {
+                <option value="@role.Id">@role.Name</option>
+            }
+        </select>
+    }
+
+    <button @onclick="RegisterUser" class="btn btn-primary mt-2">Registrieren</button>
+
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <div class="alert alert-info">@message</div>
+    }
+</div>
+
+@code {
+    private string username = "";
+    private string email = "";
+    private string password = "";
+    private string message = "";
+
+    private IEnumerable<RoleDto>? roles = default!;
+    private Guid selectedRole = Guid.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        roles = await userService.GetAllUserRoles();
+    }
+
+    // Hilfs-Property für Konvertierung von/nach String
+    private string SelectedRoleString
+    {
+        get => selectedRole == Guid.Empty ? "" : selectedRole.ToString();
+        set => selectedRole = string.IsNullOrEmpty(value) ? Guid.Empty : Guid.Parse(value);
+    }
+
+    private async Task RegisterUser()
+    {
+        if (selectedRole == Guid.Empty)
+        {
+            message = "Bitte eine Rolle wählen!";
+            return;
+        }
+
+        var hashedPassword = passwordService.HashPassword(password);
+
+        await userService.CreateUser(new CreateUserDto
+            {
+                Username = username,
+                Email = email,
+                Password = hashedPassword,
+                RoleId = selectedRole
+            });
+
+        message = "Registrierung erfolgreich!";
+        await Task.Delay(1500);
+        Navigation.NavigateTo("/login");
+    }
+}
