@@ -1,4 +1,4 @@
-﻿@page "/register"
+﻿@page "/account/register"
 @using Korrekturmanagementsystem.Dtos
 @using Korrekturmanagementsystem.Services.Interfaces
 @inject NavigationManager Navigation
@@ -46,7 +46,6 @@
         roles = await userService.GetAllUserRoles();
     }
 
-    // Hilfs-Property für Konvertierung von/nach String
     private string SelectedRoleString
     {
         get => selectedRole == Guid.Empty ? "" : selectedRole.ToString();
