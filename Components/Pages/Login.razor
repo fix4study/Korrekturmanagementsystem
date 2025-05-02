@@ -1,0 +1,18 @@
+﻿@page "/account/login"
+@using Korrekturmanagementsystem.Services.Interfaces
+@using Korrekturmanagementsystem.Dtos
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+
+@rendermode InteractiveServer
+
+<h3>Login</h3>
+
+<div>
+    <form method="post" action="/account/login">
+        <input name="username" placeholder="Benutzername" class="form-control" />
+        <input name="password" type="password" placeholder="Passwort" class="form-control" />
+        <button type="submit" class="btn btn-primary mt-2">Anmelden</button>
+    </form>
+</div>

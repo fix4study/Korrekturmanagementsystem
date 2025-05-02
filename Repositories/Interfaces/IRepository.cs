@@ -11,8 +11,8 @@ namespace Korrekturmanagementsystem.Repositories.Interfaces
 
         Task<TEntity> GetByIdAsync(object id);
         Task InsertAsync(TEntity entity);
-        void Update(TEntity entity);
-        void Delete(object id);
-        void Delete(TEntity entity);
+        Task UpdateAsync(TEntity entity);
+        Task DeleteAsync(object id);
+        Task DeleteAsync(TEntity entity);
     }
 }

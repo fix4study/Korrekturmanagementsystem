@@ -43,24 +43,25 @@ public class GenericRepository<TEntity> : IRepository<TEntity> where TEntity : c
     public virtual async Task InsertAsync(TEntity entity)
     {
         await dbSet.AddAsync(entity);
+        await context.SaveChangesAsync();
     }
 
-    public virtual void Update(TEntity entity)
+    public virtual async Task UpdateAsync(TEntity entity)
     {
         dbSet.Attach(entity);
         context.Entry(entity).State = EntityState.Modified;
+        await context.SaveChangesAsync();
     }
 
-    public virtual void Delete(object id)
+    public virtual async Task DeleteAsync(object id)
     {
-        var entity = dbSet.Find(id);
+        var entity = await dbSet.FindAsync(id);
         if (entity != null)
         {
-            Delete(entity);
+            await DeleteAsync(entity);
         }
     }
-
-    public virtual void Delete(TEntity entity)
+    public virtual async Task DeleteAsync(TEntity entity)
     {
         if (context.Entry(entity).State == EntityState.Detached)
         {
@@ -68,7 +69,9 @@ public class GenericRepository<TEntity> : IRepository<TEntity> where TEntity : c
         }
 
         dbSet.Remove(entity);
+        await context.SaveChangesAsync();
     }
+
 }
 
 

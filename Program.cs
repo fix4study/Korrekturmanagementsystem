@@ -1,4 +1,6 @@
-using Korrekturmanagementsystem.Components;
+﻿using Korrekturmanagementsystem.Components;
+using Korrekturmanagementsystem.Endpoints;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Korrekturmanagementsystem;
 
@@ -8,34 +10,61 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Add services to the container.
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents();
 
-        var configuration = builder.Configuration;
+        builder.Services.AddHttpClient("BackendAPI", client =>
+        {
+            client.BaseAddress = new Uri("https://localhost:7134");
+        });
 
+        builder.Services.AddScoped(sp =>
+            sp.GetRequiredService<IHttpClientFactory>().CreateClient("BackendAPI"));
+
+        builder.Services.AddHttpContextAccessor();
+
+        builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(options =>
+            {
+                options.Cookie.Name = "auth_token";
+                options.LoginPath = "/account/login";
+                options.AccessDeniedPath = "/access-denied";
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SameSite = SameSiteMode.Lax;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            });
+
+        builder.Services.AddAuthorization();
+
+        var config = builder.Configuration;
         builder.Services
-            .AddApplicationServices(configuration)
-            .AddRepositories(configuration)
-            .AddDatabase(configuration);
+            .AddApplicationServices(config)
+            .AddRepositories(config)
+            .AddDatabase(config);
+
+        builder.Services.AddCascadingAuthenticationState();
 
         var app = builder.Build();
 
-        // Configure the HTTP request pipeline.
+
         if (!app.Environment.IsDevelopment())
         {
             app.UseExceptionHandler("/Error");
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             app.UseHsts();
         }
 
         app.UseHttpsRedirection();
 
+        app.UseAuthentication();
+        app.UseAuthorization();
         app.UseAntiforgery();
+
+        app.MapLoginEndpoint();
+        app.MapLogoutEndpoint();
 
         app.MapStaticAssets();
         app.MapRazorComponents<App>()
-            .AddInteractiveServerRenderMode();
+            .AddInteractiveServerRenderMode().DisableAntiforgery();
 
         app.Run();
     }
