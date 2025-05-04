@@ -14,9 +14,12 @@ public class UserRepository : IUserRepository
     }
 
     public async Task<User?> GetUserByEmailAsync(string email) =>
-         await _context.Users.Include(i => i.Role).FirstOrDefaultAsync(u => u.Email == email);
+         await _context.Users.Include(i => i.StakeholderRole).FirstOrDefaultAsync(u => u.Email == email);
 
     public async Task<User?> GetUserByUsernameAsync(string username) =>
-         await _context.Users.Include(i => i.Role).FirstOrDefaultAsync(u => u.Username == username);
+         await _context.Users
+            .Include(i => i.StakeholderRole)
+            .Include(i => i.SystemRole)
+            .FirstOrDefaultAsync(u => u.Username == username);
 
 }

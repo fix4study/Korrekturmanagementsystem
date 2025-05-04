@@ -1,0 +1,14 @@
+﻿@page "/administration"
+@using Korrekturmanagementsystem.Services.Interfaces
+@using Microsoft.AspNetCore.Authorization
+@inject IRoleService roleService
+@rendermode InteractiveServer
+@attribute [Authorize(Roles = "Admin")]
+<h3>Administration</h3>
+
+<Role/>
+
+
+@code {
+
+}

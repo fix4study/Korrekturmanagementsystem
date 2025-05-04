@@ -1,0 +1,63 @@
+﻿@using Korrekturmanagementsystem.Services.Interfaces
+@using Korrekturmanagementsystem.Dtos
+@inject IRoleService roleService
+@rendermode InteractiveServer
+
+<h3>Rollenverwaltung</h3>
+
+<div class="mb-3">
+    <input class="form-control" placeholder="Neue Rolle" @bind="newRoleName" />
+    <button class="btn btn-primary mt-2" @onclick="AddRoleAsync">Rolle hinzufügen</button>
+</div>
+
+@if (roles is null)
+{
+    <p>Lade Rollen...</p>
+}
+else if (!roles.Any())
+{
+    <p>Keine Rollen vorhanden.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Rollenname</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var role in roles)
+            {
+                <tr>
+                    <td>@role.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<RoleDto>? roles;
+    private string newRoleName = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadRolesAsync();
+    }
+
+    private async Task LoadRolesAsync()
+    {
+        roles = (await roleService.GetStakeholderRolesAsync()).ToList();
+    }
+
+    private async Task AddRoleAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(newRoleName))
+        {
+            await roleService.AddStakeholderRoleAsync(newRoleName);
+            newRoleName = string.Empty;
+            await LoadRolesAsync();
+        }
+    }
+}

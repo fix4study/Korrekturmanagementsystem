@@ -4,6 +4,7 @@
 @inject NavigationManager Navigation
 @inject IPasswordService passwordService
 @inject IUserService userService
+@inject IRoleService roleService
 @rendermode InteractiveServer
 
 <h3>Registrierung</h3>
@@ -43,7 +44,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        roles = await userService.GetAllUserRoles();
+        roles = await roleService.GetStakeholderRolesAsync();
     }
 
     private string SelectedRoleString
@@ -67,11 +68,11 @@
                 Username = username,
                 Email = email,
                 Password = hashedPassword,
-                RoleId = selectedRole
+                StakeholderRoleId = selectedRole
             });
 
         message = "Registrierung erfolgreich!";
         await Task.Delay(1500);
-        Navigation.NavigateTo("/login");
+        Navigation.NavigateTo("account/login");
     }
 }

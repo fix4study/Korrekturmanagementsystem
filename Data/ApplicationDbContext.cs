@@ -20,7 +20,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<ReportHistory> ReportHistories { get; set; } = default!;
     public DbSet<Comment> Comments { get; set; } = default!;
     public DbSet<Attachment> Attachments { get; set; } = default!;
-    public DbSet<Role> Roles { get; set; } = default!;
+    public DbSet<SystemRole> SystemRoles { get; set; } = default!;
+    public DbSet<StakeholderRole> StakeholderRoles { get; set; } = default!;
     public DbSet<ReportTag> ReportTags { get; set; } = default!;
     public DbSet<Tag> Tags { get; set; } = default!;
     public DbSet<Course> Courses { get; set; } = default!;

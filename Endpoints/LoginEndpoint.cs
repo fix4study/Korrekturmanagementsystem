@@ -28,7 +28,7 @@ namespace Korrekturmanagementsystem.Endpoints
                 {
                     new(ClaimTypes.Name, user.Username),
                     new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new(ClaimTypes.Role, user.RoleName)
+                    new(ClaimTypes.Role, user.SystemRoleName)
                 };
 
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

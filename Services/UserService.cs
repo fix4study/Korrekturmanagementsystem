@@ -8,12 +8,10 @@ namespace Korrekturmanagementsystem.Services;
 public class UserService : IUserService
 {
     private readonly IRepository<User> _repository;
-    private readonly IRepository<Role> _roleRepository;
     private readonly IUserRepository _userRepository;
-    public UserService(IRepository<User> repository, IRepository<Role> roleRepository, IUserRepository userRepository)
+    public UserService(IRepository<User> repository, IUserRepository userRepository)
     {
         _repository = repository;
-        _roleRepository = roleRepository;
         _userRepository = userRepository;
     }
 
@@ -31,20 +29,20 @@ public class UserService : IUserService
             Id = user.Id,
             Username = user.Username,
             Email = user.Email,
-            RoleName = user.Role.Name
+            StakeholderRoleName = user.StakeholderRole.Name
         };
     }
 
     public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
     {
-        var users = await _repository.GetAsync(includes: e => e.Role);
+        var users = await _repository.GetAsync(includes: e => e.StakeholderRole);
 
         return users.Select(user => new UserDto
         {
             Id = user.Id,
             Username = user.Username,
             Email = user.Email,
-            RoleName = user.Role.Name
+            StakeholderRoleName = user.StakeholderRole.Name
         }).ToList();
     }
 
@@ -63,7 +61,8 @@ public class UserService : IUserService
             Username = user.Username,
             Email = user.Email,
             HashedPassword = user.Password,
-            RoleName = user.Role.Name
+            StakeholderRoleName = user.StakeholderRole.Name,
+            SystemRoleName = user.SystemRole.Name
         };
     }
 
@@ -76,7 +75,8 @@ public class UserService : IUserService
             Username = user.Username,
             Email = user.Email,
             Password = user.Password,
-            RoleId = user.RoleId,
+            StakeholderRoleId = user.StakeholderRoleId,
+            SystemRoleId = Guid.Parse("a937147a-86b6-4af7-bbff-c8d04741e411"), //Standard User Role
             CreatedAt = DateTime.UtcNow
         };
 
@@ -88,16 +88,5 @@ public class UserService : IUserService
         {
             var t = ex;
         }
-    }
-
-    public async Task<IEnumerable<RoleDto>> GetAllUserRoles()
-    {
-        var roles = await _roleRepository.GetAsync();
-
-        return roles.Select(role => new RoleDto
-        {
-            Id = role.Id,
-            Name = role.Name
-        }).ToList();
     }
 }
