@@ -27,7 +27,7 @@ public static class DependencyInjection
 
     public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        var connStr = Environment.GetEnvironmentVariable("CUSTOMCONNSTR__DefaultConnection");
+        var connStr = Environment.GetEnvironmentVariable("CUSTOMCONNSTR_DefaultConnection");
 
         if (string.IsNullOrWhiteSpace(connStr))
         {
