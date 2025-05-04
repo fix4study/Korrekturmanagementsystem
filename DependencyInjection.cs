@@ -27,7 +27,7 @@ public static class DependencyInjection
 
     public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        var connStr = Environment.GetEnvironmentVariable("POSTGRESQLCONNSTR_DefaultConnection");
+        var connStr = Environment.GetEnvironmentVariable("CUSTOMCONNSTR__DefaultConnection");
 
         if (string.IsNullOrWhiteSpace(connStr))
         {
