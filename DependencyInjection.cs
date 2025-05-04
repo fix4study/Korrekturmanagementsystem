@@ -27,17 +27,9 @@ public static class DependencyInjection
 
     public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        var connStr = Environment.GetEnvironmentVariable("CUSTOMCONNSTR_DefaultConnection");
-
-        if (string.IsNullOrWhiteSpace(connStr))
-        {
-            connStr = configuration.GetConnectionString("DefaultConnection");
-        }
-
         services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(connStr));
+            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
         return services;
     }
-
 }
