@@ -2,6 +2,7 @@
 using Korrekturmanagementsystem.Endpoints;
 using Korrekturmanagementsystem.Extensions;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Components.Server;
 
 namespace Korrekturmanagementsystem;
 
@@ -15,6 +16,11 @@ public class Program
             .AddInteractiveServerComponents();
 
         builder.Services.AddHttpContextAccessor();
+
+        builder.Services.Configure<CircuitOptions>(options =>
+        {
+            options.DetailedErrors = true;
+        });
 
         var config = builder.Configuration;
         builder.Services
