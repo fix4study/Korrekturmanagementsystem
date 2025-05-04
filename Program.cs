@@ -1,5 +1,6 @@
 ﻿using Korrekturmanagementsystem.Components;
 using Korrekturmanagementsystem.Endpoints;
+using Korrekturmanagementsystem.Extensions;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Korrekturmanagementsystem;
@@ -13,39 +14,19 @@ public class Program
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents();
 
-        builder.Services.AddHttpClient("BackendAPI", client =>
-        {
-            client.BaseAddress = new Uri("https://localhost:7134");
-        });
-
-        builder.Services.AddScoped(sp =>
-            sp.GetRequiredService<IHttpClientFactory>().CreateClient("BackendAPI"));
-
         builder.Services.AddHttpContextAccessor();
-
-        builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            .AddCookie(options =>
-            {
-                options.Cookie.Name = "auth_token";
-                options.LoginPath = "/account/login";
-                options.AccessDeniedPath = "/access-denied";
-                options.Cookie.HttpOnly = true;
-                options.Cookie.SameSite = SameSiteMode.Lax;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-            });
-
-        builder.Services.AddAuthorization();
 
         var config = builder.Configuration;
         builder.Services
             .AddApplicationServices(config)
             .AddRepositories(config)
-            .AddDatabase(config);
+            .AddDatabase(config)
+            .AddAuthenticationSetup()
+            .AddHttpClients(config);
 
         builder.Services.AddCascadingAuthenticationState();
 
         var app = builder.Build();
-
 
         if (!app.Environment.IsDevelopment())
         {
