@@ -29,6 +29,8 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        modelBuilder.HasDefaultSchema("kms");
+
         modelBuilder.Entity<ReportTag>()
             .HasKey(rt => new { rt.ReportId, rt.TagId });
     }
