@@ -1,58 +1,35 @@
-﻿using Korrekturmanagementsystem.Components;
-using Korrekturmanagementsystem.Endpoints;
-using Korrekturmanagementsystem.Extensions;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Components.Server;
+﻿using Korrekturmanagementsystem;
+using Korrekturmanagementsystem.Components;
 
-namespace Korrekturmanagementsystem;
+var builder = WebApplication.CreateBuilder(args);
 
-public class Program
-{
-    public static void Main(string[] args)
-    {
-        var builder = WebApplication.CreateBuilder(args);
-
-        builder.Services.AddRazorComponents()
+// Add services to the container.
+builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents();
 
-        builder.Services.AddHttpContextAccessor();
+var configuration = builder.Configuration;
 
-        builder.Services.Configure<CircuitOptions>(options =>
-        {
-            options.DetailedErrors = true;
-        });
+builder.Services
+    .AddApplicationServices(configuration)
+            .AddRepositories(configuration)
+            .AddDatabase(configuration);
 
-        var config = builder.Configuration;
-        builder.Services
-            .AddApplicationServices(config)
-            .AddRepositories(config)
-            .AddDatabase(config)
-            .AddAuthenticationSetup()
-            .AddHttpClients(config);
+var app = builder.Build();
 
-        builder.Services.AddCascadingAuthenticationState();
-
-        var app = builder.Build();
-
-        if (!app.Environment.IsDevelopment())
-        {
-            app.UseExceptionHandler("/Error");
-            app.UseHsts();
-        }
-
-        app.UseHttpsRedirection();
-
-        app.UseAuthentication();
-        app.UseAuthorization();
-        app.UseAntiforgery();
-
-        app.MapLoginEndpoint();
-        app.MapLogoutEndpoint();
-
-        app.MapStaticAssets();
-        app.MapRazorComponents<App>()
-            .AddInteractiveServerRenderMode().DisableAntiforgery();
-
-        app.Run();
-    }
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
 }
+
+app.UseHttpsRedirection();
+
+app.UseAntiforgery();
+
+app.MapStaticAssets();
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode();
+
+app.Run();
