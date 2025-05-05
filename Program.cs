@@ -1,58 +1,51 @@
-﻿using Korrekturmanagementsystem.Components;
+﻿using Korrekturmanagementsystem;
+using Korrekturmanagementsystem.Components;
 using Korrekturmanagementsystem.Endpoints;
 using Korrekturmanagementsystem.Extensions;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Server;
 
-namespace Korrekturmanagementsystem;
 
-public class Program
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
+
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.Configure<CircuitOptions>(options =>
 {
-    public static void Main(string[] args)
-    {
-        var builder = WebApplication.CreateBuilder(args);
+    options.DetailedErrors = true;
+});
 
-        builder.Services.AddRazorComponents()
-            .AddInteractiveServerComponents();
+var config = builder.Configuration;
+builder.Services
+    .AddApplicationServices(config)
+    .AddRepositories(config)
+    .AddDatabase(config)
+    .AddAuthenticationSetup()
+    .AddHttpClients(config);
 
-        builder.Services.AddHttpContextAccessor();
+builder.Services.AddCascadingAuthenticationState();
 
-        builder.Services.Configure<CircuitOptions>(options =>
-        {
-            options.DetailedErrors = true;
-        });
+var app = builder.Build();
 
-        var config = builder.Configuration;
-        builder.Services
-            .AddApplicationServices(config)
-            .AddRepositories(config)
-            .AddDatabase(config)
-            .AddAuthenticationSetup()
-            .AddHttpClients(config);
-
-        builder.Services.AddCascadingAuthenticationState();
-
-        var app = builder.Build();
-
-        if (!app.Environment.IsDevelopment())
-        {
-            app.UseExceptionHandler("/Error");
-            app.UseHsts();
-        }
-
-        app.UseHttpsRedirection();
-
-        app.UseAuthentication();
-        app.UseAuthorization();
-        app.UseAntiforgery();
-
-        app.MapLoginEndpoint();
-        app.MapLogoutEndpoint();
-
-        app.MapStaticAssets();
-        app.MapRazorComponents<App>()
-            .AddInteractiveServerRenderMode().DisableAntiforgery();
-
-        app.Run();
-    }
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
 }
+
+app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseAntiforgery();
+
+app.MapLoginEndpoint();
+app.MapLogoutEndpoint();
+
+app.MapStaticAssets();
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode().DisableAntiforgery();
+
+await app.RunAsync();
