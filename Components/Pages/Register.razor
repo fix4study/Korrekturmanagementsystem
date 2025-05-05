@@ -9,38 +9,29 @@
 
 <h3>Registrierung</h3>
 
-@if (RendererInfo.IsInteractive)
-{
-    <div>
-        <input @bind="username" placeholder="Benutzername" class="form-control" />
-        <input @bind="email" placeholder="Email" type="email" class="form-control" />
-        <input @bind="password" placeholder="Passwort" type="password" class="form-control" />
+<div>
+    <input @bind="username" placeholder="Benutzername" class="form-control" />
+    <input @bind="email" placeholder="Email" type="email" class="form-control" />
+    <input @bind="password" placeholder="Passwort" type="password" class="form-control" />
 
-        @if (roles is not null && roles.Any())
-        {
-            <select @bind="SelectedRoleString" class="form-select">
-                <option value="">Bitte Rolle wählen...</option>
-                @foreach (var role in roles)
-                {
-                    <option value="@role.Id">@role.Name</option>
-                }
-            </select>
-        }
+    @if (roles is not null && roles.Any())
+    {
+        <select @bind="SelectedRoleString" class="form-select">
+            <option value="">Bitte Rolle wählen...</option>
+            @foreach (var role in roles)
+            {
+                <option value="@role.Id">@role.Name</option>
+            }
+        </select>
+    }
 
-        <button @onclick="RegisterUser" class="btn btn-primary mt-2">Registrieren</button>
+    <button @onclick="RegisterUser" class="btn btn-primary mt-2">Registrieren</button>
 
-        @if (!string.IsNullOrEmpty(message))
-        {
-            <div class="alert alert-info">@message</div>
-        }
-    </div>
-}
-else
-{
-    <p>Bitte warten ...</p>
-}
-
-
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <div class="alert alert-info">@message</div>
+    }
+</div>
 
 @code {
     private string username = "";

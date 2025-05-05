@@ -1,35 +1,58 @@
-﻿using Korrekturmanagementsystem;
-using Korrekturmanagementsystem.Components;
+﻿using Korrekturmanagementsystem.Components;
+using Korrekturmanagementsystem.Endpoints;
+using Korrekturmanagementsystem.Extensions;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Components.Server;
 
-var builder = WebApplication.CreateBuilder(args);
+namespace Korrekturmanagementsystem;
 
-// Add services to the container.
-builder.Services.AddRazorComponents()
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
+
+        builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents();
 
-var configuration = builder.Configuration;
+        builder.Services.AddHttpContextAccessor();
 
-builder.Services
-    .AddApplicationServices(configuration)
-            .AddRepositories(configuration)
-            .AddDatabase(configuration);
+        builder.Services.Configure<CircuitOptions>(options =>
+        {
+            options.DetailedErrors = true;
+        });
 
-var app = builder.Build();
+        var config = builder.Configuration;
+        builder.Services
+            .AddApplicationServices(config)
+            .AddRepositories(config)
+            .AddDatabase(config)
+            .AddAuthenticationSetup()
+            .AddHttpClients(config);
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+        builder.Services.AddCascadingAuthenticationState();
+
+        var app = builder.Build();
+
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseExceptionHandler("/Error");
+            app.UseHsts();
+        }
+
+        app.UseHttpsRedirection();
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+        app.UseAntiforgery();
+
+        app.MapLoginEndpoint();
+        app.MapLogoutEndpoint();
+
+        app.MapStaticAssets();
+        app.MapRazorComponents<App>()
+            .AddInteractiveServerRenderMode().DisableAntiforgery();
+
+        app.Run();
+    }
 }
-
-app.UseHttpsRedirection();
-
-app.UseAntiforgery();
-
-app.MapStaticAssets();
-app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
-
-app.Run();
