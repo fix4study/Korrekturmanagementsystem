@@ -76,7 +76,7 @@ public class UserService : IUserService
             Email = user.Email,
             Password = user.Password,
             StakeholderRoleId = user.StakeholderRoleId,
-            SystemRoleId = Guid.Parse("a937147a-86b6-4af7-bbff-c8d04741e411"), //Standard User Role
+            SystemRoleId = Guid.Parse("a937147a-86b6-4af7-bbff-c8d04741e411"), //Standard User Role, Todo: Select User Role
             CreatedAt = DateTime.UtcNow
         };
 

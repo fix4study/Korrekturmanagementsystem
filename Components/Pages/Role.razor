@@ -10,11 +10,11 @@
     <button class="btn btn-primary mt-2" @onclick="AddRoleAsync">Rolle hinzufügen</button>
 </div>
 
-@if (roles is null)
+@if (Roles is null)
 {
     <p>Lade Rollen...</p>
 }
-else if (!roles.Any())
+else if (!Roles.Any())
 {
     <p>Keine Rollen vorhanden.</p>
 }
@@ -27,7 +27,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var role in roles)
+            @foreach (var role in Roles)
             {
                 <tr>
                     <td>@role.Name</td>
@@ -38,26 +38,20 @@ else
 }
 
 @code {
-    private List<RoleDto>? roles;
+    [Parameter]
+    public List<RoleDto> Roles { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<string> OnAddRole { get; set; }
+
     private string newRoleName = string.Empty;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadRolesAsync();
-    }
-
-    private async Task LoadRolesAsync()
-    {
-        roles = (await roleService.GetStakeholderRolesAsync()).ToList();
-    }
 
     private async Task AddRoleAsync()
     {
         if (!string.IsNullOrWhiteSpace(newRoleName))
         {
-            await roleService.AddStakeholderRoleAsync(newRoleName);
+            await OnAddRole.InvokeAsync(newRoleName);
             newRoleName = string.Empty;
-            await LoadRolesAsync();
         }
     }
 }

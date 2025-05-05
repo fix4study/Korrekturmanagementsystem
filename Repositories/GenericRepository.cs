@@ -24,10 +24,14 @@ public class GenericRepository<TEntity> : IRepository<TEntity> where TEntity : c
         IQueryable<TEntity> query = dbSet;
 
         if (filter != null)
+        {
             query = query.Where(filter);
+        }
 
         foreach (var include in includes)
+        {
             query = query.Include(include);
+        }
 
         return orderBy != null
             ? await orderBy(query).ToListAsync()
