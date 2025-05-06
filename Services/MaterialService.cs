@@ -25,7 +25,7 @@ public class MaterialService : IMaterialService
 
     public async Task<IEnumerable<MaterialTypeDto>> GetMaterialTypesAsync()
     {
-        var materialTypes = await _repository.GetAsync();
+        var materialTypes = await _repository.GetAllAsync();
 
         return materialTypes.Select(materialTypes => new MaterialTypeDto
         {

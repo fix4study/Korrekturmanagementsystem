@@ -6,4 +6,5 @@ public interface IReportService
 {
     Task<bool> AddReportAsync(AddReportDto report);
     Task<IEnumerable<ReportOverviewDto>> GetReportsOverviewAsync();
+    Task<ReportFormOptionsDto> GetFormOptionsAsync();
 }

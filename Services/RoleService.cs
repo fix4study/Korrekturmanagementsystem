@@ -25,7 +25,7 @@ public class RoleService : IRoleService
 
     public async Task<IEnumerable<RoleDto>> GetStakeholderRolesAsync()
     {
-        var roles = await _roleRepository.GetAsync();
+        var roles = await _roleRepository.GetAllAsync();
 
         return roles.Select(role => new RoleDto
         {

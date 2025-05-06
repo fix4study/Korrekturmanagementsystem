@@ -35,7 +35,7 @@ public class UserService : IUserService
 
     public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
     {
-        var users = await _repository.GetAsync(includes: e => e.StakeholderRole);
+        var users = await _repository.GetAllAsync(includes: e => e.StakeholderRole);
 
         return users.Select(user => new UserDto
         {

@@ -1,9 +1,13 @@
-﻿@using Korrekturmanagementsystem.Dtos
+﻿@page "/Meldungen"
+@using Korrekturmanagementsystem.Dtos
 @using Korrekturmanagementsystem.Services.Interfaces
-@page "/Meldungen"
 @inject IReportService ReportService
 
-<h3>ReportOverview</h3>
+<NavLink class="btn btn-success mb-3 float-end" href="/meldungen/neu">
+    + Neue Meldung
+</NavLink>
+
+<h3 class="mb-4">Meldungen</h3>
 
 <div class="report-list space-y-2">
     @if (Reports != null && Reports.Any())
@@ -14,14 +18,17 @@
                 <div class="card-body p-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="card-title mb-1 h6">@report.Title</h5>
-                        <small class="text-muted">@report.CreatedAt.ToShortDateString()</small>
+                        <em>Erstellt am: @report.CreatedAt.ToShortDateString()</em>
                     </div>
                     <div class="d-flex justify-content-between text-muted small">
                         <div>
                             <strong>Status:</strong> @report.StatusName |
                             <strong>Prio:</strong> @report.PriorityName
                         </div>
-                        <em>Updated: @report.UpdatedAt.ToShortDateString()</em>
+                        <em>Aktualisiert am: @report.UpdatedAt.ToShortDateString()</em>
+                    </div>
+                    <div class="mt-2 text-end">
+                        <a class="btn btn-sm btn-primary" href="@($"/meldungen/details/{report.Id}")">Details</a>
                     </div>
                 </div>
             </div>
@@ -33,9 +40,8 @@
     }
 </div>
 
-
 @code {
-    private List<ReportOverviewDto> Reports { get; set; } = default!;
+    private List<ReportOverviewDto> Reports { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
