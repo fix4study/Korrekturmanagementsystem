@@ -7,6 +7,8 @@
 
 @if (OptionsDto != null)
 {
+    <h3 class="mb-4">Meldung hinzufügen</h3>
+
     <EditForm Model="Model" OnValidSubmit="HandleValidSubmit" FormName="CreateReportForm">
         <DataAnnotationsValidator />
         <ValidationSummary />

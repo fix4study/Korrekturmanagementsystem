@@ -7,8 +7,8 @@ namespace Korrekturmanagementsystem.Services;
 
 public class MaterialService : IMaterialService
 {
-    private readonly IRepository<MaterialType> _repository;
-    public MaterialService(IRepository<MaterialType> repository)
+    private readonly IBaseRepository<MaterialType> _repository;
+    public MaterialService(IBaseRepository<MaterialType> repository)
     {
         _repository = repository;
     }

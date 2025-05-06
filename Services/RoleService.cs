@@ -7,8 +7,8 @@ namespace Korrekturmanagementsystem.Services;
 
 public class RoleService : IRoleService
 {
-    private readonly IRepository<StakeholderRole> _roleRepository;
-    public RoleService(IRepository<StakeholderRole> repository)
+    private readonly IBaseRepository<StakeholderRole> _roleRepository;
+    public RoleService(IBaseRepository<StakeholderRole> repository)
     {
         _roleRepository = repository;
     }

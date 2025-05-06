@@ -5,12 +5,12 @@ using System.Linq.Expressions;
 
 namespace Korrekturmanagementsystem.Repositories;
 
-public class GenericRepository<TEntity> : IRepository<TEntity> where TEntity : class
+public class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : class
 {
     protected readonly ApplicationDbContext context;
     protected readonly DbSet<TEntity> dbSet;
 
-    public GenericRepository(ApplicationDbContext context)
+    public BaseRepository(ApplicationDbContext context)
     {
         this.context = context;
         this.dbSet = context.Set<TEntity>();

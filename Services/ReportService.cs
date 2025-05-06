@@ -9,18 +9,18 @@ namespace Korrekturmanagementsystem.Services;
 
 public class ReportService : IReportService
 {
-    private readonly IRepository<Report> _reportRepository;
-    private readonly IRepository<Priority> _priorityRepository;
-    private readonly IRepository<MaterialType> _materialTypeRepository;
-    private readonly IRepository<Course> _courseRepository;
-    private readonly IRepository<ReportType> _reportTypeRepository;
+    private readonly IReportRepository _reportRepository;
+    private readonly IBaseRepository<Priority> _priorityRepository;
+    private readonly IBaseRepository<MaterialType> _materialTypeRepository;
+    private readonly IBaseRepository<Course> _courseRepository;
+    private readonly IBaseRepository<ReportType> _reportTypeRepository;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public ReportService(IRepository<Report> reportRepository, IHttpContextAccessor httpContextAccessor,
-        IRepository<Priority> priorityRepository,
-    IRepository<MaterialType> materialTypeRepositorym,
-    IRepository<Course> courseRepository,
-    IRepository<ReportType> reportTypeRepository)
+    public ReportService(IReportRepository reportRepository, IHttpContextAccessor httpContextAccessor,
+        IBaseRepository<Priority> priorityRepository,
+    IBaseRepository<MaterialType> materialTypeRepositorym,
+    IBaseRepository<Course> courseRepository,
+    IBaseRepository<ReportType> reportTypeRepository)
     {
         _reportRepository = reportRepository;
         _httpContextAccessor = httpContextAccessor;
@@ -107,7 +107,7 @@ public class ReportService : IReportService
     {
         var report = await _reportRepository.GetByIdAsync(id);
 
-        return new ReportDetailsDto
+        var reportDetails = new ReportDetailsDto
         {
             Id = report.Id,
             Title = report.Title,
@@ -144,6 +144,8 @@ public class ReportService : IReportService
             CreatedAt = report.CreatedAt,
             UpdatedAt = report.UpdatedAt
         };
+
+        return reportDetails;
     }
 
     private Guid GetCurrentUserId()

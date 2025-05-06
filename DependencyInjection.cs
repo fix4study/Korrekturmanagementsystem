@@ -22,8 +22,9 @@ public static class DependencyInjection
 
     public static IServiceCollection AddRepositories(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
+        services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IReportRepository, ReportRepository>();
 
         return services;
     }
