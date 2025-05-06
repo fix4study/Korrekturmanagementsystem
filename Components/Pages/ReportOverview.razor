@@ -1,0 +1,44 @@
+﻿@using Korrekturmanagementsystem.Dtos
+@using Korrekturmanagementsystem.Services.Interfaces
+@page "/Meldungen"
+@inject IReportService ReportService
+
+<h3>ReportOverview</h3>
+
+<div class="report-list space-y-2">
+    @if (Reports != null && Reports.Any())
+    {
+        @foreach (var report in Reports)
+        {
+            <div class="card border shadow-sm mb-2">
+                <div class="card-body p-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-1 h6">@report.Title</h5>
+                        <small class="text-muted">@report.CreatedAt.ToShortDateString()</small>
+                    </div>
+                    <div class="d-flex justify-content-between text-muted small">
+                        <div>
+                            <strong>Status:</strong> @report.StatusName |
+                            <strong>Prio:</strong> @report.PriorityName
+                        </div>
+                        <em>Updated: @report.UpdatedAt.ToShortDateString()</em>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <p>Derzeit gibt es keine Meldungen</p>
+    }
+</div>
+
+
+@code {
+    private List<ReportOverviewDto> Reports { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Reports = (await ReportService.GetReportsOverviewAsync()).ToList();
+    }
+}

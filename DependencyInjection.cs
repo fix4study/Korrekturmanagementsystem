@@ -15,6 +15,7 @@ public static class DependencyInjection
         services.AddScoped<IPasswordService, PasswordService>();
         services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<IMaterialService, MaterialService>();
+        services.AddScoped<IReportService, ReportService>();
 
         return services;
     }

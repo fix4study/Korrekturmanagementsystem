@@ -1,5 +1,9 @@
-﻿namespace Korrekturmanagementsystem.Services.Interfaces;
+﻿using Korrekturmanagementsystem.Dtos;
+
+namespace Korrekturmanagementsystem.Services.Interfaces;
 
 public interface IReportService
 {
+    Task<bool> AddReportAsync(AddReportDto report);
+    Task<IEnumerable<ReportOverviewDto>> GetReportsOverviewAsync();
 }

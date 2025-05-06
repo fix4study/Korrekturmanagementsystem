@@ -1,5 +1,48 @@
-﻿<h3>Meldung einreichen</h3>
+﻿@page "/Meldungen/Details"
+@using Korrekturmanagementsystem.Dtos
+<h3>Meldung einreichen</h3>
+
+<EditForm>
+    <DataAnnotationsValidator />
+    <div>
+        <label>
+            Titel:
+            <InputText @bind-Value=Model!.Title></InputText>
+        </label>
+    </div>
+   <div>
+        <label>
+            Beschreibung:
+            <InputText @bind-Value=Model!.Description></InputText>
+        </label>
+   </div>
+    <div>
+        <label>
+            Report Type:
+         @*    <InputSelect @bind-Value="Model.">
+                <option value="">
+                    Select classification ...
+                </option>
+                <option checked="@(Model!.Classification == "Exploration")"
+                        value="Exploration">
+                    Exploration
+                </option>
+                <option checked="@(Model!.Classification == "Diplomacy")"
+                        value="Diplomacy">
+                    Diplomacy
+                </option>
+                <option checked="@(Model!.Classification == "Defense")"
+                        value="Defense">
+                    Defense
+                </option>
+            </InputSelect> *@
+        </label>
+    </div>
+
+
+</EditForm>
 
 @code {
-
+    [SupplyParameterFromForm]
+    private AddReportDto? Model { get; set; }
 }
