@@ -7,9 +7,9 @@ namespace Korrekturmanagementsystem.Services;
 
 public class UserService : IUserService
 {
-    private readonly IRepository<User> _repository;
+    private readonly IBaseRepository<User> _repository;
     private readonly IUserRepository _userRepository;
-    public UserService(IRepository<User> repository, IUserRepository userRepository)
+    public UserService(IBaseRepository<User> repository, IUserRepository userRepository)
     {
         _repository = repository;
         _userRepository = userRepository;
@@ -35,7 +35,7 @@ public class UserService : IUserService
 
     public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
     {
-        var users = await _repository.GetAsync(includes: e => e.StakeholderRole);
+        var users = await _repository.GetAllAsync(includes: e => e.StakeholderRole);
 
         return users.Select(user => new UserDto
         {

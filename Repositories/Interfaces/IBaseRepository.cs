@@ -2,9 +2,9 @@
 
 namespace Korrekturmanagementsystem.Repositories.Interfaces
 {
-    public interface IRepository<TEntity> where TEntity : class
+    public interface IBaseRepository<TEntity> where TEntity : class
     {
-        Task<IEnumerable<TEntity>> GetAsync(
+        Task<IEnumerable<TEntity>> GetAllAsync(
         Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
         params Expression<Func<TEntity, object>>[] includes);

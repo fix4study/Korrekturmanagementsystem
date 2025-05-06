@@ -1,0 +1,88 @@
+﻿@page "/meldungen/neu"
+@using Korrekturmanagementsystem.Dtos
+@using Korrekturmanagementsystem.Services.Interfaces
+@using Microsoft.AspNetCore.Components.Forms
+@inject IReportService ReportService
+@rendermode InteractiveServer
+
+@if (OptionsDto != null)
+{
+    <h3 class="mb-4">Meldung hinzufügen</h3>
+
+    <EditForm Model="Model" OnValidSubmit="HandleValidSubmit" FormName="CreateReportForm">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label class="form-label">Titel</label>
+            <InputText class="form-control" @bind-Value="Model.Title" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Beschreibung</label>
+            <InputTextArea class="form-control" @bind-Value="Model.Description" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Meldungstyp</label>
+            <InputSelect class="form-select" @bind-Value="Model.ReportTypeId">
+                <option disabled value="">-- Bitte wählen --</option>
+                @foreach (var type in OptionsDto.ReportTypes)
+                {
+                    <option value="@type.Id">@type.Name</option>
+                }
+            </InputSelect>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Priorität</label>
+            <InputSelect class="form-select" @bind-Value="Model.PriorityId">
+                <option disabled value="">-- Bitte wählen --</option>
+                @foreach (var priority in OptionsDto.Priorities)
+                {
+                    <option value="@priority.Id">@priority.Name</option>
+                }
+            </InputSelect>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Materialtyp</label>
+            <InputSelect class="form-select" @bind-Value="Model.MaterialTypeId">
+                <option disabled value="">-- Bitte wählen --</option>
+                @foreach (var type in OptionsDto.MaterialTypes)
+                {
+                    <option value="@type.Id">@type.Name</option>
+                }
+            </InputSelect>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Kurs (optional)</label>
+            <InputSelect class="form-select" @bind-Value="Model.CourseId">
+                <option value="">-- Kein Kurs --</option>
+                @foreach (var course in OptionsDto.Courses)
+                {
+                    <option value="@course.Id">@course.Name (@course.Code)</option>
+                }
+            </InputSelect>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Speichern</button>
+    </EditForm>
+}
+
+@code {
+
+    public AddReportDto Model { get; set; } = new();
+    public ReportFormOptionsDto OptionsDto { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        OptionsDto = await ReportService.GetFormOptionsAsync();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await ReportService.AddReportAsync(Model);
+    }
+}

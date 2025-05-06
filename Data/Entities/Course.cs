@@ -6,5 +6,5 @@ public class Course
     public string Name { get; set; } = default!;
     public string Code { get; set; } = default!;
 
-    public ICollection<Material> Materials { get; set; } = default!;
+    public ICollection<Report> Reports { get; set; } = default!;
 }

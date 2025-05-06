@@ -7,8 +7,8 @@ namespace Korrekturmanagementsystem.Services;
 
 public class MaterialService : IMaterialService
 {
-    private readonly IRepository<MaterialType> _repository;
-    public MaterialService(IRepository<MaterialType> repository)
+    private readonly IBaseRepository<MaterialType> _repository;
+    public MaterialService(IBaseRepository<MaterialType> repository)
     {
         _repository = repository;
     }
@@ -25,7 +25,7 @@ public class MaterialService : IMaterialService
 
     public async Task<IEnumerable<MaterialTypeDto>> GetMaterialTypesAsync()
     {
-        var materialTypes = await _repository.GetAsync();
+        var materialTypes = await _repository.GetAllAsync();
 
         return materialTypes.Select(materialTypes => new MaterialTypeDto
         {

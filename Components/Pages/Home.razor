@@ -1,18 +1,20 @@
 ﻿@page "/"
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Authorization
 
-
-<PageTitle>Home</PageTitle>
-
-<h1>Hello, world!</h1>
-
-Welcome to your Korrekturmanagementsystem.
+<h1>Willkommen im Korrekturmanagementsystem!</h1>
 
 <AuthorizeView>
     <Authorized>
-        <p>You are logged in as @context.User.Identity.Name!</p>
+        <p>Du bist angemeldet als <strong>@context.User.Identity?.Name</strong>.</p>
+        <p>
+            Du kannst jetzt Meldungen einsehen, neue Fehlerberichte erstellen und den Status deiner bisherigen Tickets verfolgen.
+        </p>
+        <a href="/meldungen" class="btn btn-primary mt-2">Zur Übersicht der Meldungen</a>
     </Authorized>
     <NotAuthorized>
-        <p>Du bist nicht eingeloggt</p>
+        <p>Du bist nicht eingeloggt.</p>
+        <p>Bitte melde dich an, um Fehler zu melden oder deinen Bearbeitungsstatus zu verfolgen.</p>
+        <a href="/login" class="btn btn-outline-primary mt-2">Zur Anmeldung</a>
     </NotAuthorized>
 </AuthorizeView>

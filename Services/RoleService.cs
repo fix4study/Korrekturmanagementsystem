@@ -7,8 +7,8 @@ namespace Korrekturmanagementsystem.Services;
 
 public class RoleService : IRoleService
 {
-    private readonly IRepository<StakeholderRole> _roleRepository;
-    public RoleService(IRepository<StakeholderRole> repository)
+    private readonly IBaseRepository<StakeholderRole> _roleRepository;
+    public RoleService(IBaseRepository<StakeholderRole> repository)
     {
         _roleRepository = repository;
     }
@@ -25,7 +25,7 @@ public class RoleService : IRoleService
 
     public async Task<IEnumerable<RoleDto>> GetStakeholderRolesAsync()
     {
-        var roles = await _roleRepository.GetAsync();
+        var roles = await _roleRepository.GetAllAsync();
 
         return roles.Select(role => new RoleDto
         {

@@ -12,7 +12,6 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<Report> Reports { get; set; } = default!;
     public DbSet<ReportType> ReportTypes { get; set; } = default!;
-    public DbSet<Material> Materials { get; set; } = default!;
     public DbSet<MaterialType> MaterialTypes { get; set; } = default!;
     public DbSet<Status> Statuses { get; set; } = default!;
     public DbSet<Priority> Priorities { get; set; } = default!;
