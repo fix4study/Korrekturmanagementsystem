@@ -2,6 +2,8 @@
 using Korrekturmanagementsystem.Dtos;
 using Korrekturmanagementsystem.Repositories.Interfaces;
 using Korrekturmanagementsystem.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Security.Claims;
 
@@ -14,13 +16,15 @@ public class ReportService : IReportService
     private readonly IBaseRepository<MaterialType> _materialTypeRepository;
     private readonly IBaseRepository<Course> _courseRepository;
     private readonly IBaseRepository<ReportType> _reportTypeRepository;
+    private readonly IBaseRepository<Status> _statusRepository;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public ReportService(IReportRepository reportRepository, IHttpContextAccessor httpContextAccessor,
         IBaseRepository<Priority> priorityRepository,
-    IBaseRepository<MaterialType> materialTypeRepositorym,
-    IBaseRepository<Course> courseRepository,
-    IBaseRepository<ReportType> reportTypeRepository)
+        IBaseRepository<MaterialType> materialTypeRepositorym,
+        IBaseRepository<Course> courseRepository,
+        IBaseRepository<ReportType> reportTypeRepository,
+        IBaseRepository<Status> statusRepsoitory)
     {
         _reportRepository = reportRepository;
         _httpContextAccessor = httpContextAccessor;
@@ -28,6 +32,7 @@ public class ReportService : IReportService
         _materialTypeRepository = materialTypeRepositorym;
         _courseRepository = courseRepository;
         _reportTypeRepository = reportTypeRepository;
+        _statusRepository = statusRepsoitory;
     }
 
     public async Task<bool> AddReportAsync(AddReportDto report)
@@ -80,6 +85,10 @@ public class ReportService : IReportService
 
             Courses = (await _courseRepository.GetAllAsync())
             .Select(c => new CourseDto { Id = c.Id, Name = c.Name, Code = c.Code }).ToList(),
+
+            Statuses = (await _statusRepository.GetAllAsync())
+            .Select(c => new StatusDto { Id = c.Id, Name = c.Name }).ToList(),
+
         };
 
 
@@ -101,6 +110,32 @@ public class ReportService : IReportService
             CreatedAt = report.CreatedAt,
             UpdatedAt = report.UpdatedAt
         });
+    }
+
+    public async Task UpdateReportByIdAsync(UpdateReportDto reportToUpdate)
+    {
+        if (!_httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false)
+        {
+            throw new UnauthorizedAccessException();
+        }
+
+        var report = await _reportRepository.GetByIdAsync(reportToUpdate.Id);
+
+        if (report is null)
+        {
+            return;
+        }
+
+        report.Title = reportToUpdate.Title;
+        report.Description = reportToUpdate.Description;
+        report.ReportTypeId = reportToUpdate.ReportTypeId;
+        report.PriorityId = reportToUpdate.PriorityId;
+        report.MaterialTypeId = reportToUpdate.MaterialTypeId;
+        report.CourseId = reportToUpdate.CourseId;
+        report.StatusId = reportToUpdate.StatusId;
+        report.UpdatedAt = DateTime.UtcNow;
+
+        await _reportRepository.UpdateAsync();
     }
 
     public async Task<ReportDetailsDto> GetReportDetailsByIdAsync(Guid id)

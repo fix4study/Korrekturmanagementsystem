@@ -20,4 +20,9 @@ public class ReportRepository : BaseRepository<Report>, IReportRepository
         .Include(r => r.CreatedBy)
         .FirstOrDefaultAsync(r => r.Id == id);
     }
+
+    public async Task UpdateAsync()
+    {
+        await context.SaveChangesAsync();
+    }
 }

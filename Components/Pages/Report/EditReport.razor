@@ -1,4 +1,5 @@
 ﻿@page "/Meldungen/Details/{Id:guid}"
+@using Korrekturmanagementsystem.Components.Shared
 @using Korrekturmanagementsystem.Dtos
 @using Korrekturmanagementsystem.Services.Interfaces
 @using Microsoft.AspNetCore.Components.Forms
@@ -67,14 +68,26 @@
             </InputSelect>
         </div>
 
-        <button type="submit" class="btn btn-primary">Speichern</button>
+        <div class="mb-3">
+            <label class="form-label">Status</label>
+            <InputSelect class="form-select" @bind-Value="Model.StatusId">
+                <option value="">-- Kein Status --</option>
+                @foreach (var status in OptionsDto.Statuses)
+                {
+                    <option value="@status.Id">@status.Name</option>
+                }
+            </InputSelect>
+        </div>
+
+        <SubmitIfAuthorized />
     </EditForm>
 }
 
 @code {
 
-    public AddReportDto Model { get; set; } = new();
+    public UpdateReportDto Model { get; set; } = new();
     public ReportDetailsDto reportDetails { get; set; } = default!;
+
     [Parameter]
     public Guid Id { get; set; }
 
@@ -86,19 +99,21 @@
         OptionsDto = await ReportService.GetFormOptionsAsync();
         reportDetails = await ReportService.GetReportDetailsByIdAsync(Id);
 
-        Model = new AddReportDto
+        Model = new UpdateReportDto
             {
+                Id = Id,
                 Title = reportDetails.Title,
                 Description = reportDetails.Description,
                 ReportTypeId = reportDetails.ReportType.Id,
                 PriorityId = reportDetails.Priority.Id,
                 MaterialTypeId = reportDetails.MaterialType.Id,
-                CourseId = reportDetails.Course?.Id
+                CourseId = reportDetails.Course?.Id,
+                StatusId = reportDetails.Status.Id
             };
     }
 
     private async Task HandleValidSubmit()
     {
-        //await ReportService.AddReportAsync(Model);
+        await ReportService.UpdateReportByIdAsync(Model);
     }
 }
