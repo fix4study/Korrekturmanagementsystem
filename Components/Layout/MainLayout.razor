@@ -8,12 +8,13 @@
 
     <main>
         <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
             <AuthorizeView>
                 <Authorized>
                     <Logout />
                 </Authorized>
                 <NotAuthorized>
+                    <a href="account/registrieren">Registrieren</a>
+
                     <a href="account/login">Login</a>
                 </NotAuthorized>
             </AuthorizeView>

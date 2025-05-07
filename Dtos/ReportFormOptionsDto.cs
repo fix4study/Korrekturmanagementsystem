@@ -6,4 +6,5 @@ public class ReportFormOptionsDto
     public List<PriorityDto> Priorities { get; set; } = new();
     public List<MaterialTypeDto> MaterialTypes { get; set; } = new();
     public List<CourseDto> Courses { get; set; } = new();
+    public List<StatusDto> Statuses { get; set; } = new();
 }
