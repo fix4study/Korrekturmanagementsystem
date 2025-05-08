@@ -17,7 +17,7 @@ public class Report
     public ReportType ReportType { get; set; } = default!;
     public Status Status { get; set; } = default!;
     public MaterialType MaterialType { get; set; } = default!;
-    public Course? Course { get; set; } // Optional
+    public Course? Course { get; set; }
     public Priority Priority { get; set; } = default!;
     public User CreatedBy { get; set; } = default!;
     public ICollection<ReportHistory> History { get; set; } = default!;

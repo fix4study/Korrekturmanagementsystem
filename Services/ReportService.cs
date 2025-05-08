@@ -2,8 +2,6 @@
 using Korrekturmanagementsystem.Dtos;
 using Korrekturmanagementsystem.Repositories.Interfaces;
 using Korrekturmanagementsystem.Services.Interfaces;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Security.Claims;
 
@@ -88,7 +86,6 @@ public class ReportService : IReportService
 
             Statuses = (await _statusRepository.GetAllAsync())
             .Select(c => new StatusDto { Id = c.Id, Name = c.Name }).ToList(),
-
         };
 
 
