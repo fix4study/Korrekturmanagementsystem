@@ -1,34 +1,50 @@
-﻿@using Korrekturmanagementsystem.Components.Pages
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">KMS</a>
-    </div>
+﻿@using Microsoft.AspNetCore.Components.Routing
+
+<div class="mb-4 text-center">
+    <h4 class="fw-bold">KMS</h4>
 </div>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+<ul class="nav nav-pills flex-column">
+    <li class="nav-item mb-2">
+        <NavLink href="/" class="nav-link" Match="NavLinkMatch.All">
+            <i class="bi bi-house"></i> Home
+        </NavLink>
+    </li>
+    <li class="nav-item mb-2">
+        <NavLink href="/meldungen" class="nav-link">
+            <i class="bi bi-card-list"></i>Meldungen
+        </NavLink>
+    </li>
+    <AuthorizeView Roles="Admin">
+        <Authorized>
+            <li class="nav-item mb-2">
+                <NavLink href="/administration" class="nav-link">
+                    <i class="bi bi-gear"></i>Administration
+                </NavLink>
+            </li>
+        </Authorized>
+    </AuthorizeView>
+</ul>
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
+<style>
+    .sidebar {
+        width: 250px;
+        min-height: 100vh;
+    }
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="meldungen">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Meldungen
-            </NavLink>
-        </div>
-        <AuthorizeView Roles="Admin">
-            <Authorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="administration">
-                        <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Administration
-                    </NavLink>
-                </div>
-            </Authorized>
-        </AuthorizeView>
-    </nav>
-</div>
+    .nav-link {
+        color: #333;
+        font-weight: 500;
+    }
 
+        .nav-link.active {
+            background-color: #000 !important; 
+            color: #fff !important;
+            border-radius: 0.5rem;
+        }
+
+        .nav-link:hover {
+            background-color: #000 !important;
+            color: #fff !important;
+        }
+</style>
