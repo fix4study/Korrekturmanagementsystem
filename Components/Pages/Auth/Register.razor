@@ -14,44 +14,55 @@
                 <h1 class="fw-bold mb-0 fs-2">Jetzt registrieren</h1>
             </div>
             <div class="modal-body p-5 pt-0">
-                <form method="post" action="/account/register" @onclick="RegisterUser">
+                <EditForm Model="Model" OnValidSubmit="RegisterUser">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
                     <div class="form-floating mb-3">
-                        <input @bind="Model.Username" type="text" class="form-control rounded-3" id="floatingUsername">
+                        <InputText @bind-Value="Model.Username" class="form-control rounded-3" id="floatingUsername" />
                         <label for="floatingUsername">Benutzername</label>
                     </div>
+
                     <div class="form-floating mb-3">
-                        <input @bind="Model.Email" type="text" class="form-control rounded-3" id="floatingEmail">
+                        <InputText @bind-Value="Model.Email" type="email" class="form-control rounded-3" id="floatingEmail" />
                         <label for="floatingEmail">Email</label>
                     </div>
+
                     <div class="form-floating mb-3">
-                        <input @bind="Model.Password" type="password" class="form-control rounded-3" id="floatingPassword">
+                        <InputText @bind-Value="Model.Password" type="password" class="form-control rounded-3" id="floatingPassword" />
                         <label for="floatingPassword">Passwort</label>
                     </div>
+
                     <div class="form-floating mb-3">
-                        @if (roles is not null && roles.Any())
-                        {
-                            <select @bind="SelectedRoleString" class="form-select rounded-3">
-                                <option value="">Bitte Rolle wählen...</option>
+                        <InputSelect @bind-Value="SelectedRoleString" class="form-select rounded-3">
+                            <option value="">Bitte Rolle wählen...</option>
+                            @if (roles is not null)
+                            {
                                 @foreach (var role in roles)
                                 {
                                     <option value="@role.Id">@role.Name</option>
                                 }
-                            </select>
-                        }
+                            }
+                        </InputSelect>
                     </div>
-                    <button class="w-100 mb-2 btn btn-lg rounded-3 btn-dark" @onclick="RegisterUser" type="submit">Registrieren</button>
-                </form>
+
+                    <button class="w-100 mb-2 btn btn-lg rounded-3 btn-dark" type="submit">Registrieren</button>
+
+                    @if (!string.IsNullOrEmpty(message))
+                    {
+                        <div class="alert alert-info mt-3">@message</div>
+                    }
+                </EditForm>
             </div>
         </div>
     </div>
 </div>
 
-
 @code {
     public CreateUserDto Model = new();
     private string message = "";
 
-    private IEnumerable<RoleDto>? roles = default!;
+    private IEnumerable<RoleDto>? roles;
     private Guid selectedRole = Guid.Empty;
 
     protected override async Task OnInitializedAsync()
@@ -84,6 +95,9 @@
             });
 
         message = "Registrierung erfolgreich!";
+
+        StateHasChanged();
+
         await Task.Delay(1500);
         Navigation.NavigateTo("account/login");
     }
