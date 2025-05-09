@@ -7,36 +7,52 @@
 @inject IRoleService roleService
 @rendermode InteractiveServer
 
-<h3>Registrierung</h3>
-
-<div>
-    <input @bind="username" placeholder="Benutzername" class="form-control" />
-    <input @bind="email" placeholder="Email" type="email" class="form-control" />
-    <input @bind="password" placeholder="Passwort" type="password" class="form-control" />
-
-    @if (roles is not null && roles.Any())
-    {
-        <select @bind="SelectedRoleString" class="form-select">
-            <option value="">Bitte Rolle wählen...</option>
-            @foreach (var role in roles)
-            {
-                <option value="@role.Id">@role.Name</option>
-            }
-        </select>
-    }
-
-    <button @onclick="RegisterUser" class="btn btn-primary mt-2">Registrieren</button>
-
-    @if (!string.IsNullOrEmpty(message))
-    {
-        <div class="alert alert-info">@message</div>
-    }
+<div class="modal modal-sheet position-static d-block p-4 py-md-5" tabindex="-1" role="dialog" id="modalRegister">
+    <div class="modal-dialog">
+        <div class="modal-content rounded-4 shadow">
+            <div class="modal-header p-5 pb-4 border-bottom-0">
+                <h1 class="fw-bold mb-0 fs-2">Jetzt registrieren</h1>
+            </div>
+            <div class="modal-body p-5 pt-0">
+                <form method="post" action="/account/register" @onclick="RegisterUser">
+                    <div class="form-floating mb-3">
+                        <input @bind="Model.Username" type="text" class="form-control rounded-3" id="floatingInput">
+                        <label for="floatingInput">Benutzername</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input @bind="Model.Password" type="password" class="form-control rounded-3" id="floatingPassword">
+                        <label for="floatingPassword">Email</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input @bind="Model.Password" type="password" class="form-control rounded-3" id="floatingEmail">
+                        <label for="floatingEmail">Passwort</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        @if (roles is not null && roles.Any())
+                        {
+                            <select @bind="SelectedRoleString" class="form-select rounded-3">
+                                <option value="">Bitte Rolle wählen...</option>
+                                @foreach (var role in roles)
+                                {
+                                    <option value="@role.Id">@role.Name</option>
+                                }
+                            </select>
+                        }
+                    </div>
+                    <button class="w-100 mb-2 btn btn-lg rounded-3 btn-dark" @onclick="RegisterUser" type="submit">Registrieren</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="alert alert-info">@message</div>
+}
+
 @code {
-    private string username = "";
-    private string email = "";
-    private string password = "";
+    public CreateUserDto Model = new();
     private string message = "";
 
     private IEnumerable<RoleDto>? roles = default!;
@@ -61,12 +77,12 @@
             return;
         }
 
-        var hashedPassword = passwordService.HashPassword(password);
+        var hashedPassword = passwordService.HashPassword(Model.Password);
 
         await userService.CreateUser(new CreateUserDto
             {
-                Username = username,
-                Email = email,
+                Username = Model.Username,
+                Email = Model.Email,
                 Password = hashedPassword,
                 StakeholderRoleId = selectedRole
             });
