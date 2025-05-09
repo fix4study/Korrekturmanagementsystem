@@ -4,6 +4,9 @@
 @using Korrekturmanagementsystem.Services.Interfaces
 @using Microsoft.AspNetCore.Components.Forms
 @inject IReportService ReportService
+@inject IFileUploadService FileUploadService
+@inject IAttachmentService AttachmentService
+@inject IHttpContextAccessor httpContextAccessor
 @rendermode InteractiveServer
 
 @if (OptionsDto != null)
@@ -68,13 +71,31 @@
             </InputSelect>
         </div>
 
+        <AuthorizeView Context="fileUpload "Roles="Admin">
+            <InputFile OnChange="HandleFileChange" multiple />
+            <ul>
+                @foreach (var file in selectedFiles)
+                {
+                    <li>@file.Name (@(file.Size / 1024) KB)</li>
+                }
+            </ul>
+        </AuthorizeView>
+
         <SubmitIfAuthorized Label="Hinzufügen" MessageIfUnauthorized="Bitte melden Sie sich an, um eine Meldung anzulegen." />
+
+        @if (!string.IsNullOrEmpty(message))
+        {
+            <div class="alert alert-info mt-3">@message</div>
+        }
     </EditForm>
 }
 
 @code {
     public AddReportDto Model { get; set; } = new();
     public ReportFormOptionsDto OptionsDto { get; set; } = default!;
+    private List<IBrowserFile> selectedFiles = new();
+    private string message = "";
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -83,6 +104,51 @@
 
     private async Task HandleValidSubmit()
     {
-        await ReportService.AddReportAsync(Model);
+        if (!httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false)
+        {
+            message = "Sie sind nicht berechtigt, eine Meldung zu erstellen.";
+            return;
+        }
+
+        var reportId = await ReportService.AddReportAsync(Model);
+
+        if (reportId is null)
+        {
+            message = "Fehler beim Erstellen der Meldung.";
+            return;
+        }
+
+        var validReportId = reportId.Value;
+
+        foreach (var file in selectedFiles)
+        {
+            try
+            {
+                using var stream = file.OpenReadStream();
+                var blobUrl = await FileUploadService.UploadAsync(file.Name, stream);
+
+                var attachment = new CreateAttachmentDto
+                    {
+                        ReportId = validReportId,
+                        FileName = file.Name,
+                        FileUrl = blobUrl,
+                        UploadedAt = DateTime.UtcNow
+                    };
+
+                await AttachmentService.CreateAsync(attachment);
+            }
+            catch (Exception ex)
+            {
+                message = $"Fehler beim Hochladen von {file.Name}: {ex.Message}";
+            }
+        }
+
+        message = "Meldung und Dateien wurden erfolgreich gespeichert.";
+    }
+
+
+    private void HandleFileChange(InputFileChangeEventArgs e)
+    {
+        selectedFiles = e.GetMultipleFiles().ToList();
     }
 }

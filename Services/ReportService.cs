@@ -33,7 +33,7 @@ public class ReportService : IReportService
         _statusRepository = statusRepsoitory;
     }
 
-    public async Task<bool> AddReportAsync(AddReportDto report)
+    public async Task<Guid?> AddReportAsync(AddReportDto report)
     {
         try
         {
@@ -41,7 +41,7 @@ public class ReportService : IReportService
 
             if (currentUser == Guid.Empty)
             {
-                return false;
+                return null;
             }
 
             var newReport = new Report
@@ -61,11 +61,11 @@ public class ReportService : IReportService
 
             await _reportRepository.InsertAsync(newReport);
 
-            return true;
+            return newReport.Id;
         }
         catch (Exception ex)
         {
-            return false;
+            return null;
         }
     }
 
