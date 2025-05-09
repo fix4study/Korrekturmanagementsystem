@@ -16,16 +16,16 @@
             <div class="modal-body p-5 pt-0">
                 <form method="post" action="/account/register" @onclick="RegisterUser">
                     <div class="form-floating mb-3">
-                        <input @bind="Model.Username" type="text" class="form-control rounded-3" id="floatingInput">
-                        <label for="floatingInput">Benutzername</label>
+                        <input @bind="Model.Username" type="text" class="form-control rounded-3" id="floatingUsername">
+                        <label for="floatingUsername">Benutzername</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input @bind="Model.Email" type="text" class="form-control rounded-3" id="floatingEmail">
+                        <label for="floatingEmail">Email</label>
                     </div>
                     <div class="form-floating mb-3">
                         <input @bind="Model.Password" type="password" class="form-control rounded-3" id="floatingPassword">
-                        <label for="floatingPassword">Email</label>
-                    </div>
-                    <div class="form-floating mb-3">
-                        <input @bind="Model.Password" type="password" class="form-control rounded-3" id="floatingEmail">
-                        <label for="floatingEmail">Passwort</label>
+                        <label for="floatingPassword">Passwort</label>
                     </div>
                     <div class="form-floating mb-3">
                         @if (roles is not null && roles.Any())
@@ -46,10 +46,6 @@
     </div>
 </div>
 
-@if (!string.IsNullOrEmpty(message))
-{
-    <div class="alert alert-info">@message</div>
-}
 
 @code {
     public CreateUserDto Model = new();
