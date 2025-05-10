@@ -4,6 +4,7 @@
 @using Korrekturmanagementsystem.Services.Interfaces
 @using Microsoft.AspNetCore.Components.Forms
 @inject IReportService ReportService
+@inject IAttachmentService AttachmentService
 @rendermode InteractiveServer
 
 @if (OptionsDto != null)
@@ -79,25 +80,74 @@
             </InputSelect>
         </div>
 
+        <button class="btn btn-outline-primary mb-2" @onclick="ToggleAttachmentVisibility">
+            @((showAttachments ? "Anhänge ausblenden" : "Anhänge anzeigen"))
+        </button>
+
+        @if (showAttachments && Attachments != null && Attachments.Any())
+        {
+            <h5>Anhänge:</h5>
+            <ul>
+                @foreach (var attachment in Attachments)
+                {
+                    <li>
+                        @if (attachment.FileName.EndsWith(".png") || attachment.FileName.EndsWith(".jpg"))
+                        {
+                            <div style="position: relative;">
+                                @if (!loadedImages.Contains(attachment.FileName))
+                                {
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Lade...</span>
+                                    </div>
+                                }
+
+                                <img src="@FileUploadService.GenerateReadSasUrl(attachment.FileName, TimeSpan.FromHours(1))"
+                                     style="max-width: 200px; display:@(loadedImages.Contains(attachment.FileName) ? "block" : "none")"
+                                     onload="@(() => OnImageLoaded(attachment.FileName))" />
+                            </div>
+                        }
+                        else
+                        {
+                            <a href="@FileUploadService.GenerateReadSasUrl(attachment.FileName, TimeSpan.FromHours(1))" target="_blank">
+                                @attachment.FileName
+                            </a>
+                        }
+                    </li>
+                }
+
+            </ul>
+        }
+        else
+        {
+            <p>Keine Dateien vorhanden.</p>
+        }
+
+
         <SubmitIfAuthorized />
     </EditForm>
 }
 
 @code {
 
-    public UpdateReportDto Model { get; set; } = new();
-    public ReportDetailsDto reportDetails { get; set; } = default!;
+    private UpdateReportDto Model { get; set; } = new();
+    private ReportDetailsDto reportDetails { get; set; } = default!;
+    private ReportFormOptionsDto OptionsDto { get; set; } = default!;
+    private List<AttachmentDto> Attachments { get; set; } = new(); 
+    private bool showAttachments = false;
+    private HashSet<string> loadedImages = new();
+
+    [Inject]
+    private IFileUploadService FileUploadService { get; set; } = default!;
 
     [Parameter]
     public Guid Id { get; set; }
 
 
-    public ReportFormOptionsDto OptionsDto { get; set; } = default!;
-
     protected override async Task OnInitializedAsync()
     {
         OptionsDto = await ReportService.GetFormOptionsAsync();
         reportDetails = await ReportService.GetReportDetailsByIdAsync(Id);
+        Attachments = (await AttachmentService.GetByReportIdAsync(Id)).ToList();
 
         Model = new UpdateReportDto
             {
@@ -115,5 +165,16 @@
     private async Task HandleValidSubmit()
     {
         await ReportService.UpdateReportByIdAsync(Model);
+    }
+
+    private void OnImageLoaded(string fileName)
+    {
+        loadedImages.Add(fileName);
+        StateHasChanged();
+    }
+    
+    private void ToggleAttachmentVisibility()
+    {
+        showAttachments = !showAttachments;
     }
 }

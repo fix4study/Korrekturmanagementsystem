@@ -7,10 +7,29 @@ namespace Korrekturmanagementsystem.Services;
 
 public class AttachmentService : IAttachmentService
 {
-    private readonly IBaseRepository<Attachment> _attachmentRepository;
-    public AttachmentService(IBaseRepository<Attachment> attachmentRepository)
+    private readonly IAttachmentRepository _attachmentRepository;
+    public AttachmentService(IAttachmentRepository attachmentRepository)
     {
         _attachmentRepository = attachmentRepository;
+    }
+
+    public async Task<IEnumerable<AttachmentDto>> GetByReportIdAsync(Guid reportId)
+    {
+        var attachments = await _attachmentRepository.GetAttachmentsByReportId(reportId);
+
+        if(attachments == null || !attachments.Any())
+        {
+            return Enumerable.Empty<AttachmentDto>();
+        }
+
+        return attachments.Select(a => new AttachmentDto
+        {
+            Id = a.Id,
+            FileName = a.FileName,
+            FileUrl = a.FileUrl,
+            UploadedAt = a.UploadedAt,
+            ReportId = a.ReportId
+        });
     }
 
     public async Task<bool> CreateAsync(CreateAttachmentDto attachment)
