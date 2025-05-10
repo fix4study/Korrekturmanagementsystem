@@ -7,29 +7,35 @@
 @inject IAttachmentService AttachmentService
 @rendermode InteractiveServer
 
-@if (OptionsDto != null)
+@if (_optionsDto != null)
 {
     <h3 class="mb-4">Meldung bearbeiten</h3>
 
-    <EditForm Model="Model" OnValidSubmit="HandleValidSubmit" FormName="EditReportForm">
+    <EditForm Model="_model" OnValidSubmit="HandleValidSubmit" FormName="EditReportForm">
         <DataAnnotationsValidator />
         <ValidationSummary />
 
         <div class="mb-3">
             <label class="form-label">Titel</label>
-            <InputText class="form-control" @bind-Value="Model.Title" />
+            <InputText class="form-control" @bind-Value="_model.Title" />
         </div>
 
         <div class="mb-3">
+            <label class="form-label">Erstellt von</label>
+            <p class="form-control-plaintext">@_reportDetails.CreatedByUsername</p>
+        </div>
+
+
+        <div class="mb-3">
             <label class="form-label">Beschreibung</label>
-            <InputTextArea class="form-control" @bind-Value="Model.Description" />
+            <InputTextArea class="form-control" @bind-Value="_model.Description" />
         </div>
 
         <div class="mb-3">
             <label class="form-label">Meldungstyp</label>
-            <InputSelect class="form-select" @bind-Value="Model.ReportTypeId">
+            <InputSelect class="form-select" @bind-Value="_model.ReportTypeId">
                 <option disabled value="">-- Bitte wählen --</option>
-                @foreach (var type in OptionsDto.ReportTypes)
+                @foreach (var type in _optionsDto.ReportTypes)
                 {
                     <option value="@type.Id">@type.Name</option>
                 }
@@ -38,9 +44,9 @@
 
         <div class="mb-3">
             <label class="form-label">Priorität</label>
-            <InputSelect class="form-select" @bind-Value="Model.PriorityId">
+            <InputSelect class="form-select" @bind-Value="_model.PriorityId">
                 <option disabled value="">-- Bitte wählen --</option>
-                @foreach (var priority in OptionsDto.Priorities)
+                @foreach (var priority in _optionsDto.Priorities)
                 {
                     <option value="@priority.Id">@priority.Name</option>
                 }
@@ -49,9 +55,9 @@
 
         <div class="mb-3">
             <label class="form-label">Materialtyp</label>
-            <InputSelect class="form-select" @bind-Value="Model.MaterialTypeId">
+            <InputSelect class="form-select" @bind-Value="_model.MaterialTypeId">
                 <option disabled value="">-- Bitte wählen --</option>
-                @foreach (var type in OptionsDto.MaterialTypes)
+                @foreach (var type in _optionsDto.MaterialTypes)
                 {
                     <option value="@type.Id">@type.Name</option>
                 }
@@ -60,9 +66,9 @@
 
         <div class="mb-3">
             <label class="form-label">Kurs (optional)</label>
-            <InputSelect class="form-select" @bind-Value="Model.CourseId">
+            <InputSelect class="form-select" @bind-Value="_model.CourseId">
                 <option value="">-- Kein Kurs --</option>
-                @foreach (var course in OptionsDto.Courses)
+                @foreach (var course in _optionsDto.Courses)
                 {
                     <option value="@course.Id">@course.Name (@course.Code)</option>
                 }
@@ -71,9 +77,9 @@
 
         <div class="mb-3">
             <label class="form-label">Status</label>
-            <InputSelect class="form-select" @bind-Value="Model.StatusId">
+            <InputSelect class="form-select" @bind-Value="_model.StatusId">
                 <option value="">-- Kein Status --</option>
-                @foreach (var status in OptionsDto.Statuses)
+                @foreach (var status in _optionsDto.Statuses)
                 {
                     <option value="@status.Id">@status.Name</option>
                 }
@@ -81,20 +87,20 @@
         </div>
 
         <button class="btn btn-outline-primary mb-2" @onclick="ToggleAttachmentVisibility">
-            @((showAttachments ? "Anhänge ausblenden" : "Anhänge anzeigen"))
+            @((_showAttachments ? "Anhänge ausblenden" : "Anhänge anzeigen"))
         </button>
 
-        @if (showAttachments && Attachments != null && Attachments.Any())
+        @if (_showAttachments && _attachments != null && _attachments.Any())
         {
             <h5>Anhänge:</h5>
             <ul>
-                @foreach (var attachment in Attachments)
+                @foreach (var attachment in _attachments)
                 {
                     <li>
                         @if (attachment.FileName.EndsWith(".png") || attachment.FileName.EndsWith(".jpg"))
                         {
                             <div style="position: relative;">
-                                @if (!loadedImages.Contains(attachment.FileName))
+                                @if (!_loadedImages.Contains(attachment.FileName))
                                 {
                                     <div class="spinner-border text-primary" role="status">
                                         <span class="visually-hidden">Lade...</span>
@@ -102,7 +108,7 @@
                                 }
 
                                 <img src="@FileUploadService.GenerateReadSasUrl(attachment.FileName, TimeSpan.FromHours(1))"
-                                     style="max-width: 200px; display:@(loadedImages.Contains(attachment.FileName) ? "block" : "none")"
+                                     style="max-width: 200px; display:@(_loadedImages.Contains(attachment.FileName) ? "block" : "none")"
                                      onload="@(() => OnImageLoaded(attachment.FileName))" />
                             </div>
                         }
@@ -117,10 +123,6 @@
 
             </ul>
         }
-        else
-        {
-            <p>Keine Dateien vorhanden.</p>
-        }
 
 
         <SubmitIfAuthorized />
@@ -129,12 +131,12 @@
 
 @code {
 
-    private UpdateReportDto Model { get; set; } = new();
-    private ReportDetailsDto reportDetails { get; set; } = default!;
-    private ReportFormOptionsDto OptionsDto { get; set; } = default!;
-    private List<AttachmentDto> Attachments { get; set; } = new(); 
-    private bool showAttachments = false;
-    private HashSet<string> loadedImages = new();
+    private UpdateReportDto _model { get; set; } = new();
+    private ReportDetailsDto _reportDetails { get; set; } = default!;
+    private ReportFormOptionsDto _optionsDto { get; set; } = default!;
+    private List<AttachmentDto> _attachments { get; set; } = new();
+    private bool _showAttachments = false;
+    private HashSet<string> _loadedImages = new();
 
     [Inject]
     private IFileUploadService FileUploadService { get; set; } = default!;
@@ -145,36 +147,36 @@
 
     protected override async Task OnInitializedAsync()
     {
-        OptionsDto = await ReportService.GetFormOptionsAsync();
-        reportDetails = await ReportService.GetReportDetailsByIdAsync(Id);
-        Attachments = (await AttachmentService.GetByReportIdAsync(Id)).ToList();
+        _optionsDto = await ReportService.GetFormOptionsAsync();
+        _reportDetails = await ReportService.GetReportDetailsByIdAsync(Id);
+        _attachments = (await AttachmentService.GetByReportIdAsync(Id)).ToList();
 
-        Model = new UpdateReportDto
+        _model = new UpdateReportDto
             {
                 Id = Id,
-                Title = reportDetails.Title,
-                Description = reportDetails.Description,
-                ReportTypeId = reportDetails.ReportType.Id,
-                PriorityId = reportDetails.Priority.Id,
-                MaterialTypeId = reportDetails.MaterialType.Id,
-                CourseId = reportDetails.Course?.Id,
-                StatusId = reportDetails.Status.Id
+                Title = _reportDetails.Title,
+                Description = _reportDetails.Description,
+                ReportTypeId = _reportDetails.ReportType.Id,
+                PriorityId = _reportDetails.Priority.Id,
+                MaterialTypeId = _reportDetails.MaterialType.Id,
+                CourseId = _reportDetails.Course?.Id,
+                StatusId = _reportDetails.Status.Id
             };
     }
 
     private async Task HandleValidSubmit()
     {
-        await ReportService.UpdateReportByIdAsync(Model);
+        await ReportService.UpdateReportByIdAsync(_model);
     }
 
     private void OnImageLoaded(string fileName)
     {
-        loadedImages.Add(fileName);
+        _loadedImages.Add(fileName);
         StateHasChanged();
     }
-    
+
     private void ToggleAttachmentVisibility()
     {
-        showAttachments = !showAttachments;
+        _showAttachments = !_showAttachments;
     }
 }

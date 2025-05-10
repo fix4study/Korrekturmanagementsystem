@@ -1,7 +1,9 @@
-﻿namespace Korrekturmanagementsystem.Services.Interfaces;
+﻿using Microsoft.AspNetCore.Components.Forms;
+
+namespace Korrekturmanagementsystem.Services.Interfaces;
 
 public interface IFileUploadService
 {
-    Task<string> UploadAsync(string fileName, Stream content);
+    Task<bool> UploadAsync(Guid reportId, List<IBrowserFile> files);
     string GenerateReadSasUrl(string fileName, TimeSpan validFor);
 }

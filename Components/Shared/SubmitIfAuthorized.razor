@@ -1,16 +1,18 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 
-<AuthorizeView>
-    <Authorized Context="auth">
-        <button type="submit" class="btn btn-primary">@Label</button>
-    </Authorized>
-    <NotAuthorized Context="noauth">
-        <button type="submit" class="btn btn-primary" disabled>@Label</button>
-        <div class="form-text text-danger mt-1">
-            @MessageIfUnauthorized
-        </div>
-    </NotAuthorized>
-</AuthorizeView>
+<div class="mb-3">
+    <AuthorizeView>
+        <Authorized Context="auth">
+            <button type="submit" class="btn btn-primary">@Label</button>
+        </Authorized>
+        <NotAuthorized Context="noauth">
+            <button type="submit" class="btn btn-primary" disabled>@Label</button>
+            <div class="form-text text-danger mt-1">
+                @MessageIfUnauthorized
+            </div>
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
 
 @code {
     [Parameter] public string Label { get; set; } = "Speichern";

@@ -71,7 +71,7 @@
             </InputSelect>
         </div>
 
-        <AuthorizeView Context="fileUpload "Roles="Admin">
+        <AuthorizeView Context="fileUpload " Roles="Admin">
             <InputFile OnChange="HandleFileChange" multiple />
             <ul>
                 @foreach (var file in selectedFiles)
@@ -118,32 +118,14 @@
             return;
         }
 
-        var validReportId = reportId.Value;
-
-        foreach (var file in selectedFiles)
+        if (selectedFiles.Any())
         {
-            try
-            {
-                using var stream = file.OpenReadStream();
-                var blobUrl = await FileUploadService.UploadAsync(file.Name, stream);
-
-                var attachment = new CreateAttachmentDto
-                    {
-                        ReportId = validReportId,
-                        FileName = file.Name,
-                        FileUrl = blobUrl,
-                        UploadedAt = DateTime.UtcNow
-                    };
-
-                await AttachmentService.CreateAsync(attachment);
-            }
-            catch (Exception ex)
-            {
-                message = $"Fehler beim Hochladen von {file.Name}: {ex.Message}";
-            }
+            message = await FileUploadService.UploadAsync(reportId.Value, selectedFiles)
+              ? "Meldung und Dateien erfolgreich hochgeladen."
+              : "Meldung erfolgreich gespeichert. Fehler beim Hochladen der Dateien.";
         }
 
-        message = "Meldung und Dateien wurden erfolgreich gespeichert.";
+        message = "Meldung erfolreich gespeichert.";
     }
 
 
