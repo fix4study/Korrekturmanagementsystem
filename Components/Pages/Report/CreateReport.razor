@@ -8,87 +8,33 @@
 @inject IFileUploadService FileUploadService
 @inject IAttachmentService AttachmentService
 @inject IHttpContextAccessor httpContextAccessor
+@inject NavigationManager Navigation
 @rendermode InteractiveServer
 
 @if (OptionsDto != null)
 {
     <h3 class="mb-4">Meldung hinzufügen</h3>
 
-    <EditForm Model="Model" OnValidSubmit="HandleValidSubmit" FormName="CreateReportForm">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
+    <ReportForm Model="@Model"
+                Options="@OptionsDto"
+                IsEdit="false"
+                ShowMessage="@message"
+                OnValidSubmit="HandleValidSubmit" />
 
-        <div class="mb-3">
-            <label class="form-label">Titel</label>
-            <InputText class="form-control" @bind-Value="Model.Title" />
-        </div>
+    <AuthorizeView Roles="Admin">
+        <InputFile OnChange="HandleFileChange" multiple />
+        <ul>
+            @foreach (var file in selectedFiles)
+            {
+                <li>@file.Name (@(file.Size / 1024) KB)</li>
+            }
+        </ul>
+    </AuthorizeView>
 
-        <div class="mb-3">
-            <label class="form-label">Beschreibung</label>
-            <InputTextArea class="form-control" @bind-Value="Model.Description" />
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Meldungstyp</label>
-            <InputSelect class="form-select" @bind-Value="Model.ReportTypeId">
-                <option disabled value="">-- Bitte wählen --</option>
-                @foreach (var type in OptionsDto.ReportTypes)
-                {
-                    <option value="@type.Id">@type.Name</option>
-                }
-            </InputSelect>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Priorität</label>
-            <InputSelect class="form-select" @bind-Value="Model.PriorityId">
-                <option disabled value="">-- Bitte wählen --</option>
-                @foreach (var priority in OptionsDto.Priorities)
-                {
-                    <option value="@priority.Id">@priority.Name</option>
-                }
-            </InputSelect>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Materialtyp</label>
-            <InputSelect class="form-select" @bind-Value="Model.MaterialTypeId">
-                <option disabled value="">-- Bitte wählen --</option>
-                @foreach (var type in OptionsDto.MaterialTypes)
-                {
-                    <option value="@type.Id">@type.Name</option>
-                }
-            </InputSelect>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Kurs (optional)</label>
-            <InputSelect class="form-select" @bind-Value="Model.CourseId">
-                <option value="">-- Kein Kurs --</option>
-                @foreach (var course in OptionsDto.Courses)
-                {
-                    <option value="@course.Id">@course.Name (@course.Code)</option>
-                }
-            </InputSelect>
-        </div>
-
-        <AuthorizeView Context="fileUpload " Roles="Admin">
-            <InputFile OnChange="HandleFileChange" multiple />
-            <ul>
-                @foreach (var file in selectedFiles)
-                {
-                    <li>@file.Name (@(file.Size / 1024) KB)</li>
-                }
-            </ul>
-        </AuthorizeView>
-
-        <SubmitIfAuthorized Label="Hinzufügen" MessageIfUnauthorized="Bitte melden Sie sich an, um eine Meldung anzulegen." />
-
-        @if (!string.IsNullOrEmpty(message))
-        {
-            <div class="alert alert-info mt-3">@message</div>
-        }
-    </EditForm>
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <div class="alert alert-info mt-3">@message</div>
+    }
 }
 
 @code {
@@ -96,7 +42,6 @@
     public ReportFormOptionsDto OptionsDto { get; set; } = default!;
     private List<IBrowserFile> selectedFiles = new();
     private string message = "";
-
 
     protected override async Task OnInitializedAsync()
     {
@@ -136,6 +81,8 @@
         }
 
         message = sb.ToString();
+        await Task.Delay(1500);
+        Navigation.NavigateTo("/meldungen");
     }
 
     private void HandleFileChange(InputFileChangeEventArgs e)

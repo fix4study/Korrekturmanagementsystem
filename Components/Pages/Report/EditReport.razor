@@ -2,159 +2,28 @@
 @using Korrekturmanagementsystem.Components.Shared
 @using Korrekturmanagementsystem.Dtos
 @using Korrekturmanagementsystem.Services.Interfaces
-@using Microsoft.AspNetCore.Components.Forms
 @inject IReportService ReportService
 @inject IAttachmentService AttachmentService
+@inject IFileUploadService FileUploadService
 @rendermode InteractiveServer
 
-@if (_optionsDto != null)
+@if (_optionsDto != null && _reportDetails != null)
 {
     <h3 class="mb-4">Meldung bearbeiten</h3>
 
-    <div class="container">
-        <h3 class="mb-4">Meldung bearbeiten</h3>
-
-        <EditForm Model="_model" OnValidSubmit="HandleValidSubmit" class="row g-4">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
-
-            <!-- Linke Spalte -->
-            <div class="col-md-8">
-                <div class="card mb-3 shadow-sm">
-                    <div class="card-header fw-semibold">Details</div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label class="form-label">Titel</label>
-                            <InputText class="form-control" @bind-Value="_model.Title" />
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Beschreibung</label>
-                            <InputTextArea class="form-control" rows="4" @bind-Value="_model.Description" />
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Meldungstyp</label>
-                            <InputSelect class="form-select" @bind-Value="_model.ReportTypeId">
-                                <option disabled value="">-- Bitte wählen --</option>
-                                @foreach (var type in _optionsDto.ReportTypes)
-                                {
-                                    <option value="@type.Id">@type.Name</option>
-                                }
-                            </InputSelect>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Materialtyp</label>
-                            <InputSelect class="form-select" @bind-Value="_model.MaterialTypeId">
-                                <option disabled value="">-- Bitte wählen --</option>
-                                @foreach (var type in _optionsDto.MaterialTypes)
-                                {
-                                    <option value="@type.Id">@type.Name</option>
-                                }
-                            </InputSelect>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Kurs (optional)</label>
-                            <InputSelect class="form-select" @bind-Value="_model.CourseId">
-                                <option value="">-- Kein Kurs --</option>
-                                @foreach (var course in _optionsDto.Courses)
-                                {
-                                    <option value="@course.Id">@course.Name (@course.Code)</option>
-                                }
-                            </InputSelect>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card mb-3 shadow-sm">
-                    <div class="card-header fw-semibold">Anhänge</div>
-                    <div class="card-body">
-                        <button type="button" class="btn btn-sm btn-outline-secondary mb-3" @onclick="ToggleAttachmentVisibility">
-                            @(_showAttachments ? "Anhänge ausblenden" : "Anhänge anzeigen")
-                        </button>
-
-                        @if (_showAttachments && _attachments.Any())
-                        {
-                            <div class="row g-2">
-                                @foreach (var attachment in _attachments)
-                                {
-                                    <div class="col-6 col-sm-4 col-lg-3">
-                                        <div class="border rounded p-2 text-center">
-                                            @if (attachment.FileName.EndsWith(".png") || attachment.FileName.EndsWith(".jpg"))
-                                            {
-                                                <img class="img-fluid rounded mb-1"
-                                                     src="@FileUploadService.GenerateReadSasUrl(attachment.FileName, TimeSpan.FromHours(1))"
-                                                     style="max-height: 120px; object-fit: cover;"
-                                                     onload="@(() => OnImageLoaded(attachment.FileName))" />
-                                            }
-                                            else
-                                            {
-                                                <a href="@FileUploadService.GenerateReadSasUrl(attachment.FileName, TimeSpan.FromHours(1))"
-                                                   target="_blank" class="text-decoration-none">
-                                                    📄 @attachment.FileName
-                                                </a>
-                                            }
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                        }
-                    </div>
-                </div>
-            </div>
-
-            <!-- Rechte Spalte -->
-            <div class="col-md-4">
-                <div class="card mb-3 shadow-sm">
-                    <div class="card-header fw-semibold">Metadaten</div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label class="form-label">Erstellt von</label>
-                            <p class="form-control-plaintext">@_reportDetails.CreatedByUsername</p>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Status</label>
-                            <InputSelect class="form-select" @bind-Value="_model.StatusId">
-                                <option value="">-- Kein Status --</option>
-                                @foreach (var status in _optionsDto.Statuses)
-                                {
-                                    <option value="@status.Id">@status.Name</option>
-                                }
-                            </InputSelect>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Priorität</label>
-                            <InputSelect class="form-select" @bind-Value="_model.PriorityId">
-                                <option disabled value="">-- Bitte wählen --</option>
-                                @foreach (var priority in _optionsDto.Priorities)
-                                {
-                                    <option value="@priority.Id">@priority.Name</option>
-                                }
-                            </InputSelect>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-primary btn-lg">Speichern</button>
-                </div>
-
-                @if (!string.IsNullOrEmpty(_message))
-                {
-                    <div class="alert alert-info mt-3">@_message</div>
-                }
-            </div>
-        </EditForm>
-    </div>
-
+    <ReportForm Model="@_model"
+                Options="@_optionsDto"
+                CreatedBy="@_reportDetails.CreatedByUsername"
+                IsEdit="true"
+                Attachments="@_attachments"
+                ShowAttachments="@_showAttachments"
+                OnToggleAttachments="ToggleAttachmentVisibility"
+                OnImageLoaded="OnImageLoaded"
+                ShowMessage="@_message"
+                OnValidSubmit="HandleValidSubmit" />
 }
 
 @code {
-
     private UpdateReportDto _model { get; set; } = new();
     private ReportDetailsDto _reportDetails { get; set; } = default!;
     private ReportFormOptionsDto _optionsDto { get; set; } = default!;
@@ -163,12 +32,8 @@
     private HashSet<string> _loadedImages = new();
     private string _message = "";
 
-    [Inject]
-    private IFileUploadService FileUploadService { get; set; } = default!;
-
     [Parameter]
     public Guid Id { get; set; }
-
 
     protected override async Task OnInitializedAsync()
     {
@@ -197,7 +62,6 @@
             _message = result.ErrorMessage ?? "Unbekannter Fehler";
             return;
         }
-        ;
 
         _message = "Meldung erfolgreich aktualisiert.";
     }

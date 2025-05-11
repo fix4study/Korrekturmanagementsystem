@@ -1,0 +1,171 @@
+﻿@using Korrekturmanagementsystem.Services.Interfaces
+@using Microsoft.AspNetCore.Components.Forms
+@using Korrekturmanagementsystem.Dtos
+
+<EditForm Model="Model" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="row g-4">
+        <!-- Linke Spalte -->
+        <div class="col-md-8">
+            <div class="card mb-3 shadow-sm">
+                <div class="card-header fw-semibold">Details</div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Titel</label>
+                        <InputText class="form-control" @bind-Value="Model.Title" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Beschreibung</label>
+                        <InputTextArea class="form-control" rows="4" @bind-Value="Model.Description" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Meldungstyp</label>
+                        <InputSelect class="form-select" @bind-Value="Model.ReportTypeId">
+                            <option disabled value="">-- Bitte wählen --</option>
+                            @foreach (var type in Options.ReportTypes)
+                            {
+                                <option value="@type.Id">@type.Name</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Materialtyp</label>
+                        <InputSelect class="form-select" @bind-Value="Model.MaterialTypeId">
+                            <option disabled value="">-- Bitte wählen --</option>
+                            @foreach (var type in Options.MaterialTypes)
+                            {
+                                <option value="@type.Id">@type.Name</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Kurs (optional)</label>
+                        <InputSelect class="form-select" @bind-Value="Model.CourseId">
+                            <option value="">-- Kein Kurs --</option>
+                            @foreach (var course in Options.Courses)
+                            {
+                                <option value="@course.Id">@course.Name (@course.Code)</option>
+                            }
+                        </InputSelect>
+                    </div>
+                </div>
+            </div>
+
+            @if (IsEdit)
+            {
+                <div class="card mb-3 shadow-sm">
+                    <div class="card-header fw-semibold">Anhänge</div>
+                    <div class="card-body">
+
+                        @if (Attachments?.Any() == true)
+                        {
+                            <button type="button" class="btn btn-sm btn-outline-secondary mb-3" @onclick="OnToggleAttachments">
+                                @(ShowAttachments ? "Anhänge ausblenden" : "Anhänge anzeigen")
+                            </button>
+
+                            @if (ShowAttachments)
+                            {
+                                <div class="row g-2">
+                                    @foreach (var attachment in Attachments)
+                                    {
+                                        <div class="col-6 col-sm-4 col-lg-3">
+                                            <div class="border rounded p-2 text-center">
+                                                @if (attachment.FileName.EndsWith(".png") || attachment.FileName.EndsWith(".jpg"))
+                                                {
+                                                    <img class="img-fluid rounded mb-1"
+                                                         src="@FileUploadService.GenerateReadSasUrl(attachment.FileName, TimeSpan.FromHours(1))"
+                                                         style="max-height: 120px; object-fit: cover;"
+                                                         @onload="@(() => OnImageLoaded.InvokeAsync(attachment.FileName))" />
+                                                }
+                                                else
+                                                {
+                                                    <a href="@FileUploadService.GenerateReadSasUrl(attachment.FileName, TimeSpan.FromHours(1))"
+                                                       target="_blank" class="text-decoration-none">
+                                                        📄 @attachment.FileName
+                                                    </a>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted">Keine Anhänge vorhanden.</p>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Rechte Spalte -->
+        <div class="col-md-4">
+            <div class="card mb-3 shadow-sm">
+                <div class="card-header fw-semibold">Metadaten</div>
+                <div class="card-body">
+                    @if (IsEdit)
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">Erstellt von</label>
+                            <p class="form-control-plaintext">@CreatedBy</p>
+                        </div>
+                    }
+
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <InputSelect class="form-select" @bind-Value="Model.StatusId">
+                            <option value="">-- Kein Status --</option>
+                            @foreach (var status in Options.Statuses)
+                            {
+                                <option value="@status.Id">@status.Name</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Priorität</label>
+                        <InputSelect class="form-select" @bind-Value="Model.PriorityId">
+                            <option disabled value="">-- Bitte wählen --</option>
+                            @foreach (var priority in Options.Priorities)
+                            {
+                                <option value="@priority.Id">@priority.Name</option>
+                            }
+                        </InputSelect>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">Speichern</button>
+            </div>
+
+            @if (!string.IsNullOrEmpty(ShowMessage))
+            {
+                <div class="alert alert-info mt-3">@ShowMessage</div>
+            }
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter] public BaseReportDto Model { get; set; } = default!;
+    [Parameter] public ReportFormOptionsDto Options { get; set; } = default!;
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+    [Parameter] public List<AttachmentDto> Attachments { get; set; } = new();
+    [Parameter] public string ShowMessage { get; set; } = string.Empty;
+    [Parameter] public bool ShowAttachments { get; set; }
+    [Parameter] public EventCallback OnToggleAttachments { get; set; }
+    [Parameter] public EventCallback<string> OnImageLoaded { get; set; }
+    [Parameter] public bool IsEdit { get; set; } = false;
+    [Parameter] public string CreatedBy { get; set; } = string.Empty;
+
+    [Inject]
+    public IFileUploadService FileUploadService { get; set; } = default!;
+}
