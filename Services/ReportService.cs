@@ -90,7 +90,6 @@ public class ReportService : IReportService
             .Select(c => new StatusDto { Id = c.Id, Name = c.Name }).ToList(),
         };
 
-
     public async Task<IEnumerable<ReportOverviewDto>> GetReportsOverviewAsync()
     {
         var reports = await _reportRepository.GetAllAsync(
@@ -143,7 +142,6 @@ public class ReportService : IReportService
         {
             return Result.Failure("Beim Speichern ist ein technischer Fehler aufgetreten");
         }
-
     }
 
     public async Task<ReportDetailsDto> GetReportDetailsByIdAsync(Guid id)
