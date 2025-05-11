@@ -1,4 +1,4 @@
-﻿using Korrekturmanagementsystem.Dtos;
+﻿using Korrekturmanagementsystem.Dtos.Report;
 using Korrekturmanagementsystem.Shared;
 
 namespace Korrekturmanagementsystem.Services.Interfaces;

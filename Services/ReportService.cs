@@ -1,5 +1,6 @@
 ﻿using Korrekturmanagementsystem.Data.Entities;
 using Korrekturmanagementsystem.Dtos;
+using Korrekturmanagementsystem.Dtos.Report;
 using Korrekturmanagementsystem.Repositories.Interfaces;
 using Korrekturmanagementsystem.Services.Interfaces;
 using Korrekturmanagementsystem.Shared;
