@@ -22,38 +22,7 @@
                 ShowMessage="@message"
                 OnValidSubmit="HandleValidSubmit" />
 
-    <AuthorizeView Roles="Admin">
-        <div class="card border-secondary mb-3 shadow-sm">
-            <div class="card-header bg-light fw-semibold">
-                <i class="bi bi-upload me-1"></i> Dateien hochladen (nur Admins)
-            </div>
-            <div class="card-body">
-                <div class="mb-3">
-                    <InputFile OnChange="HandleFileChange" multiple class="form-control" />
-                    <small class="text-muted">Mehrere Dateien können ausgewählt werden.</small>
-                </div>
-
-                @if (selectedFiles?.Any() == true)
-                {
-                    <ul class="list-group list-group-flush">
-                        @foreach (var file in selectedFiles)
-                        {
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span>
-                                    <i class="bi bi-file-earmark me-2"></i>@file.Name
-                                </span>
-                                <span class="badge bg-secondary rounded-pill">@($"{file.Size / 1024} KB")</span>
-                            </li>
-                        }
-                    </ul>
-                }
-                else
-                {
-                    <p class="text-muted">Noch keine Datei ausgewählt.</p>
-                }
-            </div>
-        </div>
-    </AuthorizeView>
+    <FileUploadPanel OnFilesChanged="files => selectedFiles = files.ToList()" />
 }
 
 @code {
@@ -102,10 +71,5 @@
         message = sb.ToString();
         await Task.Delay(1500);
         Navigation.NavigateTo("/meldungen");
-    }
-
-    private void HandleFileChange(InputFileChangeEventArgs e)
-    {
-        selectedFiles = e.GetMultipleFiles().ToList();
     }
 }

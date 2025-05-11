@@ -3,6 +3,7 @@
 @using Korrekturmanagementsystem.Dtos
 @using Korrekturmanagementsystem.Dtos.Report
 @using Korrekturmanagementsystem.Services.Interfaces
+@using System.Text
 @inject IReportService ReportService
 @inject IAttachmentService AttachmentService
 @inject IFileUploadService FileUploadService
@@ -22,6 +23,8 @@
                 OnImageLoaded="OnImageLoaded"
                 ShowMessage="@_message"
                 OnValidSubmit="HandleValidSubmit" />
+
+    <FileUploadPanel OnFilesChanged="files => selectedFiles = files.ToList()" />
 }
 
 @code {
@@ -32,6 +35,8 @@
     private bool _showAttachments = false;
     private HashSet<string> _loadedImages = new();
     private string _message = "";
+    private List<IBrowserFile> selectedFiles = new();
+
 
     [Parameter]
     public Guid Id { get; set; }
@@ -64,7 +69,23 @@
             return;
         }
 
-        _message = "Meldung erfolgreich aktualisiert.";
+        var sb = new StringBuilder("Meldung erfolgreich aktualisiert.");
+
+        if (selectedFiles?.Count > 0)
+        {
+            var uploadResult = await FileUploadService.UploadAsync(_model.Id, selectedFiles);
+
+            if (result.IsSuccess)
+            {
+                sb.Append(" Dateien erfolgreich hochgeladen.");
+            }
+            else
+            {
+                sb.Append(result.ErrorMessage ?? "Unbekannter Fehler.");
+            }
+        }
+
+        _message = sb.ToString();
     }
 
     private void OnImageLoaded(string fileName)
