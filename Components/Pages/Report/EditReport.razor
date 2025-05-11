@@ -124,7 +124,10 @@
             </ul>
         }
 
-
+        @if (!string.IsNullOrEmpty(_message))
+        {
+            <div class="alert alert-info mt-3">@_message</div>
+        }
         <SubmitIfAuthorized />
     </EditForm>
 }
@@ -137,6 +140,7 @@
     private List<AttachmentDto> _attachments { get; set; } = new();
     private bool _showAttachments = false;
     private HashSet<string> _loadedImages = new();
+    private string _message = "";
 
     [Inject]
     private IFileUploadService FileUploadService { get; set; } = default!;
@@ -166,7 +170,14 @@
 
     private async Task HandleValidSubmit()
     {
-        await ReportService.UpdateReportByIdAsync(_model);
+        var result = await ReportService.UpdateReportByIdAsync(_model);
+        if (!result.IsSuccess)
+        {
+            _message = result.ErrorMessage ?? "Unbekannter Fehler";
+            return;
+        };
+
+        _message = "Meldung erfolgreich aktualisiert.";
     }
 
     private void OnImageLoaded(string fileName)

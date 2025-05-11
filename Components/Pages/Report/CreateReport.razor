@@ -3,6 +3,7 @@
 @using Korrekturmanagementsystem.Dtos
 @using Korrekturmanagementsystem.Services.Interfaces
 @using Microsoft.AspNetCore.Components.Forms
+@using System.Text
 @inject IReportService ReportService
 @inject IFileUploadService FileUploadService
 @inject IAttachmentService AttachmentService
@@ -118,16 +119,24 @@
             return;
         }
 
-        if (selectedFiles.Any())
+        var sb = new StringBuilder("Meldung erfolgreich gespeichert.");
+
+        if (selectedFiles?.Count > 0)
         {
-            message = await FileUploadService.UploadAsync(reportId.Value, selectedFiles)
-              ? "Meldung und Dateien erfolgreich hochgeladen."
-              : "Meldung erfolgreich gespeichert. Fehler beim Hochladen der Dateien.";
+            var result = await FileUploadService.UploadAsync(reportId.Value, selectedFiles);
+
+            if (result.IsSuccess)
+            {
+                sb.Append(" Dateien erfolgreich hochgeladen.");
+            }
+            else
+            {
+                sb.Append(result.ErrorMessage ?? "Unbekannter Fehler.");
+            }
         }
 
-        message = "Meldung erfolreich gespeichert.";
+        message = sb.ToString();
     }
-
 
     private void HandleFileChange(InputFileChangeEventArgs e)
     {

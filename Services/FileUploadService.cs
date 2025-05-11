@@ -4,6 +4,7 @@ using Azure.Storage;
 using Azure.Storage.Sas;
 using Korrekturmanagementsystem.Dtos;
 using Microsoft.AspNetCore.Components.Forms;
+using Korrekturmanagementsystem.Shared;
 
 
 namespace Korrekturmanagementsystem.Services;
@@ -25,7 +26,7 @@ public class FileUploadService : IFileUploadService
         _attachmentService = attachmentService;
     }
 
-    public async Task<bool> UploadAsync(Guid reportId, List<IBrowserFile> files)
+    public async Task<Result> UploadAsync(Guid reportId, List<IBrowserFile> files)
     {
         try
         {
@@ -53,11 +54,11 @@ public class FileUploadService : IFileUploadService
                 await _attachmentService.CreateAsync(attachment);
             }
 
-            return true;
+            return Result.Success();
         }
         catch (Exception ex)
         {
-            return false;
+            return Result.Failure("Fehler beim Hochladen der Datei");
         }
 
     }

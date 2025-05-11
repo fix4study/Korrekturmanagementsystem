@@ -2,6 +2,7 @@
 using Korrekturmanagementsystem.Dtos;
 using Korrekturmanagementsystem.Repositories.Interfaces;
 using Korrekturmanagementsystem.Services.Interfaces;
+using Korrekturmanagementsystem.Shared;
 using System.Linq.Expressions;
 using System.Security.Claims;
 
@@ -109,18 +110,18 @@ public class ReportService : IReportService
         });
     }
 
-    public async Task UpdateReportByIdAsync(UpdateReportDto reportToUpdate)
+    public async Task<Result> UpdateReportByIdAsync(UpdateReportDto reportToUpdate)
     {
         if (!_httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false)
         {
-            throw new UnauthorizedAccessException();
+            return Result.Failure("Sie sind nicht angemeldet. Bitte loggen Sie sich ein.");
         }
 
         var report = await _reportRepository.GetByIdAsync(reportToUpdate.Id);
 
         if (report is null)
         {
-            return;
+            return Result.Failure("Meldung wurde nicht gefunden");
         }
 
         report.Title = reportToUpdate.Title;
@@ -132,7 +133,16 @@ public class ReportService : IReportService
         report.StatusId = reportToUpdate.StatusId;
         report.UpdatedAt = DateTime.UtcNow;
 
-        await _reportRepository.UpdateAsync();
+        try
+        {
+            await _reportRepository.UpdateAsync();
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure("Beim Speichern ist ein technischer Fehler aufgetreten");
+        }
+
     }
 
     public async Task<ReportDetailsDto> GetReportDetailsByIdAsync(Guid id)

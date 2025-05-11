@@ -1,4 +1,5 @@
 ﻿using Korrekturmanagementsystem.Dtos;
+using Korrekturmanagementsystem.Shared;
 
 namespace Korrekturmanagementsystem.Services.Interfaces;
 
@@ -8,5 +9,5 @@ public interface IReportService
     Task<IEnumerable<ReportOverviewDto>> GetReportsOverviewAsync();
     Task<ReportFormOptionsDto> GetFormOptionsAsync();
     Task<ReportDetailsDto> GetReportDetailsByIdAsync(Guid id);
-    Task UpdateReportByIdAsync(UpdateReportDto report);
+    Task<Result> UpdateReportByIdAsync(UpdateReportDto reportToUpdate);
 }

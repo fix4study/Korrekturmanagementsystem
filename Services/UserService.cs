@@ -2,6 +2,7 @@
 using Korrekturmanagementsystem.Dtos;
 using Korrekturmanagementsystem.Repositories.Interfaces;
 using Korrekturmanagementsystem.Services.Interfaces;
+using Korrekturmanagementsystem.Shared;
 
 namespace Korrekturmanagementsystem.Services;
 
@@ -66,8 +67,13 @@ public class UserService : IUserService
         };
     }
 
-    public async Task CreateUser(CreateUserDto user)
+    public async Task<Result> CreateUser(CreateUserDto user)
     {
+        var result = await CheckUserConflictsAsync(user);
+        if (!result.IsSuccess)
+        {
+            return result;
+        }
 
         var userEntity = new User
         {
@@ -83,10 +89,27 @@ public class UserService : IUserService
         try
         {
             await _repository.InsertAsync(userEntity);
+            return Result.Success();
         }
         catch (Exception ex)
         {
-            var t = ex;
+            return Result.Failure("Beim Speichern ist ein Fehler aufgetreten.");
         }
+    }
+    private async Task<Result> CheckUserConflictsAsync(CreateUserDto user)
+    {
+        var existingUserByUsername = await _userRepository.GetUserByUsernameAsync(user.Username);
+        if (existingUserByUsername is not null)
+        {
+            return Result.Failure("Der Benutzername ist bereits vergeben.");
+        }
+
+        var existingEmail = await _userRepository.GetUserByEmailAsync(user.Email);
+        if (existingEmail is not null)
+        {
+            return Result.Failure("Die E-Mail-Adresse ist bereits vergeben.");
+        }
+
+        return Result.Success();
     }
 }

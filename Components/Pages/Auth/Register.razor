@@ -86,18 +86,21 @@
 
         var hashedPassword = passwordService.HashPassword(Model.Password);
 
-        await userService.CreateUser(new CreateUserDto
-            {
-                Username = Model.Username,
-                Email = Model.Email,
-                Password = hashedPassword,
-                StakeholderRoleId = selectedRole
-            });
+        var result = await userService.CreateUser(new CreateUserDto
+        {
+            Username = Model.Username,
+            Email = Model.Email,
+            Password = hashedPassword,
+            StakeholderRoleId = selectedRole
+        });
+
+        if (!result.IsSuccess)
+        {
+            message = result.ErrorMessage ?? "Registrierung fehlgeschlagen.";
+            return;
+        }
 
         message = "Registrierung erfolgreich!";
-
-        StateHasChanged();
-
         await Task.Delay(1500);
         Navigation.NavigateTo("account/login");
     }

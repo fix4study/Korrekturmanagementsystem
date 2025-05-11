@@ -25,8 +25,32 @@
                     </div>
                     <button class="w-100 mb-2 btn btn-lg rounded-3 btn-dark" type="submit">Anmelden</button>
                 </form>
+
+                @if (_showError)
+                {
+                    <div class="alert alert-danger mt-3" role="alert">
+                        Benutzername oder Passwort ist ungültig.
+                    </div>
+                }
             </div>
         </div>
     </div>
 </div>
+
+@code {
+    private bool _showError;
+
+    [Inject] 
+    private NavigationManager NavigationManager { get; set; } = default!;
+
+
+    protected override void OnInitialized()
+    {
+        var uri = new Uri(NavigationManager.Uri);
+        var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+        _showError = query.TryGetValue("error", out var value) && value == "true";
+    }
+
+}
+
 
