@@ -140,6 +140,15 @@
                             }
                         </InputSelect>
                     </div>
+
+                    <!-- Tags Auswahl -->
+                    <div class="mb-3">
+                        <label class="form-label">Tags</label>
+                        <TagSelector AvailableTags="Options.Tags"
+                                     SelectedTags="SelectedTags"
+                                     SelectedTagsChanged="SelectedTagsChanged" />
+                    </div>
+
                 </div>
             </div>
 
@@ -166,6 +175,9 @@
     [Parameter] public EventCallback<string> OnImageLoaded { get; set; }
     [Parameter] public bool IsEdit { get; set; } = false;
     [Parameter] public string CreatedBy { get; set; } = string.Empty;
+    [Parameter] public List<TagDto> SelectedTags { get; set; } = new();
+    [Parameter] public EventCallback<List<TagDto>> SelectedTagsChanged { get; set; }
+
 
     [Inject]
     public IFileUploadService FileUploadService { get; set; } = default!;

@@ -4,6 +4,7 @@ using Korrekturmanagementsystem.Dtos.Report;
 using Korrekturmanagementsystem.Repositories.Interfaces;
 using Korrekturmanagementsystem.Services.Interfaces;
 using Korrekturmanagementsystem.Shared;
+using Microsoft.Extensions.Azure;
 using System.Linq.Expressions;
 using System.Security.Claims;
 
@@ -17,6 +18,7 @@ public class ReportService : IReportService
     private readonly IBaseRepository<Course> _courseRepository;
     private readonly IBaseRepository<ReportType> _reportTypeRepository;
     private readonly IBaseRepository<Status> _statusRepository;
+    private readonly IBaseRepository<Tag> _tagRepository;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public ReportService(IReportRepository reportRepository, IHttpContextAccessor httpContextAccessor,
@@ -24,7 +26,7 @@ public class ReportService : IReportService
         IBaseRepository<MaterialType> materialTypeRepositorym,
         IBaseRepository<Course> courseRepository,
         IBaseRepository<ReportType> reportTypeRepository,
-        IBaseRepository<Status> statusRepsoitory)
+        IBaseRepository<Status> statusRepsoitory, IBaseRepository<Tag> tagRepository)
     {
         _reportRepository = reportRepository;
         _httpContextAccessor = httpContextAccessor;
@@ -33,6 +35,7 @@ public class ReportService : IReportService
         _courseRepository = courseRepository;
         _reportTypeRepository = reportTypeRepository;
         _statusRepository = statusRepsoitory;
+        _tagRepository = tagRepository;
     }
 
     public async Task<Guid?> AddReportAsync(AddReportDto report)
@@ -87,7 +90,10 @@ public class ReportService : IReportService
             .Select(c => new CourseDto { Id = c.Id, Name = c.Name, Code = c.Code }).ToList(),
 
             Statuses = (await _statusRepository.GetAllAsync())
-            .Select(c => new StatusDto { Id = c.Id, Name = c.Name }).ToList(),
+            .Select(s => new StatusDto { Id = s.Id, Name = s.Name }).ToList(),
+
+            Tags = (await _tagRepository.GetAllAsync())
+            .Select(t => new TagDto { Id = t.Id, Name = t.Name }).ToList()
         };
 
     public async Task<IEnumerable<ReportOverviewDto>> GetReportsOverviewAsync()

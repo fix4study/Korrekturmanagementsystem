@@ -6,6 +6,7 @@
 @using Korrekturmanagementsystem.Services.Interfaces
 @using Microsoft.AspNetCore.Components.Forms
 @inject IReportService ReportService
+@inject IReportTagService ReportTagService
 @inject IFileUploadService FileUploadService
 @inject IAttachmentService AttachmentService
 @inject IHttpContextAccessor httpContextAccessor
@@ -20,7 +21,9 @@
                 Options="@OptionsDto"
                 IsEdit="false"
                 ShowMessage="@message"
-                OnValidSubmit="HandleValidSubmit" />
+                OnValidSubmit="HandleValidSubmit"
+                SelectedTags="@_selectedTags"
+                SelectedTagsChanged="HandleSelectedTagsChanged" />
 
     <FileUploadPanel OnFilesChanged="files => selectedFiles = files.ToList()" />
 }
@@ -29,6 +32,7 @@
     public AddReportDto Model { get; set; } = new();
     public ReportFormOptionsDto OptionsDto { get; set; } = default!;
     private List<IBrowserFile> selectedFiles = new();
+    private List<TagDto> _selectedTags = new();
     private string message = "";
 
     protected override async Task OnInitializedAsync()
@@ -52,6 +56,17 @@
             return;
         }
 
+        if (_selectedTags?.Count > 0)
+        {
+            var resportTags = _selectedTags.Select(x => new ReportTagDto
+            {
+                ReportId = reportId.Value,
+                TagId = x.Id
+            }).ToList();
+
+            await ReportTagService.InsertReportTagAsync(resportTags);
+        }
+
         var sb = new StringBuilder("Meldung erfolgreich gespeichert.");
 
         if (selectedFiles?.Count > 0)
@@ -71,5 +86,11 @@
         message = sb.ToString();
         await Task.Delay(1500);
         Navigation.NavigateTo("/meldungen");
+    }
+
+    private Task HandleSelectedTagsChanged(List<TagDto> tags)
+    {
+        _selectedTags = tags;
+        return Task.CompletedTask;
     }
 }

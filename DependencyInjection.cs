@@ -18,6 +18,7 @@ public static class DependencyInjection
         services.AddScoped<IReportService, ReportService>();
         services.AddScoped<IFileUploadService, FileUploadService>();
         services.AddScoped<IAttachmentService, AttachmentService>();
+        services.AddScoped<IReportTagService, ReportTagService>();
 
         return services;
     }

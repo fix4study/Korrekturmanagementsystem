@@ -1,0 +1,49 @@
+﻿@using Korrekturmanagementsystem.Dtos
+
+<div class="d-flex flex-wrap gap-2 align-items-start">
+    @foreach (var tag in SelectedTags)
+    {
+        <span class="badge rounded-pill bg-primary d-flex align-items-center">
+            @tag.Name
+            <button type="button" class="btn-close btn-close-white btn-sm ms-2"
+                    @onclick="() => RemoveTag(tag.Id)" aria-label="Tag entfernen"></button>
+        </span>
+    }
+
+    <select class="form-select form-select-sm w-auto" @onchange="OnTagSelected">
+        <option value="">+ Tag hinzufügen</option>
+        @foreach (var tag in AvailableTags.Where(t => !SelectedTags.Any(s => s.Id == t.Id)))
+        {
+            <option value="@tag.Id">@tag.Name</option>
+        }
+    </select>
+</div>
+
+@code {
+    [Parameter] public List<TagDto> AvailableTags { get; set; } = new();
+    [Parameter] public List<TagDto> SelectedTags { get; set; } = new();
+    [Parameter] public EventCallback<List<TagDto>> SelectedTagsChanged { get; set; }
+
+    private async Task OnTagSelected(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var tagId))
+        {
+            var tag = AvailableTags.FirstOrDefault(t => t.Id == tagId);
+            if (tag != null && !SelectedTags.Any(t => t.Id == tag.Id))
+            {
+                SelectedTags.Add(tag);
+                await SelectedTagsChanged.InvokeAsync(SelectedTags);
+            }
+        }
+    }
+
+    private async Task RemoveTag(int tagId)
+    {
+        var tag = SelectedTags.FirstOrDefault(t => t.Id == tagId);
+        if (tag != null)
+        {
+            SelectedTags.Remove(tag);
+            await SelectedTagsChanged.InvokeAsync(SelectedTags);
+        }
+    }
+}
