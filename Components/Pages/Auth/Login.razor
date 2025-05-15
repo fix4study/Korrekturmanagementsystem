@@ -5,9 +5,11 @@
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authentication.Cookies
 @using Microsoft.AspNetCore.Authorization
+@using Korrekturmanagementsystem.Components.Layout
 
 @rendermode InteractiveServer
 @attribute [AllowAnonymous]
+@layout AuthLayout
 
 <div class="modal modal-sheet position-static d-block p-4 py-md-5" tabindex="-1" role="dialog" id="modalSignin">
     <div class="modal-dialog">

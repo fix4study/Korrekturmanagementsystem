@@ -1,0 +1,23 @@
+﻿@using Korrekturmanagementsystem.Components.Pages.Auth
+@inherits LayoutComponentBase
+
+<div class="d-flex">
+
+    <main class="flex-grow-1 p-4">
+        <div class="d-flex justify-content-end mb-3">
+            <AuthorizeView>
+                <Authorized>
+                    <Logout />
+                </Authorized>
+                <NotAuthorized>
+                    <a href="/account/registrieren" class="btn btn-outline-secondary btn-sm me-2">Registrieren</a>
+                    <a href="/account/login" class="btn btn-dark btn-sm">Login</a>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+
+        <article class="content">
+            @Body
+        </article>
+    </main>
+</div>

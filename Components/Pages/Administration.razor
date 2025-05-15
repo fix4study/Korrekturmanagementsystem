@@ -1,9 +1,12 @@
 ﻿@page "/administration"
 @using Korrekturmanagementsystem.Dtos
 @using Korrekturmanagementsystem.Services.Interfaces
+@using Microsoft.AspNetCore.Authorization
 @inject IRoleService RoleService
 @inject IMaterialService MaterialService
 @rendermode InteractiveServer
+
+@attribute [Authorize (Roles ="Admin")]
 
 <h3>Administration</h3>
 
