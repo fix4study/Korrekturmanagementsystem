@@ -1,4 +1,6 @@
 ﻿using Korrekturmanagementsystem.Data;
+using Korrekturmanagementsystem.Providers;
+using Korrekturmanagementsystem.Providers.Interfaces;
 using Korrekturmanagementsystem.Repositories;
 using Korrekturmanagementsystem.Repositories.Interfaces;
 using Korrekturmanagementsystem.Services;
@@ -12,13 +14,13 @@ public static class DependencyInjection
     public static IServiceCollection AddApplicationProviders(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IUserProvider, UserProvider>();
-        services.AddScoped<IPasswordService, PasswordService>();
         services.AddScoped<IRoleProvider, RoleProvider>();
         services.AddScoped<IMaterialProvider, MaterialProvider>();
         services.AddScoped<IReportProvider, ReportProvider>();
         services.AddScoped<IFileUploadProvider, FileUploadProvider>();
         services.AddScoped<IAttachmentProvider, AttachmentProvider>();
         services.AddScoped<IReportTagProvider, ReportTagProvider>();
+        services.AddScoped<ICommentProvider, CommentProvider>();
 
         return services;
     }
@@ -26,9 +28,12 @@ public static class DependencyInjection
     public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IReportService, ReportService>();
+        services.AddScoped<ICommentService, CommentService>();
+        services.AddScoped<IPasswordService, PasswordService>();
 
         return services;
     }
+
     public static IServiceCollection AddRepositories(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));

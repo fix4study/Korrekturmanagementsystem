@@ -8,17 +8,15 @@ namespace Korrekturmanagementsystem.Services;
 
 public class UserProvider : IUserProvider
 {
-    private readonly IBaseRepository<User> _repository;
     private readonly IUserRepository _userRepository;
-    public UserProvider(IBaseRepository<User> repository, IUserRepository userRepository)
+    public UserProvider(IUserRepository userRepository)
     {
-        _repository = repository;
         _userRepository = userRepository;
     }
 
     public async Task<UserDto> GetUserByIdAsync(Guid id)
     {
-        var user = await _repository.GetByIdAsync(id);
+        var user = await _userRepository.GetUserByIdAsync(id);
 
         if (user == null)
         {
@@ -36,7 +34,7 @@ public class UserProvider : IUserProvider
 
     public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
     {
-        var users = await _repository.GetAllAsync(includes: e => e.StakeholderRole);
+        var users = await _userRepository.GetAllAsync(includes: e => e.StakeholderRole);
 
         return users.Select(user => new UserDto
         {
@@ -88,7 +86,7 @@ public class UserProvider : IUserProvider
 
         try
         {
-            await _repository.InsertAsync(userEntity);
+            await _userRepository.InsertAsync(userEntity);
             return Result.Success();
         }
         catch (Exception ex)
