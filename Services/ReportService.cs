@@ -28,7 +28,7 @@ public class ReportService : IReportService
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<EditReportViewModel> BuildEditReportViewModelAsync(Guid reportId)
+    public async Task<EditReportModel> BuildEditReportViewModelAsync(Guid reportId)
     {
         var options = await _reportProvider.GetFormOptionsAsync();
         var details = await _reportProvider.GetReportDetailsByIdAsync(reportId);
@@ -52,7 +52,7 @@ public class ReportService : IReportService
             TagIds = selectedTags.Select(t => t.Id).ToList(),
         };
 
-        return new EditReportViewModel
+        return new EditReportModel
         {
             Report = dto,
             Options = options,
@@ -62,7 +62,7 @@ public class ReportService : IReportService
         };
     }
 
-    public async Task<Result> UpdateReportAsync(EditReportViewModel model, List<IBrowserFile> files)
+    public async Task<Result> UpdateReportAsync(EditReportModel model, List<IBrowserFile> files)
     {
         var updateResult = await _reportProvider.UpdateReportByIdAsync(model.Report);
 

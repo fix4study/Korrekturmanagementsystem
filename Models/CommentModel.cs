@@ -2,7 +2,7 @@
 
 namespace Korrekturmanagementsystem.Models;
 
-public class CommentViewModel
+public class CommentModel
 {
     public List<CommentDto> Comments { get; set; } = new();
 }

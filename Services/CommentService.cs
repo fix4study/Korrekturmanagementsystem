@@ -12,11 +12,11 @@ public class CommentService : ICommentService
         _commentProvider = commentProvider;
     }
 
-    public async Task<CommentViewModel> GetCommentsByReportIdAsync(Guid reportId)
+    public async Task<CommentModel> GetCommentsByReportIdAsync(Guid reportId)
     {
         var result = await _commentProvider.GetCommentsByReportIdAsync(reportId);
 
-        return new CommentViewModel
+        return new CommentModel
         {
             Comments = result.ToList()
         };

@@ -53,7 +53,7 @@
     [Parameter]
     public Guid ReportId { get; set; }
 
-    private CommentViewModel? _model;
+    private CommentModel? _model;
     private CommentInputModel newComment = new();
 
     protected override async Task OnInitializedAsync()

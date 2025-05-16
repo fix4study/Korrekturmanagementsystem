@@ -1,0 +1,28 @@
+﻿@if (TotalPages > 1)
+{
+    <nav class="mt-3">
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(CurrentPage == 1 ? "disabled" : "")">
+                <button class="page-link" @onclick="@(() => OnPageChange.InvokeAsync(CurrentPage - 1))">«</button>
+            </li>
+
+            @for (int i = 1; i <= TotalPages; i++)
+            {
+                var pageNumber = i;
+                <li class="page-item @(CurrentPage == pageNumber ? "active" : "")">
+                    <button class="page-link" @onclick="@(() => OnPageChange.InvokeAsync(pageNumber))">@pageNumber</button>
+                </li>
+            }
+
+            <li class="page-item @(CurrentPage == TotalPages ? "disabled" : "")">
+                <button class="page-link" @onclick="@(() => OnPageChange.InvokeAsync(CurrentPage + 1))">»</button>
+            </li>
+        </ul>
+    </nav>
+}
+
+@code {
+    [Parameter] public int TotalPages { get; set; }
+    [Parameter] public int CurrentPage { get; set; }
+    [Parameter] public EventCallback<int> OnPageChange { get; set; }
+}

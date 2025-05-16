@@ -1,0 +1,33 @@
+﻿@using Korrekturmanagementsystem.Models
+@using System.Collections.Generic
+
+<div class="mb-4">
+    <input type="text" class="form-control mb-2" placeholder="Titel enthält..."
+           @bind="Filter.Title" @bind:event="oninput" />
+
+    <select class="form-select" @bind="Filter.Status">
+        <option value="">Alle Status</option>
+        @foreach (var status in Statuses)
+        {
+            <option value="@status">@status</option>
+        }
+    </select>
+    <select class="form-select" @bind="Filter.Priority">
+        <option value="">Alle Prioritäten</option>
+        @foreach (var status in Priorities)
+        {
+            <option value="@status">@status</option>
+        }
+    </select>
+</div>
+
+@code {
+    [Parameter]
+    public ReportFilterModel Filter { get; set; } = default!;
+
+    [Parameter]
+    public IEnumerable<string> Statuses { get; set; } = Enumerable.Empty<string>();
+
+    [Parameter]
+    public IEnumerable<string> Priorities { get; set; } = Enumerable.Empty<string>();
+}
