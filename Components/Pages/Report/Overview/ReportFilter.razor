@@ -1,24 +1,41 @@
 ﻿@using Korrekturmanagementsystem.Models
 @using System.Collections.Generic
 
-<div class="mb-4">
-    <input type="text" class="form-control mb-2" placeholder="Titel enthält..."
-           @bind="Filter.Title" @bind:event="oninput" />
-
-    <select class="form-select" @bind="Filter.Status">
-        <option value="">Alle Status</option>
-        @foreach (var status in Statuses)
-        {
-            <option value="@status">@status</option>
-        }
-    </select>
-    <select class="form-select" @bind="Filter.Priority">
-        <option value="">Alle Prioritäten</option>
-        @foreach (var status in Priorities)
-        {
-            <option value="@status">@status</option>
-        }
-    </select>
+<div class="card mb-4 shadow-sm">
+    <div class="card-body">
+        <form class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label for="filter-title" class="form-label mb-1">Titel</label>
+                <input id="filter-title" type="text" class="form-control" placeholder="Titel enthält..."
+                       @bind="Filter.Title" @bind:event="oninput" />
+            </div>
+            <div class="col-md-3">
+                <label for="filter-status" class="form-label mb-1">Status</label>
+                <select id="filter-status" class="form-select" @bind="Filter.Status">
+                    <option value="">Alle Status</option>
+                    @foreach (var status in Statuses)
+                    {
+                        <option value="@status">@status</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="filter-priority" class="form-label mb-1">Priorität</label>
+                <select id="filter-priority" class="form-select" @bind="Filter.Priority">
+                    <option value="">Alle Prioritäten</option>
+                    @foreach (var prio in Priorities)
+                    {
+                        <option value="@prio">@prio</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <button type="button" class="btn btn-outline-secondary w-100" @onclick="ClearFilter" title="Filter zurücksetzen">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 
 @code {
@@ -30,4 +47,11 @@
 
     [Parameter]
     public IEnumerable<string> Priorities { get; set; } = Enumerable.Empty<string>();
+
+    private void ClearFilter()
+    {
+        Filter.Title = "";
+        Filter.Status = "";
+        Filter.Priority = "";
+    }
 }
