@@ -2,8 +2,9 @@
 
 namespace Korrekturmanagementsystem.Repositories.Interfaces;
 
-public interface IUserRepository
+public interface IUserRepository : IBaseRepository<User>
 {
     Task<User?> GetUserByEmailAsync(string email);
     Task<User?> GetUserByUsernameAsync(string username);
+    Task<User?> GetUserByIdAsync(Guid id);
 }
