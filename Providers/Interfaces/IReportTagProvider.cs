@@ -2,7 +2,8 @@
 
 namespace Korrekturmanagementsystem.Services.Interfaces;
 
-public interface IReportTagService
+public interface IReportTagProvider
 {
     Task InsertReportTagAsync(IEnumerable<ReportTagDto> reportTags);
+    Task<IEnumerable<ReportTagDto>> GetReportTagsByReportIdAsync(Guid reportId);
 }

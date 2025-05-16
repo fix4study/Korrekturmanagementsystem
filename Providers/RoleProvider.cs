@@ -5,10 +5,10 @@ using Korrekturmanagementsystem.Services.Interfaces;
 
 namespace Korrekturmanagementsystem.Services;
 
-public class RoleService : IRoleService
+public class RoleProvider : IRoleProvider
 {
     private readonly IBaseRepository<StakeholderRole> _roleRepository;
-    public RoleService(IBaseRepository<StakeholderRole> repository)
+    public RoleProvider(IBaseRepository<StakeholderRole> repository)
     {
         _roleRepository = repository;
     }

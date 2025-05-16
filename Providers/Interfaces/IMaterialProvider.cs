@@ -3,7 +3,7 @@ using Korrekturmanagementsystem.Dtos;
 
 namespace Korrekturmanagementsystem.Services.Interfaces;
 
-public interface IMaterialService
+public interface IMaterialProvider
 {
     Task AddMaterialTypeAsync(string name);
 

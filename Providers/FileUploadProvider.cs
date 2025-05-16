@@ -9,16 +9,16 @@ using Korrekturmanagementsystem.Shared;
 
 namespace Korrekturmanagementsystem.Services;
 
-public class FileUploadService : IFileUploadService
+public class FileUploadProvider : IFileUploadProvider
 {
     private readonly string _connectionString;
     private readonly string _containerName = "uploads";
     private readonly string _accountName;
     private readonly string _accountKey;
-    private readonly IAttachmentService _attachmentService;
+    private readonly IAttachmentProvider _attachmentService;
 
 
-    public FileUploadService(IConfiguration configuration, IAttachmentService attachmentService)
+    public FileUploadProvider(IConfiguration configuration, IAttachmentProvider attachmentService)
     {
         _connectionString = configuration["AzureStorage:ConnectionString"]!;
         _accountName = configuration["AzureStorage:AccountName"]!;
@@ -54,11 +54,11 @@ public class FileUploadService : IFileUploadService
                 await _attachmentService.CreateAsync(attachment);
             }
 
-            return Result.Success();
+            return Result.Success("Dateien erfolgreich hochgeladen.");
         }
         catch (Exception ex)
         {
-            return Result.Failure("Fehler beim Hochladen der Datei");
+            return Result.Failure("Es ist ein Fehler beim Hochladen aufgetreten");
         }
 
     }

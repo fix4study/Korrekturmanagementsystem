@@ -5,10 +5,10 @@ using Korrekturmanagementsystem.Services.Interfaces;
 
 namespace Korrekturmanagementsystem.Services;
 
-public class AttachmentService : IAttachmentService
+public class AttachmentProvider : IAttachmentProvider
 {
     private readonly IAttachmentRepository _attachmentRepository;
-    public AttachmentService(IAttachmentRepository attachmentRepository)
+    public AttachmentProvider(IAttachmentRepository attachmentRepository)
     {
         _attachmentRepository = attachmentRepository;
     }

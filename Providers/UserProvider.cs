@@ -6,11 +6,11 @@ using Korrekturmanagementsystem.Shared;
 
 namespace Korrekturmanagementsystem.Services;
 
-public class UserService : IUserService
+public class UserProvider : IUserProvider
 {
     private readonly IBaseRepository<User> _repository;
     private readonly IUserRepository _userRepository;
-    public UserService(IBaseRepository<User> repository, IUserRepository userRepository)
+    public UserProvider(IBaseRepository<User> repository, IUserRepository userRepository)
     {
         _repository = repository;
         _userRepository = userRepository;

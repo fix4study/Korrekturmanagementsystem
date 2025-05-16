@@ -18,6 +18,7 @@ builder.Services.Configure<CircuitOptions>(options =>
 
 var config = builder.Configuration;
 builder.Services
+    .AddApplicationProviders(config)
     .AddApplicationServices(config)
     .AddRepositories(config)
     .AddDatabase(config)
