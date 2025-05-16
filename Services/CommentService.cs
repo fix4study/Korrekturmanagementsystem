@@ -21,4 +21,9 @@ public class CommentService : ICommentService
             Comments = result.ToList()
         };
     }
+
+    public async Task AddCommentAsync(Guid reportId, string content)
+    {
+        await _commentProvider.AddCommentAsync(reportId, content);
+    }
 }

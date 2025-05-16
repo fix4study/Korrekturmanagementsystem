@@ -23,7 +23,10 @@
             {
                 <div class="border rounded shadow-sm p-3 bg-light">
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <div class="fw-semibold">@comment.Author</div>
+                        <div class="fw-semibold">
+                            @comment.Author
+                            <span class="fw-normal text-secondary small"> – @comment.StakeholderRoleName</span>
+                        </div>
                         <small class="text-muted">@comment.CreatedAt.ToString("g")</small>
                     </div>
                     <div class="text-body">@comment.Content</div>
@@ -65,12 +68,12 @@
 
     private async Task SubmitComment()
     {
-        // if (!string.IsNullOrWhiteSpace(newComment.Content))
-        // {
-        //     await ReportService.AddCommentAsync(ReportId, newComment.Content);
-        //     newComment = new();
-        //     await LoadComments();
-        // }
+        if (!string.IsNullOrWhiteSpace(newComment.Content))
+        {
+            await CommentService.AddCommentAsync(ReportId, newComment.Content);
+            newComment = new();
+            await LoadComments();
+        }
     }
 
     private class CommentInputModel

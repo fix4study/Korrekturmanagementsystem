@@ -1,5 +1,4 @@
-﻿using Korrekturmanagementsystem.Components.Pages;
-using Korrekturmanagementsystem.Data.Entities;
+﻿using Korrekturmanagementsystem.Data.Entities;
 using Korrekturmanagementsystem.Dtos;
 using Korrekturmanagementsystem.Providers.Interfaces;
 using Korrekturmanagementsystem.Repositories.Interfaces;
@@ -11,10 +10,12 @@ public class CommentProvider : ICommentProvider
 {
     private readonly IBaseRepository<Comment> _commentRepository;
     private readonly IUserProvider _userProvider;
-    public CommentProvider(IBaseRepository<Comment> commentRepository, IUserProvider userProvider)
+    private readonly ICurrentUserService _currentUserService;
+    public CommentProvider(IBaseRepository<Comment> commentRepository, IUserProvider userProvider, ICurrentUserService currentUserService)
     {
         _commentRepository = commentRepository;
         _userProvider = userProvider;
+        _currentUserService = currentUserService;
     }
 
     public async Task<IEnumerable<CommentDto>> GetCommentsByReportIdAsync(Guid reportId)
@@ -30,11 +31,28 @@ public class CommentProvider : ICommentProvider
             {
                 Id = comment.Id,
                 Author = user.Username,
+                StakeholderRoleName = user.StakeholderRoleName,
                 Content = comment.Content,
                 CreatedAt = comment.CreatedAt
             });
         }
 
         return comments;
+    }
+
+    public async Task AddCommentAsync(Guid reportId, string content)
+    {
+        var userId = _currentUserService.GetCurrentUserId();
+
+        var newComment = new Comment
+        {
+            Id = new Guid(),
+            AuthorId = userId,
+            Content = content,
+            ReportId = reportId,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await _commentRepository.InsertAsync(newComment);
     }
 }
