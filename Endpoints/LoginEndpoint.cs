@@ -12,7 +12,7 @@ namespace Korrekturmanagementsystem.Endpoints
         {
             app.MapPost("/account/login", async (
                 HttpContext http,
-                IUserService userService,
+                IUserProvider userService,
                 IPasswordService passwordService,
                 [FromForm] string username,
                 [FromForm] string password

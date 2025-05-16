@@ -3,15 +3,16 @@
 @attribute [AllowAnonymous]
 @layout AuthLayout
 
+@using Korrekturmanagementsystem.Components.Layout
 @using Korrekturmanagementsystem.Dtos
+@using Korrekturmanagementsystem.Services
 @using Korrekturmanagementsystem.Services.Interfaces
 @using Microsoft.AspNetCore.Authorization
-@using Korrekturmanagementsystem.Components.Layout
 
 @inject NavigationManager Navigation
 @inject IPasswordService passwordService
-@inject IUserService userService
-@inject IRoleService roleService
+@inject IUserProvider userService
+@inject IRoleProvider roleService
 
 
 <div class="modal modal-sheet position-static d-block p-4 py-md-5" tabindex="-1" role="dialog" id="modalRegister">
@@ -103,7 +104,7 @@
 
         if (!result.IsSuccess)
         {
-            message = result.ErrorMessage ?? "Registrierung fehlgeschlagen.";
+            message = result.Message ?? "Registrierung fehlgeschlagen.";
             return;
         }
 

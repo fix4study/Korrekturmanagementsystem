@@ -3,7 +3,7 @@ using Korrekturmanagementsystem.Shared;
 
 namespace Korrekturmanagementsystem.Services.Interfaces;
 
-public interface IUserService
+public interface IUserProvider
 {
     Task<UserDto> GetUserByIdAsync(Guid id);
     Task<IEnumerable<UserDto>> GetAllUsersAsync();

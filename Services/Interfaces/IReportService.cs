@@ -1,13 +1,15 @@
-﻿using Korrekturmanagementsystem.Dtos.Report;
+﻿using Korrekturmanagementsystem.Dtos;
+using Korrekturmanagementsystem.Dtos.Report;
+using Korrekturmanagementsystem.Models;
 using Korrekturmanagementsystem.Shared;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace Korrekturmanagementsystem.Services.Interfaces;
 
 public interface IReportService
 {
-    Task<Guid?> AddReportAsync(AddReportDto report);
-    Task<IEnumerable<ReportOverviewDto>> GetReportsOverviewAsync();
+    Task<EditReportViewModel> BuildEditReportViewModelAsync(Guid reportId);
+    Task<Result> UpdateReportAsync(UpdateReportDto model, List<IBrowserFile> files);
+    Task<Result> AddReportAsync(AddReportDto report, List<TagDto> selectedTags, List<IBrowserFile> files);
     Task<ReportFormOptionsDto> GetFormOptionsAsync();
-    Task<ReportDetailsDto> GetReportDetailsByIdAsync(Guid id);
-    Task<Result> UpdateReportByIdAsync(UpdateReportDto reportToUpdate);
 }

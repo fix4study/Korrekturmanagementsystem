@@ -2,7 +2,7 @@
 
 namespace Korrekturmanagementsystem.Services.Interfaces;
 
-public interface IRoleService
+public interface IRoleProvider
 {
     Task AddStakeholderRoleAsync(string name);
     Task<IEnumerable<RoleDto>> GetStakeholderRolesAsync();

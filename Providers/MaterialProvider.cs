@@ -5,10 +5,10 @@ using Korrekturmanagementsystem.Services.Interfaces;
 
 namespace Korrekturmanagementsystem.Services;
 
-public class MaterialService : IMaterialService
+public class MaterialProvider : IMaterialProvider
 {
     private readonly IBaseRepository<MaterialType> _repository;
-    public MaterialService(IBaseRepository<MaterialType> repository)
+    public MaterialProvider(IBaseRepository<MaterialType> repository)
     {
         _repository = repository;
     }

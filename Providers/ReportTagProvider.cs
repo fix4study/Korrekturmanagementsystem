@@ -5,10 +5,10 @@ using Korrekturmanagementsystem.Services.Interfaces;
 
 namespace Korrekturmanagementsystem.Services;
 
-public class ReportTagService : IReportTagService
+public class ReportTagProvider : IReportTagProvider
 {
-    private readonly IBaseRepository<ReportTag> _reportTagRepository;
-    public ReportTagService(IBaseRepository<ReportTag> reportTagRepository)
+    private readonly IReportTagRepository _reportTagRepository;
+    public ReportTagProvider(IReportTagRepository reportTagRepository)
     {
         _reportTagRepository = reportTagRepository;
     }
@@ -23,5 +23,17 @@ public class ReportTagService : IReportTagService
                 TagId = reportTag.TagId
             });
         }
+    }
+
+    public async Task<IEnumerable<ReportTagDto>> GetReportTagsByReportIdAsync(Guid reportId)
+    {
+        var reportTags = await _reportTagRepository.GetReportTagsByReportIdAsync(reportId);
+
+        return reportTags.Select(reportTag => new ReportTagDto
+        {
+            ReportId = reportTag.ReportId,
+            TagId = reportTag.TagId,
+            TagName = reportTag.Tag.Name
+        });
     }
 }

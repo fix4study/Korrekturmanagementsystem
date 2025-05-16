@@ -6,84 +6,42 @@
 @using Korrekturmanagementsystem.Services.Interfaces
 @using Microsoft.AspNetCore.Components.Forms
 @inject IReportService ReportService
-@inject IReportTagService ReportTagService
-@inject IFileUploadService FileUploadService
-@inject IAttachmentService AttachmentService
-@inject IHttpContextAccessor httpContextAccessor
 @inject NavigationManager Navigation
 @rendermode InteractiveServer
 
-@if (OptionsDto != null)
+@if (_optionsDto != null)
 {
     <h3 class="mb-4">Meldung hinzufügen</h3>
 
     <ReportForm Model="@Model"
-                Options="@OptionsDto"
-                IsEdit="false"
-                ShowMessage="@message"
-                OnValidSubmit="HandleValidSubmit"
-                SelectedTags="@_selectedTags"
-                SelectedTagsChanged="HandleSelectedTagsChanged" />
+        Options="@_optionsDto"
+        IsEdit="false"
+        ShowMessage="@_message"
+        OnValidSubmit="HandleValidSubmit"
+        SelectedTags="@_selectedTags"
+        SelectedTagsChanged="HandleSelectedTagsChanged" />
 
-    <FileUploadPanel OnFilesChanged="files => selectedFiles = files.ToList()" />
+    <FileUploadPanel OnFilesChanged="files => _selectedFiles = files.ToList()" />
 }
 
 @code {
     public AddReportDto Model { get; set; } = new();
-    public ReportFormOptionsDto OptionsDto { get; set; } = default!;
-    private List<IBrowserFile> selectedFiles = new();
+    public ReportFormOptionsDto _optionsDto { get; set; } = default!;
+    private List<IBrowserFile> _selectedFiles = new();
     private List<TagDto> _selectedTags = new();
-    private string message = "";
+    private string _message = "";
 
     protected override async Task OnInitializedAsync()
     {
-        OptionsDto = await ReportService.GetFormOptionsAsync();
+        _optionsDto = await ReportService.GetFormOptionsAsync();
     }
 
     private async Task HandleValidSubmit()
     {
-        if (!httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false)
-        {
-            message = "Sie sind nicht berechtigt, eine Meldung zu erstellen.";
-            return;
-        }
+        var result = await ReportService.AddReportAsync(Model, _selectedTags, _selectedFiles);
 
-        var reportId = await ReportService.AddReportAsync(Model);
+        _message = result.Message ?? "Unbekannter Fehler.";
 
-        if (reportId is null)
-        {
-            message = "Fehler beim Erstellen der Meldung.";
-            return;
-        }
-
-        if (_selectedTags?.Count > 0)
-        {
-            var resportTags = _selectedTags.Select(x => new ReportTagDto
-            {
-                ReportId = reportId.Value,
-                TagId = x.Id
-            }).ToList();
-
-            await ReportTagService.InsertReportTagAsync(resportTags);
-        }
-
-        var sb = new StringBuilder("Meldung erfolgreich gespeichert.");
-
-        if (selectedFiles?.Count > 0)
-        {
-            var result = await FileUploadService.UploadAsync(reportId.Value, selectedFiles);
-
-            if (result.IsSuccess)
-            {
-                sb.Append(" Dateien erfolgreich hochgeladen.");
-            }
-            else
-            {
-                sb.Append(result.ErrorMessage ?? "Unbekannter Fehler.");
-            }
-        }
-
-        message = sb.ToString();
         await Task.Delay(1500);
         Navigation.NavigateTo("/meldungen");
     }

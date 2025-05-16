@@ -1,209 +1,124 @@
-﻿using Korrekturmanagementsystem.Data.Entities;
+﻿using Korrekturmanagementsystem.Dtos.Report;
 using Korrekturmanagementsystem.Dtos;
-using Korrekturmanagementsystem.Dtos.Report;
-using Korrekturmanagementsystem.Repositories.Interfaces;
 using Korrekturmanagementsystem.Services.Interfaces;
+using Korrekturmanagementsystem.Models;
+using System.Text;
+using Microsoft.AspNetCore.Components.Forms;
 using Korrekturmanagementsystem.Shared;
-using Microsoft.Extensions.Azure;
-using System.Linq.Expressions;
-using System.Security.Claims;
 
 namespace Korrekturmanagementsystem.Services;
 
 public class ReportService : IReportService
 {
-    private readonly IReportRepository _reportRepository;
-    private readonly IBaseRepository<Priority> _priorityRepository;
-    private readonly IBaseRepository<MaterialType> _materialTypeRepository;
-    private readonly IBaseRepository<Course> _courseRepository;
-    private readonly IBaseRepository<ReportType> _reportTypeRepository;
-    private readonly IBaseRepository<Status> _statusRepository;
-    private readonly IBaseRepository<Tag> _tagRepository;
+    private readonly IAttachmentProvider _attachmentProvider;
+    private readonly IReportProvider _reportProvider;
+    private readonly IReportTagProvider _reportTagProvider;
+    private readonly IFileUploadProvider _fileUploadProvider;
     private readonly IHttpContextAccessor _httpContextAccessor;
-
-    public ReportService(IReportRepository reportRepository, IHttpContextAccessor httpContextAccessor,
-        IBaseRepository<Priority> priorityRepository,
-        IBaseRepository<MaterialType> materialTypeRepositorym,
-        IBaseRepository<Course> courseRepository,
-        IBaseRepository<ReportType> reportTypeRepository,
-        IBaseRepository<Status> statusRepsoitory, IBaseRepository<Tag> tagRepository)
+    public ReportService(IReportProvider reportProvider, 
+        IReportTagProvider reportTagProvider, 
+        IAttachmentProvider attachmentProvider,
+        IFileUploadProvider fileUploadProvider,
+        IHttpContextAccessor httpContextAccessor)
     {
-        _reportRepository = reportRepository;
+        _reportProvider = reportProvider;
+        _reportTagProvider = reportTagProvider;
+        _attachmentProvider = attachmentProvider;
+        _fileUploadProvider = fileUploadProvider;
         _httpContextAccessor = httpContextAccessor;
-        _priorityRepository = priorityRepository;
-        _materialTypeRepository = materialTypeRepositorym;
-        _courseRepository = courseRepository;
-        _reportTypeRepository = reportTypeRepository;
-        _statusRepository = statusRepsoitory;
-        _tagRepository = tagRepository;
     }
 
-    public async Task<Guid?> AddReportAsync(AddReportDto report)
+    public async Task<EditReportViewModel> BuildEditReportViewModelAsync(Guid reportId)
     {
-        try
+        var options = await _reportProvider.GetFormOptionsAsync();
+        var details = await _reportProvider.GetReportDetailsByIdAsync(reportId);
+        var attachments = (await _attachmentProvider.GetByReportIdAsync(reportId)).ToList();
+        var reportTags = (await _reportTagProvider.GetReportTagsByReportIdAsync(reportId)).ToList();
+
+        var selectedTags = reportTags
+            .Select(rt => new TagDto { Id = rt.TagId, Name = rt.TagName })
+            .ToList();
+
+        var dto = new UpdateReportDto
         {
-            var currentUser = GetCurrentUserId();
-
-            if (currentUser == Guid.Empty)
-            {
-                return null;
-            }
-
-            var newReport = new Report
-            {
-                Id = Guid.NewGuid(),
-                Title = report.Title,
-                Description = report.Description,
-                ReportTypeId = report.ReportTypeId,
-                PriorityId = report.PriorityId,
-                MaterialTypeId = report.MaterialTypeId,
-                CourseId = report.CourseId,
-                StatusId = 1, //Todo immer Status Offen
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                CreatedById = currentUser
-            };
-
-            await _reportRepository.InsertAsync(newReport);
-
-            return newReport.Id;
-        }
-        catch (Exception ex)
-        {
-            return null;
-        }
-    }
-
-    public async Task<ReportFormOptionsDto> GetFormOptionsAsync() =>
-        new ReportFormOptionsDto
-        {
-            ReportTypes = (await _reportTypeRepository.GetAllAsync())
-            .Select(r => new ReportTypeDto { Id = r.Id, Name = r.Name }).ToList(),
-
-            Priorities = (await _priorityRepository.GetAllAsync())
-            .Select(p => new PriorityDto { Id = p.Id, Name = p.Name }).ToList(),
-
-            MaterialTypes = (await _materialTypeRepository.GetAllAsync())
-            .Select(m => new MaterialTypeDto { Id = m.Id, Name = m.Name }).ToList(),
-
-            Courses = (await _courseRepository.GetAllAsync())
-            .Select(c => new CourseDto { Id = c.Id, Name = c.Name, Code = c.Code }).ToList(),
-
-            Statuses = (await _statusRepository.GetAllAsync())
-            .Select(s => new StatusDto { Id = s.Id, Name = s.Name }).ToList(),
-
-            Tags = (await _tagRepository.GetAllAsync())
-            .Select(t => new TagDto { Id = t.Id, Name = t.Name }).ToList()
+            Id = reportId,
+            Title = details.Title,
+            Description = details.Description,
+            ReportTypeId = details.ReportType.Id,
+            PriorityId = details.Priority.Id,
+            MaterialTypeId = details.MaterialType.Id,
+            CourseId = details.Course?.Id,
+            StatusId = details.Status.Id,
+            TagIds = selectedTags.Select(t => t.Id).ToList(),
         };
 
-    public async Task<IEnumerable<ReportOverviewDto>> GetReportsOverviewAsync()
-    {
-        var reports = await _reportRepository.GetAllAsync(
-            includes: new Expression<Func<Report, object>>[]
-            {
-                kms => kms.Priority,
-                kms => kms.Status
-            });
-
-        return reports.Select(report => new ReportOverviewDto
+        return new EditReportViewModel
         {
-            Id = report.Id,
-            Title = report.Title,
-            StatusName = report.Status.Name,
-            PriorityName = report.Priority.Name,
-            CreatedAt = report.CreatedAt,
-            UpdatedAt = report.UpdatedAt
-        });
+            Report = dto,
+            Options = options,
+            Attachments = attachments,
+            SelectedTags = selectedTags,
+            CreatedByUsername = details.CreatedByUsername ?? string.Empty
+        };
     }
 
-    public async Task<Result> UpdateReportByIdAsync(UpdateReportDto reportToUpdate)
+    public async Task<Result> UpdateReportAsync(UpdateReportDto model, List<IBrowserFile> files)
+    {
+        var updateResult = await _reportProvider.UpdateReportByIdAsync(model);
+        if (!updateResult.IsSuccess)
+        {
+            return new Result { IsSuccess = false, Message = updateResult.Message ?? "Unbekannter Fehler" };
+        }
+
+        var message = new StringBuilder("Meldung erfolgreich aktualisiert. ");
+
+        if (files?.Count > 0)
+        {
+            var uploadResult = await _fileUploadProvider.UploadAsync(model.Id, files);
+
+            message.Append(uploadResult.Message ?? "Unbekannter Fehler.");
+        }
+
+        return new Result { IsSuccess = true, Message = message.ToString() ?? "Unbekannter Fehler" };
+    }
+
+    public async Task<ReportFormOptionsDto> GetFormOptionsAsync()
+        => await _reportProvider.GetFormOptionsAsync();
+
+    public async Task<Result> AddReportAsync(AddReportDto report, List<TagDto> selectedTags, List<IBrowserFile> files)
     {
         if (!_httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false)
         {
-            return Result.Failure("Sie sind nicht angemeldet. Bitte loggen Sie sich ein.");
+            return new Result { IsSuccess = false, Message = "Sie sind nicht berechtigt eine Meldung zu erstellen." };
         }
 
-        var report = await _reportRepository.GetByIdAsync(reportToUpdate.Id);
+        var reportId = await _reportProvider.AddReportAsync(report);
 
-        if (report is null)
+        if (reportId is null)
         {
-            return Result.Failure("Meldung wurde nicht gefunden");
+            return new Result { IsSuccess = false, Message = "Fehler beim Erstellen der Meldung." };
         }
 
-        report.Title = reportToUpdate.Title;
-        report.Description = reportToUpdate.Description;
-        report.ReportTypeId = reportToUpdate.ReportTypeId;
-        report.PriorityId = reportToUpdate.PriorityId;
-        report.MaterialTypeId = reportToUpdate.MaterialTypeId;
-        report.CourseId = reportToUpdate.CourseId;
-        report.StatusId = reportToUpdate.StatusId;
-        report.UpdatedAt = DateTime.UtcNow;
-
-        try
+        if (selectedTags?.Count > 0)
         {
-            await _reportRepository.UpdateAsync();
-            return Result.Success();
-        }
-        catch (Exception ex)
-        {
-            return Result.Failure("Beim Speichern ist ein technischer Fehler aufgetreten");
-        }
-    }
-
-    public async Task<ReportDetailsDto> GetReportDetailsByIdAsync(Guid id)
-    {
-        var report = await _reportRepository.GetByIdAsync(id);
-
-        var reportDetails = new ReportDetailsDto
-        {
-            Id = report.Id,
-            Title = report.Title,
-            Description = report.Description,
-            ReportType = new ReportTypeDto
+            var resportTags = selectedTags.Select(x => new ReportTagDto
             {
-                Id = report.ReportType.Id,
-                Name = report.ReportType.Name
-            },
-            Status = new StatusDto
-            {
-                Id = report.Status.Id,
-                Name = report.Status.Name
-            },
-            Priority = new PriorityDto
-            {
-                Id = report.Priority.Id,
-                Name = report.Priority.Name
-            },
-            MaterialType = new MaterialTypeDto
-            {
-                Id = report.MaterialType.Id,
-                Name = report.MaterialType.Name
-            },
-            Course = report.Course != null
-            ? new CourseDto
-            {
-                Id = report.Course.Id,
-                Name = report.Course.Name,
-                Code = report.Course.Code
-            }
-            : null,
-            CreatedByUsername = report.CreatedBy.Username,
-            CreatedAt = report.CreatedAt,
-            UpdatedAt = report.UpdatedAt
-        };
+                ReportId = reportId.Value,
+                TagId = x.Id
+            }).ToList();
 
-        return reportDetails;
-    }
-
-    private Guid GetCurrentUserId()
-    {
-        var userIdString = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (!Guid.TryParse(userIdString, out var userId))
-        {
-            throw new UnauthorizedAccessException("Ungültige Benutzer-ID im Token.");
+            await _reportTagProvider.InsertReportTagAsync(resportTags);
         }
 
-        return userId;
+        var message = new StringBuilder("Meldung erfolgreich gespeichert.");
+
+        if (selectedTags?.Count > 0)
+        {
+            var uploadResult = await _fileUploadProvider.UploadAsync(reportId.Value, files);
+
+            message.Append(uploadResult.Message ?? "Unbekannter Fehler.");
+        }
+
+        return new Result { IsSuccess = true, Message = message.ToString() ?? "Unbekannter Fehler" };
     }
 }

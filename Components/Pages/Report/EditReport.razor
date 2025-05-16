@@ -2,92 +2,53 @@
 @using Korrekturmanagementsystem.Components.Shared
 @using Korrekturmanagementsystem.Dtos
 @using Korrekturmanagementsystem.Dtos.Report
+@using Korrekturmanagementsystem.Models
 @using Korrekturmanagementsystem.Services.Interfaces
 @using System.Text
 @inject IReportService ReportService
-@inject IAttachmentService AttachmentService
-@inject IFileUploadService FileUploadService
 @rendermode InteractiveServer
 
-@if (_optionsDto != null && _reportDetails != null)
+@if (_viewModel != null)
 {
     <h3 class="mb-4">Meldung bearbeiten</h3>
 
-    <ReportForm Model="@_model"
-                Options="@_optionsDto"
-                CreatedBy="@_reportDetails.CreatedByUsername"
-                IsEdit="true"
-                Attachments="@_attachments"
-                ShowAttachments="@_showAttachments"
-                OnToggleAttachments="ToggleAttachmentVisibility"
-                OnImageLoaded="OnImageLoaded"
-                ShowMessage="@_message"
-                OnValidSubmit="HandleValidSubmit"
-                SelectedTags="@_selectedTags"
-                SelectedTagsChanged="HandleSelectedTagsChanged" />
+    <ReportForm Model="@_viewModel.Report"
+        Options="@_viewModel.Options"
+        CreatedBy="@_viewModel.CreatedByUsername"
+        IsEdit="true"
+        Attachments="@_viewModel.Attachments"
+        ShowAttachments="@_showAttachments"
+        OnToggleAttachments="ToggleAttachmentVisibility"
+        OnImageLoaded="OnImageLoaded"
+        ShowMessage="@_message"
+        OnValidSubmit="HandleValidSubmit"
+        SelectedTags="@_viewModel.SelectedTags"
+        SelectedTagsChanged="HandleSelectedTagsChanged" />
 
     <FileUploadPanel OnFilesChanged="files => selectedFiles = files.ToList()" />
 }
 
 @code {
-    private UpdateReportDto _model { get; set; } = new();
-    private ReportDetailsDto _reportDetails { get; set; } = default!;
-    private ReportFormOptionsDto _optionsDto { get; set; } = default!;
-    private List<AttachmentDto> _attachments { get; set; } = new();
+    private EditReportViewModel _viewModel = new();
     private bool _showAttachments = false;
     private HashSet<string> _loadedImages = new();
     private string _message = "";
     private List<IBrowserFile> selectedFiles = new();
-    private List<TagDto> _selectedTags = new();
+    
 
     [Parameter]
     public Guid Id { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        _optionsDto = await ReportService.GetFormOptionsAsync();
-        _reportDetails = await ReportService.GetReportDetailsByIdAsync(Id);
-        _attachments = (await AttachmentService.GetByReportIdAsync(Id)).ToList();
-
-        _model = new UpdateReportDto
-            {
-                Id = Id,
-                Title = _reportDetails.Title,
-                Description = _reportDetails.Description,
-                ReportTypeId = _reportDetails.ReportType.Id,
-                PriorityId = _reportDetails.Priority.Id,
-                MaterialTypeId = _reportDetails.MaterialType.Id,
-                CourseId = _reportDetails.Course?.Id,
-                StatusId = _reportDetails.Status.Id
-            };
+        _viewModel  = await ReportService.BuildEditReportViewModelAsync(Id);
     }
 
     private async Task HandleValidSubmit()
     {
-        var result = await ReportService.UpdateReportByIdAsync(_model);
-        if (!result.IsSuccess)
-        {
-            _message = result.ErrorMessage ?? "Unbekannter Fehler";
-            return;
-        }
+        var result = await ReportService.UpdateReportAsync(_viewModel.Report, selectedFiles);
 
-        var sb = new StringBuilder("Meldung erfolgreich aktualisiert.");
-
-        if (selectedFiles?.Count > 0)
-        {
-            var uploadResult = await FileUploadService.UploadAsync(_model.Id, selectedFiles);
-
-            if (result.IsSuccess)
-            {
-                sb.Append(" Dateien erfolgreich hochgeladen.");
-            }
-            else
-            {
-                sb.Append(result.ErrorMessage ?? "Unbekannter Fehler.");
-            }
-        }
-
-        _message = sb.ToString();
+        _message = result.Message ?? "Unbekannter Fehler.";
     }
 
     private void OnImageLoaded(string fileName)
@@ -103,7 +64,7 @@
 
     private Task HandleSelectedTagsChanged(List<TagDto> tags)
     {
-        _selectedTags = tags;
+        _viewModel.SelectedTags = tags;
         return Task.CompletedTask;
     }
 }

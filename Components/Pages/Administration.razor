@@ -2,8 +2,8 @@
 @using Korrekturmanagementsystem.Dtos
 @using Korrekturmanagementsystem.Services.Interfaces
 @using Microsoft.AspNetCore.Authorization
-@inject IRoleService RoleService
-@inject IMaterialService MaterialService
+@inject IRoleProvider RoleService
+@inject IMaterialProvider MaterialService
 @rendermode InteractiveServer
 
 @attribute [Authorize (Roles ="Admin")]
