@@ -46,7 +46,7 @@
 
     private async Task HandleValidSubmit()
     {
-        var result = await ReportService.UpdateReportAsync(_viewModel.Report, selectedFiles);
+        var result = await ReportService.UpdateReportAsync(_viewModel, selectedFiles);
 
         _message = result.Message ?? "Unbekannter Fehler.";
     }

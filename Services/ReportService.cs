@@ -62,9 +62,12 @@ public class ReportService : IReportService
         };
     }
 
-    public async Task<Result> UpdateReportAsync(UpdateReportDto model, List<IBrowserFile> files)
+    public async Task<Result> UpdateReportAsync(EditReportViewModel model, List<IBrowserFile> files)
     {
-        var updateResult = await _reportProvider.UpdateReportByIdAsync(model);
+        var updateResult = await _reportProvider.UpdateReportByIdAsync(model.Report);
+
+        await _reportTagProvider.UpdateReportTagsAsync(model.Report.Id, model.SelectedTags);
+
         if (!updateResult.IsSuccess)
         {
             return new Result { IsSuccess = false, Message = updateResult.Message ?? "Unbekannter Fehler" };
@@ -74,7 +77,7 @@ public class ReportService : IReportService
 
         if (files?.Count > 0)
         {
-            var uploadResult = await _fileUploadProvider.UploadAsync(model.Id, files);
+            var uploadResult = await _fileUploadProvider.UploadAsync(model.Report.Id, files);
 
             message.Append(uploadResult.Message ?? "Unbekannter Fehler.");
         }

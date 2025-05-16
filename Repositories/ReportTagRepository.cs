@@ -1,6 +1,7 @@
 ﻿using Korrekturmanagementsystem.Data;
 using Korrekturmanagementsystem.Data.Entities;
 using Korrekturmanagementsystem.Repositories.Interfaces;
+using Korrekturmanagementsystem.Shared;
 using Microsoft.EntityFrameworkCore;
 
 namespace Korrekturmanagementsystem.Repositories;
@@ -16,4 +17,24 @@ public class ReportTagRepository : BaseRepository<ReportTag>, IReportTagReposito
             .Where(rt => rt.ReportId == reportId)
             .ToListAsync();
     }
+
+    public async Task<bool> DeleteByReportIdAsync(Guid reportId)
+    {
+        try
+        {
+            var tagsToDelete = context.ReportTags
+                .Where(rt => rt.ReportId == reportId);
+
+            context.ReportTags.RemoveRange(tagsToDelete);
+            await context.SaveChangesAsync();
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+    }
+
+
 }

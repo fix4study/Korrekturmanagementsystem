@@ -25,6 +25,38 @@ public class ReportTagProvider : IReportTagProvider
         }
     }
 
+    public async Task UpdateReportTagsAsync(Guid reportId, List<TagDto> reportTags)
+    {
+        try
+        {
+            var success = await _reportTagRepository.DeleteByReportIdAsync(reportId);
+
+            if (!success)
+            {
+                return;
+            }
+
+            var reportTagToInsert = reportTags
+                .Select(tag => new ReportTagDto
+                {
+                    ReportId = reportId,
+                    TagId = tag.Id
+                })
+                .ToList();
+
+            if (!reportTagToInsert.Any())
+            {
+                return;
+            }
+
+            await InsertReportTagAsync(reportTagToInsert);
+        }
+        catch(Exception ex)
+        {
+            return;
+        }
+    }
+
     public async Task<IEnumerable<ReportTagDto>> GetReportTagsByReportIdAsync(Guid reportId)
     {
         var reportTags = await _reportTagRepository.GetReportTagsByReportIdAsync(reportId);
