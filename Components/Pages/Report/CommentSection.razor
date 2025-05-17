@@ -1,0 +1,103 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using Korrekturmanagementsystem.Dtos
+@using Korrekturmanagementsystem.Models
+@using Korrekturmanagementsystem.Services
+@using Korrekturmanagementsystem.Services.Interfaces
+@inject ICommentService CommentService
+
+<div class="card mb-3 shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-bold">Kommentare</span>
+        <button class="btn btn-sm btn-outline-secondary"
+                type="button"
+                @onclick="ToggleCollapse"
+                aria-expanded="@(!collapsed)"
+                aria-controls="commentsCollapse">
+            @(collapsed ? "Anzeigen" : "Ausblenden")
+        </button>
+    </div>
+    <div class="collapse @(collapsed ? "" : "show")" id="commentsCollapse">
+        <div class="p-3">
+            @if (_model is null)
+            {
+                <div class="text-muted">Lade Kommentare...</div>
+            }
+            else if (!_model.Comments.Any())
+            {
+                <p class="text-muted">Noch keine Kommentare vorhanden.</p>
+            }
+            else
+            {
+                <div class="d-flex flex-column gap-3 mb-4">
+                    @foreach (var comment in _model.Comments.OrderByDescending(c => c.CreatedAt))
+                    {
+                        <div class="border rounded shadow-sm p-3 bg-light">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div class="fw-semibold">
+                                    @comment.Author
+                                    <span class="fw-normal text-secondary small"> – @comment.StakeholderRoleName</span>
+                                </div>
+                                <small class="text-muted">@comment.CreatedAt.ToString("g")</small>
+                            </div>
+                            <div class="text-body">@comment.Content</div>
+                        </div>
+                    }
+                </div>
+            }
+
+            <EditForm Model="@newComment" OnValidSubmit="SubmitComment">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="mb-3">
+                    <InputTextArea class="form-control" @bind-Value="newComment.Content" rows="3" placeholder="Kommentar schreiben..." />
+                </div>
+
+                <button class="btn btn-sm btn-primary" type="submit">
+                    <i class="bi bi-chat-left-text me-1"></i> Kommentar hinzufügen
+                </button>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Guid ReportId { get; set; }
+
+    private CommentModel? _model;
+    private CommentInputModel newComment = new();
+
+    private bool collapsed = true;
+
+    private void ToggleCollapse()
+    {
+        collapsed = !collapsed;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadComments();
+    }
+
+    private async Task LoadComments()
+    {
+        _model = await CommentService.GetCommentsByReportIdAsync(ReportId);
+    }
+
+    private async Task SubmitComment()
+    {
+        if (!string.IsNullOrWhiteSpace(newComment.Content))
+        {
+            await CommentService.AddCommentAsync(ReportId, newComment.Content);
+            newComment = new();
+            await LoadComments();
+        }
+    }
+
+    private class CommentInputModel
+    {
+        [Required(ErrorMessage = "Kommentar darf nicht leer sein.")]
+        public string Content { get; set; } = string.Empty;
+    }
+}

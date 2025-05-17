@@ -5,6 +5,7 @@ using Korrekturmanagementsystem.Models;
 using System.Text;
 using Microsoft.AspNetCore.Components.Forms;
 using Korrekturmanagementsystem.Shared;
+using Korrekturmanagementsystem.Providers.Interfaces;
 
 namespace Korrekturmanagementsystem.Services;
 
@@ -14,26 +15,30 @@ public class ReportService : IReportService
     private readonly IReportProvider _reportProvider;
     private readonly IReportTagProvider _reportTagProvider;
     private readonly IFileUploadProvider _fileUploadProvider;
+    private readonly IReportHistoryProvider _reportHistoryProvider;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    public ReportService(IReportProvider reportProvider, 
-        IReportTagProvider reportTagProvider, 
+    public ReportService(IReportProvider reportProvider,
+        IReportTagProvider reportTagProvider,
         IAttachmentProvider attachmentProvider,
         IFileUploadProvider fileUploadProvider,
-        IHttpContextAccessor httpContextAccessor)
+        IHttpContextAccessor httpContextAccessor,
+        IReportHistoryProvider reportHistoryProvider)
     {
         _reportProvider = reportProvider;
         _reportTagProvider = reportTagProvider;
         _attachmentProvider = attachmentProvider;
         _fileUploadProvider = fileUploadProvider;
         _httpContextAccessor = httpContextAccessor;
+        _reportHistoryProvider = reportHistoryProvider;
     }
 
     public async Task<EditReportModel> BuildEditReportViewModelAsync(Guid reportId)
     {
         var options = await _reportProvider.GetFormOptionsAsync();
         var details = await _reportProvider.GetReportDetailsByIdAsync(reportId);
-        var attachments = (await _attachmentProvider.GetByReportIdAsync(reportId)).ToList();
-        var reportTags = (await _reportTagProvider.GetReportTagsByReportIdAsync(reportId)).ToList();
+        var attachments = await _attachmentProvider.GetByReportIdAsync(reportId);
+        var reportTags = await _reportTagProvider.GetReportTagsByReportIdAsync(reportId);
+        var reportHistory = await _reportHistoryProvider.GetAllReportHistoriesByReportIdAsync(reportId);
 
         var selectedTags = reportTags
             .Select(rt => new TagDto { Id = rt.TagId, Name = rt.TagName })
@@ -56,9 +61,10 @@ public class ReportService : IReportService
         {
             Report = dto,
             Options = options,
-            Attachments = attachments,
+            Attachments = attachments.ToList(),
             SelectedTags = selectedTags,
-            CreatedByUsername = details.CreatedByUsername ?? string.Empty
+            CreatedByUsername = details.CreatedByUsername ?? string.Empty,
+            ReportHistory = reportHistory
         };
     }
 
@@ -66,12 +72,20 @@ public class ReportService : IReportService
     {
         var updateResult = await _reportProvider.UpdateReportByIdAsync(model.Report);
 
-        await _reportTagProvider.UpdateReportTagsAsync(model.Report.Id, model.SelectedTags);
-
         if (!updateResult.IsSuccess)
         {
             return new Result { IsSuccess = false, Message = updateResult.Message ?? "Unbekannter Fehler" };
         }
+
+        var reportHistoryEntry = new CreateReportHistoryDto
+        {
+            ReportId = model.Report.Id,
+            StatusId = model.Report.StatusId,
+            Note = ""
+        };
+
+        await _reportHistoryProvider.AddReportHistoryAsync(reportHistoryEntry);
+        await _reportTagProvider.UpdateReportTagsAsync(model.Report.Id, model.SelectedTags);
 
         var message = new StringBuilder("Meldung erfolgreich aktualisiert. ");
 

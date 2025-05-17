@@ -10,5 +10,6 @@ public class EditReportModel
     public List<AttachmentDto> Attachments { get; set; } = new();
     public List<TagDto> SelectedTags { get; set; } = new();
     public string CreatedByUsername { get; set; } = string.Empty;
+    public IEnumerable<ReportHistoryDto> ReportHistory { get; set; } = default!;
 }
 

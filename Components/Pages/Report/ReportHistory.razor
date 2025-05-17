@@ -1,0 +1,56 @@
+﻿@using Korrekturmanagementsystem.Dtos
+@rendermode InteractiveServer
+
+<div class="card mb-3 shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-bold">Historie</span>
+        <button class="btn btn-sm btn-outline-secondary"
+                type="button"
+                @onclick="ToggleCollapse"
+                aria-expanded="@(!collapsed)"
+                aria-controls="activityCollapse">
+            @(collapsed ? "Anzeigen" : "Ausblenden")
+        </button>
+    </div>
+    <div class="collapse @(collapsed ? "" : "show")" id="activityCollapse">
+        @if (HistoryEntries != null && HistoryEntries.Any())
+        {
+            <ul class="list-group list-group-flush">
+                @foreach (var entry in HistoryEntries.OrderByDescending(h => h.ChangedAt))
+                {
+                    <li class="list-group-item">
+                        <div class="d-flex justify-content-between">
+                            <span>
+                                <strong>Status:</strong> @entry.StatusName
+                                @if (!string.IsNullOrWhiteSpace(entry.Note))
+                                {
+                                    <span class="text-muted ms-2">(@entry.Note)</span>
+                                }
+                            </span>
+                            <span class="text-muted small">@entry.ChangedAt.ToString("g")</span>
+                        </div>
+                        <div class="small text-muted">
+                            von <strong>@entry.ChangedByName</strong>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p class="text-muted m-3">Keine Aktivitäten vorhanden.</p>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public IEnumerable<ReportHistoryDto> HistoryEntries { get; set; } = default!;
+
+    private bool collapsed = true;
+
+    private void ToggleCollapse()
+    {
+        collapsed = !collapsed;
+    }
+}

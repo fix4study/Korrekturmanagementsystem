@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Korrekturmanagementsystem;
 
-public static class DependencyInjection 
+public static class DependencyInjection
 {
     public static IServiceCollection AddApplicationProviders(this IServiceCollection services, IConfiguration configuration)
     {
@@ -21,6 +21,7 @@ public static class DependencyInjection
         services.AddScoped<IAttachmentProvider, AttachmentProvider>();
         services.AddScoped<IReportTagProvider, ReportTagProvider>();
         services.AddScoped<ICommentProvider, CommentProvider>();
+        services.AddScoped<IReportHistoryProvider, ReportHistoryProvider>();
 
         return services;
     }
@@ -42,6 +43,7 @@ public static class DependencyInjection
         services.AddScoped<IReportRepository, ReportRepository>();
         services.AddScoped<IAttachmentRepository, AttachmentRepository>();
         services.AddScoped<IReportTagRepository, ReportTagRepository>();
+        services.AddScoped<IReportHistoryRepository, ReportHistoryRepository>();
 
         return services;
     }

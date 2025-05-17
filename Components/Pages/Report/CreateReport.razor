@@ -14,12 +14,12 @@
     <h3 class="mb-4">Meldung hinzufügen</h3>
 
     <ReportForm Model="@Model"
-        Options="@_optionsDto"
-        IsEdit="false"
-        ShowMessage="@_message"
-        OnValidSubmit="HandleValidSubmit"
-        SelectedTags="@_selectedTags"
-        SelectedTagsChanged="HandleSelectedTagsChanged" />
+                Options="@_optionsDto"
+                IsEdit="false"
+                ShowMessage="@_message"
+                OnValidSubmit="HandleValidSubmit"
+                SelectedTags="@_selectedTags"
+                SelectedTagsChanged="HandleSelectedTagsChanged" />
 
     <FileUploadPanel OnFilesChanged="files => _selectedFiles = files.ToList()" />
 }

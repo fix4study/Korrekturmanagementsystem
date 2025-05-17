@@ -13,23 +13,30 @@
     <h3 class="mb-4">Meldung bearbeiten</h3>
 
     <ReportForm Model="@_viewModel.Report"
-    Options="@_viewModel.Options"
-    CreatedBy="@_viewModel.CreatedByUsername"
-    IsEdit="true"
-    Attachments="@_viewModel.Attachments"
-    ShowAttachments="@_showAttachments"
-    OnToggleAttachments="ToggleAttachmentVisibility"
-    OnImageLoaded="OnImageLoaded"
-    ShowMessage="@_message"
-    OnValidSubmit="HandleValidSubmit"
-    SelectedTags="@_viewModel.SelectedTags"
-    SelectedTagsChanged="HandleSelectedTagsChanged" />
+                Options="@_viewModel.Options"
+                CreatedBy="@_viewModel.CreatedByUsername"
+                IsEdit="true"
+                Attachments="@_viewModel.Attachments"
+                ShowAttachments="@_showAttachments"
+                OnToggleAttachments="ToggleAttachmentVisibility"
+                OnImageLoaded="OnImageLoaded"
+                ShowMessage="@_message"
+                OnValidSubmit="HandleValidSubmit"
+                SelectedTags="@_viewModel.SelectedTags"
+                SelectedTagsChanged="HandleSelectedTagsChanged" />
 
     <FileUploadPanel OnFilesChanged="files => selectedFiles = files.ToList()" />
 
-    if (_viewModel.Report.Id != Guid.Empty) {
-        <CommentSection ReportId="_viewModel.Report.Id" />
+    if (_viewModel.Report.Id != Guid.Empty)
+    {
+        <div class="mb-4">
+            <CommentSection ReportId="_viewModel.Report.Id" />
+        </div>
     }
+
+    <div class="mb-4">
+        <ReportHistory HistoryEntries="_viewModel.ReportHistory" />
+    </div>
 }
 
 @code {
@@ -38,14 +45,14 @@
     private HashSet<string> _loadedImages = new();
     private string _message = "";
     private List<IBrowserFile> selectedFiles = new();
-    
+
 
     [Parameter]
     public Guid Id { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        _viewModel  = await ReportService.BuildEditReportViewModelAsync(Id);
+        _viewModel = await ReportService.BuildEditReportViewModelAsync(Id);
     }
 
     private async Task HandleValidSubmit()
