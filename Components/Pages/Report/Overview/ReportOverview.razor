@@ -28,7 +28,7 @@
             <ReportCard Report="report" />
         }
 
-        <Pagination TotalPages="@TotalPages" CurrentPage="@CurrentPage" OnPageChange="SetPage" />
+        <Pagination TotalPages="@Paging.TotalPages" CurrentPage="@Paging.CurrentPage" OnPageChange="Paging.SetPage" />
     }
     else
     {
@@ -41,6 +41,7 @@
     private ReportFilterModel Filter { get; set; } = new();
     private ReportSortingModel Sorting { get; set; } = new();
     private List<ReportOverviewDto> FilteredReports => Filter.Apply(AllReports);
+    private PagingModel Paging { get; set; } = new();
 
     private IEnumerable<string> DistinctStatuses => AllReports
         .Select(r => r.StatusName)
@@ -52,25 +53,12 @@
         .Distinct()
         .OrderBy(s => s);
 
-    private int PageSize = 5;
-    private int CurrentPage = 1;
-    private int TotalPages => (int)Math.Ceiling((double)FilteredReports.Count / PageSize);
-
     private IEnumerable<ReportOverviewDto> CurrentPageReports =>
-        Sorting.SortedReports(FilteredReports).Skip((CurrentPage - 1) * PageSize).Take(PageSize);
-
-
-    private void SetPage(int page)
-    {
-        if (page >= 1 && page <= TotalPages)
-        {
-            CurrentPage = page;
-        }
-    }
+        Paging.Paginate(Sorting.SortedReports(FilteredReports));
 
     protected override async Task OnInitializedAsync()
     {
         AllReports = (await ReportService.GetReportsOverviewAsync()).ToList();
-        Filter.OnChanged = () => { CurrentPage = 1; StateHasChanged(); };
+        Filter.OnChanged = () => { Paging.CurrentPage = 1; StateHasChanged(); };
     }
 }
