@@ -1,0 +1,33 @@
+﻿@using Korrekturmanagementsystem.Models.Enums
+
+<div class="d-flex gap-2 mb-2">
+    <button class="btn btn-outline-secondary btn-sm"
+            @onclick="() => OnSortChanged.InvokeAsync(SortField.CreatedAt)">
+        Erstellungsdatum
+        @if (CurrentSortField == SortField.CreatedAt)
+        {
+            <span>@(SortDescending ? "▼" : "▲")</span>
+        }
+    </button>
+    <button class="btn btn-outline-secondary btn-sm"
+            @onclick="() => OnSortChanged.InvokeAsync(SortField.UpdatedAt)">
+        Aktualisiert am
+        @if (CurrentSortField == SortField.UpdatedAt)
+        {
+            <span>@(SortDescending ? "▼" : "▲")</span>
+        }
+    </button>
+</div>
+
+
+@code {
+    [Parameter]
+    public SortField CurrentSortField { get; set; }
+
+    [Parameter]
+    public bool SortDescending { get; set; }
+
+    [Parameter]
+    public EventCallback<SortField> OnSortChanged { get; set; }
+
+}

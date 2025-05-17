@@ -2,6 +2,7 @@
 @using Korrekturmanagementsystem.Dtos
 @using Korrekturmanagementsystem.Dtos.Report
 @using Korrekturmanagementsystem.Models
+@using Korrekturmanagementsystem.Models.Enums
 @using Korrekturmanagementsystem.Services.Interfaces
 @inject IReportProvider ReportService
 @rendermode InteractiveServer
@@ -18,26 +19,13 @@
 
         <ReportFilter Filter="Filter" Statuses="DistinctStatuses" Priorities="DistinctPriorities" />
 
+        <Sorting CurrentSortField="Sorting.CurrentSortField"
+                 SortDescending="Sorting.SortDescending"
+                 OnSortChanged="Sorting.SetSort" />
+
         @foreach (var report in CurrentPageReports)
         {
-            <div class="card border shadow-sm mb-2">
-                <div class="card-body p-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-1 h6">@report.Title</h5>
-                        <em>Erstellt am: @report.CreatedAt.ToShortDateString()</em>
-                    </div>
-                    <div class="d-flex justify-content-between text-muted small">
-                        <div>
-                            <strong>Status:</strong> @report.StatusName |
-                            <strong>Prio:</strong> @report.PriorityName
-                        </div>
-                        <em>Aktualisiert am: @report.UpdatedAt.ToShortDateString()</em>
-                    </div>
-                    <div class="mt-2 text-end">
-                        <a class="btn btn-sm btn-primary" href="@($"/meldungen/details/{report.Id}")">Details</a>
-                    </div>
-                </div>
-            </div>
+            <ReportCard Report="report" />
         }
 
         <Pagination TotalPages="@TotalPages" CurrentPage="@CurrentPage" OnPageChange="SetPage" />
@@ -51,6 +39,7 @@
 @code {
     private List<ReportOverviewDto> AllReports { get; set; } = new();
     private ReportFilterModel Filter { get; set; } = new();
+    private ReportSortingModel Sorting { get; set; } = new();
     private List<ReportOverviewDto> FilteredReports => Filter.Apply(AllReports);
 
     private IEnumerable<string> DistinctStatuses => AllReports
@@ -63,13 +52,13 @@
         .Distinct()
         .OrderBy(s => s);
 
-
     private int PageSize = 5;
     private int CurrentPage = 1;
     private int TotalPages => (int)Math.Ceiling((double)FilteredReports.Count / PageSize);
 
     private IEnumerable<ReportOverviewDto> CurrentPageReports =>
-        FilteredReports.Skip((CurrentPage - 1) * PageSize).Take(PageSize);
+        Sorting.SortedReports(FilteredReports).Skip((CurrentPage - 1) * PageSize).Take(PageSize);
+
 
     private void SetPage(int page)
     {
@@ -84,5 +73,4 @@
         AllReports = (await ReportService.GetReportsOverviewAsync()).ToList();
         Filter.OnChanged = () => { CurrentPage = 1; StateHasChanged(); };
     }
-
 }
