@@ -3,6 +3,7 @@
 @using Korrekturmanagementsystem.Components.Shared
 @using Korrekturmanagementsystem.Dtos
 @using Korrekturmanagementsystem.Dtos.Report
+@using Korrekturmanagementsystem.Models
 @using Korrekturmanagementsystem.Services.Interfaces
 @using Microsoft.AspNetCore.Components.Forms
 @inject IReportService ReportService
@@ -13,7 +14,7 @@
 {
     <h3 class="mb-4">Meldung hinzufügen</h3>
 
-    <ReportForm Model="@Model"
+    <ReportForm Model="@_viewModel"
                 Options="@_optionsDto"
                 IsEdit="false"
                 ShowMessage="@_message"
@@ -25,7 +26,7 @@
 }
 
 @code {
-    public AddReportDto Model { get; set; } = new();
+    public EditReportModel _viewModel { get; set; } = new();
     public ReportFormOptionsDto _optionsDto { get; set; } = default!;
     private List<IBrowserFile> _selectedFiles = new();
     private List<TagDto> _selectedTags = new();
@@ -33,12 +34,12 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _optionsDto = await ReportService.GetFormOptionsAsync();
+        var options = await ReportService.GetFormOptionsAsync();
     }
 
     private async Task HandleValidSubmit()
     {
-        var result = await ReportService.AddReportAsync(Model, _selectedTags, _selectedFiles);
+        var result = await ReportService.AddReportAsync(_viewModel, _selectedTags, _selectedFiles);
 
         _message = result.Message ?? "Unbekannter Fehler.";
 

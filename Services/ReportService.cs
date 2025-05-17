@@ -68,7 +68,7 @@ public class ReportService : IReportService
         };
     }
 
-    public async Task<Result> UpdateReportAsync(EditReportModel model, List<IBrowserFile> files)
+    public async Task<Result> UpdateReportAsync(EditReportModel model, List<IBrowserFile> files, string statusNote)
     {
         var updateResult = await _reportProvider.UpdateReportByIdAsync(model.Report);
 
@@ -77,12 +77,14 @@ public class ReportService : IReportService
             return new Result { IsSuccess = false, Message = updateResult.Message ?? "Unbekannter Fehler" };
         }
 
-        var reportHistoryEntry = new CreateReportHistoryDto
-        {
-            ReportId = model.Report.Id,
-            StatusId = model.Report.StatusId,
-            Note = ""
-        };
+
+            var reportHistoryEntry = new CreateReportHistoryDto
+            {
+                ReportId = model.Report.Id,
+                StatusId = model.Report.StatusId,
+                Note = ""
+            };
+        
 
         await _reportHistoryProvider.AddReportHistoryAsync(reportHistoryEntry);
         await _reportTagProvider.UpdateReportTagsAsync(model.Report.Id, model.SelectedTags);
@@ -102,12 +104,23 @@ public class ReportService : IReportService
     public async Task<ReportFormOptionsDto> GetFormOptionsAsync()
         => await _reportProvider.GetFormOptionsAsync();
 
-    public async Task<Result> AddReportAsync(AddReportDto report, List<TagDto> selectedTags, List<IBrowserFile> files)
+    public async Task<Result> AddReportAsync(EditReportModel model, List<TagDto> selectedTags, List<IBrowserFile> files)
     {
         if (!_httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false)
         {
             return new Result { IsSuccess = false, Message = "Sie sind nicht berechtigt eine Meldung zu erstellen." };
         }
+
+        var report = new AddReportDto
+        {
+            Title = model.Report.Title,
+            Description = model.Report.Description,
+            ReportTypeId = model.Report.ReportTypeId,
+            PriorityId = model.Report.PriorityId,
+            MaterialTypeId = model.Report.MaterialTypeId,
+            CourseId = model.Report.CourseId,
+            StatusId = model.Report.StatusId
+        };
 
         var reportId = await _reportProvider.AddReportAsync(report);
 

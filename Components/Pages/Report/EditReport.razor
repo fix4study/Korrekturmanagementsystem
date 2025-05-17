@@ -12,18 +12,16 @@
 {
     <h3 class="mb-4">Meldung bearbeiten</h3>
 
-    <ReportForm Model="@_viewModel.Report"
-                Options="@_viewModel.Options"
-                CreatedBy="@_viewModel.CreatedByUsername"
+    <ReportForm Model="@_viewModel"
                 IsEdit="true"
-                Attachments="@_viewModel.Attachments"
                 ShowAttachments="@_showAttachments"
                 OnToggleAttachments="ToggleAttachmentVisibility"
                 OnImageLoaded="OnImageLoaded"
                 ShowMessage="@_message"
                 OnValidSubmit="HandleValidSubmit"
-                SelectedTags="@_viewModel.SelectedTags"
-                SelectedTagsChanged="HandleSelectedTagsChanged" />
+                SelectedTagsChanged="HandleSelectedTagsChanged"
+                StatusNote="_statusNote" />
+
 
     <FileUploadPanel OnFilesChanged="files => selectedFiles = files.ToList()" />
 
@@ -45,6 +43,7 @@
     private HashSet<string> _loadedImages = new();
     private string _message = "";
     private List<IBrowserFile> selectedFiles = new();
+    private string _statusNote = default!;
 
 
     [Parameter]
@@ -57,7 +56,7 @@
 
     private async Task HandleValidSubmit()
     {
-        var result = await ReportService.UpdateReportAsync(_viewModel, selectedFiles);
+        var result = await ReportService.UpdateReportAsync(_viewModel, selectedFiles, _statusNote);
 
         _message = result.Message ?? "Unbekannter Fehler.";
     }

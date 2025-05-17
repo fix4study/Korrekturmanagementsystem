@@ -1,5 +1,6 @@
 ﻿@using Korrekturmanagementsystem.Dtos
 @using Korrekturmanagementsystem.Dtos.Report
+@using Korrekturmanagementsystem.Models
 @using Korrekturmanagementsystem.Services.Interfaces
 @using Microsoft.AspNetCore.Components.Forms
 
@@ -15,19 +16,19 @@
                 <div class="card-body">
                     <div class="mb-3">
                         <label class="form-label">Titel</label>
-                        <InputText class="form-control" @bind-Value="Model.Title" />
+                        <InputText class="form-control" @bind-Value="Model.Report.Title" />
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Beschreibung</label>
-                        <InputTextArea class="form-control" rows="4" @bind-Value="Model.Description" />
+                        <InputTextArea class="form-control" rows="4" @bind-Value="Model.Report.Description" />
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Meldungstyp</label>
-                        <InputSelect class="form-select" @bind-Value="Model.ReportTypeId">
+                        <InputSelect class="form-select" @bind-Value="Model.Report.ReportTypeId">
                             <option disabled value="">-- Bitte wählen --</option>
-                            @foreach (var type in Options.ReportTypes)
+                            @foreach (var type in Model.Options.ReportTypes)
                             {
                                 <option value="@type.Id">@type.Name</option>
                             }
@@ -36,9 +37,9 @@
 
                     <div class="mb-3">
                         <label class="form-label">Materialtyp</label>
-                        <InputSelect class="form-select" @bind-Value="Model.MaterialTypeId">
+                        <InputSelect class="form-select" @bind-Value="Model.Report.MaterialTypeId">
                             <option disabled value="">-- Bitte wählen --</option>
-                            @foreach (var type in Options.MaterialTypes)
+                            @foreach (var type in Model.Options.MaterialTypes)
                             {
                                 <option value="@type.Id">@type.Name</option>
                             }
@@ -47,9 +48,9 @@
 
                     <div class="mb-3">
                         <label class="form-label">Kurs (optional)</label>
-                        <InputSelect class="form-select" @bind-Value="Model.CourseId">
+                        <InputSelect class="form-select" @bind-Value="Model.Report.CourseId">
                             <option value="">-- Kein Kurs --</option>
-                            @foreach (var course in Options.Courses)
+                            @foreach (var course in Model.Options.Courses)
                             {
                                 <option value="@course.Id">@course.Name (@course.Code)</option>
                             }
@@ -64,7 +65,7 @@
                     <div class="card-header fw-semibold">Anhänge</div>
                     <div class="card-body">
 
-                        @if (Attachments?.Any() == true)
+                        @if (Model.Attachments?.Any() == true)
                         {
                             <button type="button" class="btn btn-sm btn-outline-secondary mb-3" @onclick="OnToggleAttachments">
                                 @(ShowAttachments ? "Anhänge ausblenden" : "Anhänge anzeigen")
@@ -73,7 +74,7 @@
                             @if (ShowAttachments)
                             {
                                 <div class="row g-2">
-                                    @foreach (var attachment in Attachments)
+                                    @foreach (var attachment in Model.Attachments)
                                     {
                                         <div class="col-6 col-sm-4 col-lg-3">
                                             <div class="border rounded p-2 text-center">
@@ -115,26 +116,49 @@
                     {
                         <div class="mb-3">
                             <label class="form-label">Erstellt von</label>
-                            <p class="form-control-plaintext">@CreatedBy</p>
+                            <p class="form-control-plaintext">@Model.CreatedByUsername</p>
                         </div>
                     }
-
-                    <div class="mb-3">
-                        <label class="form-label">Status</label>
-                        <InputSelect class="form-select" @bind-Value="Model.StatusId">
-                            <option value="">-- Kein Status --</option>
-                            @foreach (var status in Options.Statuses)
+                    <div class="card mb-3 border-info">
+                        <div class="card-header bg-info bg-opacity-10 fw-semibold">
+                            Status (intern)
+                        </div>
+                        <div class="card-body">
+                            @if (1 == 1) //IsInternalUser (TODO)
                             {
-                                <option value="@status.Id">@status.Name</option>
+                                <div class="mb-3">
+                                    <label class="form-label">Status</label>
+                                    <InputSelect class="form-select" @bind-Value="Model.Report.StatusId">
+                                        <option value="">-- Kein Status --</option>
+                                        @foreach (var status in Model.Options.Statuses)
+                                        {
+                                            <option value="@status.Id">@status.Name</option>
+                                        }
+                                    </InputSelect>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Kommentar (optional)</label>
+                                    <InputTextArea class="form-control" rows="4" @bind-Value="StatusNote" />
+                                </div>
                             }
-                        </InputSelect>
+                            else
+                            {
+                                <div class="mb-3">
+                                    <label class="form-label">Status</label>
+                                    <p class="form-control-plaintext">
+                                        @Model.Options.Statuses.FirstOrDefault(s => s.Id == Model.Report.StatusId)?.Name ?? "–"
+                                    </p>
+                                </div>
+                            }
+                        </div>
                     </div>
+
 
                     <div class="mb-3">
                         <label class="form-label">Priorität</label>
-                        <InputSelect class="form-select" @bind-Value="Model.PriorityId">
+                        <InputSelect class="form-select" @bind-Value="Model.Report.PriorityId">
                             <option disabled value="">-- Bitte wählen --</option>
-                            @foreach (var priority in Options.Priorities)
+                            @foreach (var priority in Model.Options.Priorities)
                             {
                                 <option value="@priority.Id">@priority.Name</option>
                             }
@@ -144,8 +168,8 @@
                     <!-- Tags Auswahl -->
                     <div class="mb-3">
                         <label class="form-label">Tags</label>
-                        <TagSelector AvailableTags="Options.Tags"
-                                     SelectedTags="SelectedTags"
+                        <TagSelector AvailableTags="Model.Options.Tags"
+                                     SelectedTags="Model.SelectedTags"
                                      SelectedTagsChanged="SelectedTagsChanged" />
                     </div>
 
@@ -165,19 +189,15 @@
 </EditForm>
 
 @code {
-    [Parameter] public BaseReportDto Model { get; set; } = default!;
-    [Parameter] public ReportFormOptionsDto Options { get; set; } = default!;
+    [Parameter] public EditReportModel Model { get; set; } = default!;
     [Parameter] public EventCallback OnValidSubmit { get; set; }
-    [Parameter] public List<AttachmentDto> Attachments { get; set; } = new();
     [Parameter] public string ShowMessage { get; set; } = string.Empty;
     [Parameter] public bool ShowAttachments { get; set; }
     [Parameter] public EventCallback OnToggleAttachments { get; set; }
     [Parameter] public EventCallback<string> OnImageLoaded { get; set; }
     [Parameter] public bool IsEdit { get; set; } = false;
-    [Parameter] public string CreatedBy { get; set; } = string.Empty;
-    [Parameter] public List<TagDto> SelectedTags { get; set; } = new();
     [Parameter] public EventCallback<List<TagDto>> SelectedTagsChanged { get; set; }
-
+    [Parameter] public string StatusNote { get; set; } = default!;
 
     [Inject]
     public IFileUploadProvider FileUploadService { get; set; } = default!;
