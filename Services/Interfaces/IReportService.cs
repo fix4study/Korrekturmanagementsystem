@@ -9,7 +9,7 @@ namespace Korrekturmanagementsystem.Services.Interfaces;
 public interface IReportService
 {
     Task<EditReportModel> BuildEditReportViewModelAsync(Guid reportId);
-    Task<Result> UpdateReportAsync(EditReportModel model, List<IBrowserFile> files, string statusNote);
+    Task<Result> UpdateReportAsync(EditReportModel model, List<IBrowserFile> files);
     Task<Result> AddReportAsync(EditReportModel model, List<TagDto> selectedTags, List<IBrowserFile> files);
     Task<ReportFormOptionsDto> GetFormOptionsAsync();
 }

@@ -138,7 +138,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Kommentar (optional)</label>
-                                    <InputTextArea class="form-control" rows="4" @bind-Value="StatusNote" />
+                                    <InputTextArea class="form-control" rows="4" @bind-Value="Model.StatusNote" />
                                 </div>
                             }
                             else
@@ -197,7 +197,6 @@
     [Parameter] public EventCallback<string> OnImageLoaded { get; set; }
     [Parameter] public bool IsEdit { get; set; } = false;
     [Parameter] public EventCallback<List<TagDto>> SelectedTagsChanged { get; set; }
-    [Parameter] public string StatusNote { get; set; } = default!;
 
     [Inject]
     public IFileUploadProvider FileUploadService { get; set; } = default!;

@@ -19,8 +19,7 @@
                 OnImageLoaded="OnImageLoaded"
                 ShowMessage="@_message"
                 OnValidSubmit="HandleValidSubmit"
-                SelectedTagsChanged="HandleSelectedTagsChanged"
-                StatusNote="_statusNote" />
+                SelectedTagsChanged="HandleSelectedTagsChanged"/>
 
 
     <FileUploadPanel OnFilesChanged="files => selectedFiles = files.ToList()" />
@@ -43,8 +42,6 @@
     private HashSet<string> _loadedImages = new();
     private string _message = "";
     private List<IBrowserFile> selectedFiles = new();
-    private string _statusNote = default!;
-
 
     [Parameter]
     public Guid Id { get; set; }
@@ -56,7 +53,7 @@
 
     private async Task HandleValidSubmit()
     {
-        var result = await ReportService.UpdateReportAsync(_viewModel, selectedFiles, _statusNote);
+        var result = await ReportService.UpdateReportAsync(_viewModel, selectedFiles);
 
         _message = result.Message ?? "Unbekannter Fehler.";
     }
@@ -66,6 +63,7 @@
         _loadedImages.Add(fileName);
         StateHasChanged();
     }
+
 
     private void ToggleAttachmentVisibility()
     {
