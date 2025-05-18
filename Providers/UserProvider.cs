@@ -9,6 +9,7 @@ namespace Korrekturmanagementsystem.Services;
 public class UserProvider : IUserProvider
 {
     private readonly IUserRepository _userRepository;
+
     public UserProvider(IUserRepository userRepository)
     {
         _userRepository = userRepository;
@@ -65,7 +66,7 @@ public class UserProvider : IUserProvider
         };
     }
 
-    public async Task<Result> CreateUser(CreateUserDto user)
+    public async Task<Result> CreateUser(CreateUserDto user, Guid systemRoleId)
     {
         var result = await CheckUserConflictsAsync(user);
         if (!result.IsSuccess)
@@ -80,14 +81,14 @@ public class UserProvider : IUserProvider
             Email = user.Email,
             Password = user.Password,
             StakeholderRoleId = user.StakeholderRoleId,
-            SystemRoleId = Guid.Parse("a937147a-86b6-4af7-bbff-c8d04741e411"), //Standard User Role, Todo: Select User Role
+            SystemRoleId = systemRoleId,
             CreatedAt = DateTime.UtcNow
         };
 
         try
         {
             await _userRepository.InsertAsync(userEntity);
-            return Result.Success();
+            return Result.Success("Registrierung erfolgreich!");
         }
         catch (Exception ex)
         {

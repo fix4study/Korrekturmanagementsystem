@@ -32,6 +32,7 @@ public static class DependencyInjection
         services.AddScoped<ICommentService, CommentService>();
         services.AddScoped<IPasswordService, PasswordService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<IUserService, UserService>();
 
         return services;
     }
@@ -44,6 +45,7 @@ public static class DependencyInjection
         services.AddScoped<IAttachmentRepository, AttachmentRepository>();
         services.AddScoped<IReportTagRepository, ReportTagRepository>();
         services.AddScoped<IReportHistoryRepository, ReportHistoryRepository>();
+        services.AddScoped<ISystemRoleRepository, SystemRoleRepository>();
 
         return services;
     }

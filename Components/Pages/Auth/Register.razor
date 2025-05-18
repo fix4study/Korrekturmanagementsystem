@@ -11,7 +11,7 @@
 
 @inject NavigationManager Navigation
 @inject IPasswordService passwordService
-@inject IUserProvider userService
+@inject IUserService userService
 @inject IRoleProvider roleService
 
 
@@ -94,7 +94,7 @@
 
         var hashedPassword = passwordService.HashPassword(Model.Password);
 
-        var result = await userService.CreateUser(new CreateUserDto
+        message = await userService.CreateUser(new CreateUserDto
         {
             Username = Model.Username,
             Email = Model.Email,
@@ -102,13 +102,6 @@
             StakeholderRoleId = selectedRole
         });
 
-        if (!result.IsSuccess)
-        {
-            message = result.Message ?? "Registrierung fehlgeschlagen.";
-            return;
-        }
-
-        message = "Registrierung erfolgreich!";
         await Task.Delay(1500);
         Navigation.NavigateTo("account/login");
     }

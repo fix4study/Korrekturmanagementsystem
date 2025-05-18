@@ -8,9 +8,25 @@ namespace Korrekturmanagementsystem.Services;
 public class RoleProvider : IRoleProvider
 {
     private readonly IBaseRepository<StakeholderRole> _roleRepository;
-    public RoleProvider(IBaseRepository<StakeholderRole> repository)
+    private readonly ISystemRoleRepository _systemRoleRepository;
+    public RoleProvider(IBaseRepository<StakeholderRole> repository, ISystemRoleRepository systemRoleRepository)
     {
         _roleRepository = repository;
+        _systemRoleRepository = systemRoleRepository;
+    }
+
+    public async Task<Guid?> GetSystemRoleIdByNameAsync(string name)
+    {
+        var id = await _systemRoleRepository.GetSystemRoleIdByNameAsync(name);
+
+        if (id is null)
+        {
+            return null;
+        }
+        else
+        {
+            return id;
+        }
     }
 
     public async Task AddStakeholderRoleAsync(string name)
