@@ -58,7 +58,7 @@ public class ReportProvider : IReportProvider
                 PriorityId = report.PriorityId,
                 MaterialTypeId = report.MaterialTypeId,
                 CourseId = report.CourseId,
-                StatusId = 1, //Todo immer Status Offen
+                StatusId = (int)Models.Enums.Status.Eingereicht,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
                 CreatedById = currentUser

@@ -10,24 +10,21 @@
 @inject NavigationManager Navigation
 @rendermode InteractiveServer
 
-@if (_optionsDto != null)
+@if (_model.Options != null)
 {
     <h3 class="mb-4">Meldung hinzufügen</h3>
 
-    <ReportForm Model="@_viewModel"
-                Options="@_optionsDto"
+    <ReportForm Model="@_model"
                 IsEdit="false"
                 ShowMessage="@_message"
                 OnValidSubmit="HandleValidSubmit"
-                SelectedTags="@_selectedTags"
                 SelectedTagsChanged="HandleSelectedTagsChanged" />
 
     <FileUploadPanel OnFilesChanged="files => _selectedFiles = files.ToList()" />
 }
 
 @code {
-    public EditReportModel _viewModel { get; set; } = new();
-    public ReportFormOptionsDto _optionsDto { get; set; } = default!;
+    public EditReportModel _model { get; set; } = new();
     private List<IBrowserFile> _selectedFiles = new();
     private List<TagDto> _selectedTags = new();
     private string _message = "";
@@ -35,11 +32,12 @@
     protected override async Task OnInitializedAsync()
     {
         var options = await ReportService.GetFormOptionsAsync();
+        _model.Options = options;
     }
 
     private async Task HandleValidSubmit()
     {
-        var result = await ReportService.AddReportAsync(_viewModel, _selectedTags, _selectedFiles);
+        var result = await ReportService.AddReportAsync(_model, _selectedTags, _selectedFiles);
 
         _message = result.Message ?? "Unbekannter Fehler.";
 

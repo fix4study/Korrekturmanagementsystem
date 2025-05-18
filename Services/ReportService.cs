@@ -111,7 +111,6 @@ public class ReportService : IReportService
             PriorityId = model.Report.PriorityId,
             MaterialTypeId = model.Report.MaterialTypeId,
             CourseId = model.Report.CourseId,
-            StatusId = model.Report.StatusId
         };
 
         var reportId = await _reportProvider.AddReportAsync(report);

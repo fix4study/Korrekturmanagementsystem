@@ -8,5 +8,4 @@ public class BaseReportDto
     public int PriorityId { get; set; }
     public int MaterialTypeId { get; set; }
     public Guid? CourseId { get; set; }
-    public int StatusId { get; set; }
 }

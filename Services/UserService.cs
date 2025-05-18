@@ -51,7 +51,7 @@ public class UserService : IUserService
                 return RoleResolutionResult.Failure("Für Studierende muss eine @iu-study.org E-Mail-Adresse angegeben werden.");
             }
 
-            role = SystemRole.Student;
+            role = SystemRole.User;
         }
 
         var systemRoleId = await _roleProvider.GetSystemRoleIdByNameAsync(role.ToString());

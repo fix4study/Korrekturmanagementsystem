@@ -47,7 +47,7 @@
     [Parameter]
     public IEnumerable<ReportHistoryDto> HistoryEntries { get; set; } = default!;
 
-    private bool collapsed = true;
+    private bool collapsed = false;
 
     private void ToggleCollapse()
     {

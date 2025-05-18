@@ -18,17 +18,30 @@
     </div>
     <div class="collapse @(collapsed ? "" : "show")" id="commentsCollapse">
         <div class="p-3">
+            <EditForm Model="@newComment" OnValidSubmit="SubmitComment">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="mb-3">
+                    <InputTextArea class="form-control" @bind-Value="newComment.Content" rows="3" placeholder="Kommentar schreiben..." />
+                </div>
+
+                <button class="btn btn-sm btn-primary" type="submit">
+                    <i class="bi bi-chat-left-text me-1"></i> Kommentar hinzufügen
+                </button>
+            </EditForm>
+
             @if (_model is null)
             {
-                <div class="text-muted">Lade Kommentare...</div>
+                <div class="text-muted mt-3">Lade Kommentare...</div>
             }
             else if (!_model.Comments.Any())
             {
-                <p class="text-muted">Noch keine Kommentare vorhanden.</p>
+                <p class="text-muted mt-3">Noch keine Kommentare vorhanden.</p>
             }
             else
             {
-                <div class="d-flex flex-column gap-3 mb-4">
+                <div class="d-flex flex-column gap-3 mb-4 mt-3">
                     @foreach (var comment in _model.Comments.OrderByDescending(c => c.CreatedAt))
                     {
                         <div class="border rounded shadow-sm p-3 bg-light">
@@ -44,22 +57,10 @@
                     }
                 </div>
             }
-
-            <EditForm Model="@newComment" OnValidSubmit="SubmitComment">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
-
-                <div class="mb-3">
-                    <InputTextArea class="form-control" @bind-Value="newComment.Content" rows="3" placeholder="Kommentar schreiben..." />
-                </div>
-
-                <button class="btn btn-sm btn-primary" type="submit">
-                    <i class="bi bi-chat-left-text me-1"></i> Kommentar hinzufügen
-                </button>
-            </EditForm>
         </div>
     </div>
 </div>
+
 
 @code {
     [Parameter]
@@ -68,7 +69,7 @@
     private CommentModel? _model;
     private CommentInputModel newComment = new();
 
-    private bool collapsed = true;
+    private bool collapsed = false;
 
     private void ToggleCollapse()
     {
