@@ -24,7 +24,7 @@
                                 <strong>Status:</strong> @entry.StatusName
                                 @if (!string.IsNullOrWhiteSpace(entry.Note))
                                 {
-                                    <span class="text-muted ms-2">(@entry.Note)</span>
+                                    <span class="text-muted ms-2">(Kommentar: @entry.Note)</span>
                                 }
                             </span>
                             <span class="text-muted small">@entry.ChangedAt.ToString("g")</span>

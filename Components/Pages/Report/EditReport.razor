@@ -12,18 +12,15 @@
 {
     <h3 class="mb-4">Meldung bearbeiten</h3>
 
-    <ReportForm Model="@_viewModel.Report"
-                Options="@_viewModel.Options"
-                CreatedBy="@_viewModel.CreatedByUsername"
+    <ReportForm Model="@_viewModel"
                 IsEdit="true"
-                Attachments="@_viewModel.Attachments"
                 ShowAttachments="@_showAttachments"
                 OnToggleAttachments="ToggleAttachmentVisibility"
                 OnImageLoaded="OnImageLoaded"
                 ShowMessage="@_message"
                 OnValidSubmit="HandleValidSubmit"
-                SelectedTags="@_viewModel.SelectedTags"
-                SelectedTagsChanged="HandleSelectedTagsChanged" />
+                SelectedTagsChanged="HandleSelectedTagsChanged"/>
+
 
     <FileUploadPanel OnFilesChanged="files => selectedFiles = files.ToList()" />
 
@@ -46,7 +43,6 @@
     private string _message = "";
     private List<IBrowserFile> selectedFiles = new();
 
-
     [Parameter]
     public Guid Id { get; set; }
 
@@ -67,6 +63,7 @@
         _loadedImages.Add(fileName);
         StateHasChanged();
     }
+
 
     private void ToggleAttachmentVisibility()
     {
