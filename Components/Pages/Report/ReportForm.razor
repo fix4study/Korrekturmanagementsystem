@@ -124,35 +124,34 @@
                             Status (intern)
                         </div>
                         <div class="card-body">
-                            @if (1 == 1) //IsInternalUser (TODO)
-                            {
-                                <div class="mb-3">
-                                    <label class="form-label">Status</label>
-                                    <InputSelect class="form-select" @bind-Value="Model.Report.StatusId">
-                                        <option value="">-- Kein Status --</option>
-                                        @foreach (var status in Model.Options.Statuses)
-                                        {
-                                            <option value="@status.Id">@status.Name</option>
-                                        }
-                                    </InputSelect>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Kommentar (optional)</label>
-                                    <InputTextArea class="form-control" rows="4" @bind-Value="Model.StatusNote" />
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="mb-3">
-                                    <label class="form-label">Status</label>
-                                    <p class="form-control-plaintext">
-                                        @Model.Options.Statuses.FirstOrDefault(s => s.Id == Model.Report.StatusId)?.Name ?? "–"
-                                    </p>
-                                </div>
-                            }
+                            <AuthorizeView Roles="Admin, Intern">
+                                <Authorized Context="authContext">
+                                    <div class="mb-3">
+                                        <label class="form-label">Status</label>
+                                        <InputSelect class="form-select" @bind-Value="Model.Report.StatusId">
+                                            <option value="">-- Kein Status --</option>
+                                            @foreach (var status in Model.Options.Statuses)
+                                            {
+                                                <option value="@status.Id">@status.Name</option>
+                                            }
+                                        </InputSelect>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Kommentar (optional)</label>
+                                        <InputTextArea class="form-control" rows="4" @bind-Value="Model.StatusNote" />
+                                    </div>
+                                </Authorized>
+                                <NotAuthorized Context="notAuthContext">
+                                    <div class="mb-3">
+                                        <label class="form-label">Status</label>
+                                        <p class="form-control-plaintext">
+                                            @Model.Options.Statuses.FirstOrDefault(s => s.Id == Model.Report.StatusId)?.Name ?? "–"
+                                        </p>
+                                    </div>
+                                </NotAuthorized>
+                            </AuthorizeView>
                         </div>
                     </div>
-
 
                     <div class="mb-3">
                         <label class="form-label">Priorität</label>
