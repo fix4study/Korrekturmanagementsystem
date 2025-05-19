@@ -14,7 +14,10 @@
             <em>Aktualisiert am: @Report.UpdatedAt.ToShortDateString()</em>
         </div>
         <div class="mt-2 text-end">
-            <a class="btn btn-sm btn-primary" href="@($"/meldungen/details/{Report.Id}")">Details</a>
+            <a class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-semibold details-btn"
+               href="@($"/meldungen/details/{Report.Id}")">
+                Details
+            </a>
         </div>
     </div>
 </div>

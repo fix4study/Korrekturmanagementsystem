@@ -7,16 +7,16 @@
 @inject IReportProvider ReportService
 @rendermode InteractiveServer
 
-<NavLink class="btn btn-success mb-3 float-end" href="/meldungen/neu">
-    + Neue Meldung
-</NavLink>
-
-<h3 class="mb-4">Meldungen</h3>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="mb-0">Meldungen</h3>
+    <NavLink class="btn btn-success" href="/meldungen/neu">
+        <i class="bi bi-plus-lg"></i> Neue Meldung
+    </NavLink>
+</div>
 
 <div class="report-list space-y-2">
     @if (AllReports != null && AllReports.Any())
     {
-
         <ReportFilter Filter="Filter" Statuses="DistinctStatuses" Priorities="DistinctPriorities" />
 
         <Sorting CurrentSortField="Sorting.CurrentSortField"
