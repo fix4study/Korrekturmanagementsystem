@@ -15,20 +15,19 @@ public class UserService : IUserService
         _roleProvider = roleProvider;
     }
 
-    public async Task<string> CreateUser(CreateUserDto user)
+    public async Task<Result> CreateUser(CreateUserDto user)
     {
         var roleResult = await GetSystemRoleIdForUser(user);
 
         if (!roleResult.IsSuccess)
         {
-            return $"Registrierung fehlgeschlagen: {roleResult.ErrorMessage}";
+            return Result.Failure($"Registrierung fehlgeschlagen: { roleResult.ErrorMessage}");
         }
 
         var result = await _userProvider.CreateUser(user, roleResult.SystemRoleId!.Value);
 
-        return result.Message ?? "Registrierung fehlgeschlagen.";
+        return result;
     }
-
 
     private async Task<RoleResolutionResult> GetSystemRoleIdForUser(CreateUserDto user)
     {

@@ -4,14 +4,14 @@
     <div class="card-body p-2">
         <div class="d-flex justify-content-between align-items-center">
             <h5 class="card-title mb-1 h6">@Report.Title</h5>
-            <em>Erstellt am: @Report.CreatedAt.ToShortDateString()</em>
+            <em>Erstellt am: @Report.CreatedAt.ToString("dd.MM.yyyy HH:mm") Uhr</em>
         </div>
         <div class="d-flex justify-content-between text-muted small">
             <div>
                 <strong>Status:</strong> @Report.StatusName |
                 <strong>Prio:</strong> @Report.PriorityName
             </div>
-            <em>Aktualisiert am: @Report.UpdatedAt.ToShortDateString()</em>
+            <em>Aktualisiert am: @Report.UpdatedAt.ToString("dd.MM.yyyy HH:mm") Uhr</em>
         </div>
         <div class="mt-2 text-end">
             <a class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-semibold details-btn"

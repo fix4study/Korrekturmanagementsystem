@@ -56,9 +56,9 @@
 
                     <button class="w-100 mb-2 btn btn-lg rounded-3 btn-dark" type="submit">Registrieren</button>
 
-                    @if (!string.IsNullOrEmpty(message))
+                    @if (!string.IsNullOrEmpty(_message))
                     {
-                        <div class="alert alert-info mt-3">@message</div>
+                        <div class="alert alert-info mt-3">@_message</div>
                     }
                 </EditForm>
             </div>
@@ -68,7 +68,7 @@
 
 @code {
     public CreateUserDto Model = new();
-    private string message = "";
+    private string _message = "";
 
     private IEnumerable<RoleDto>? roles;
     private Guid selectedRole = Guid.Empty;
@@ -88,19 +88,25 @@
     {
         if (selectedRole == Guid.Empty)
         {
-            message = "Bitte eine Rolle wählen!";
+            _message = "Bitte eine Rolle wählen!";
             return;
         }
 
         var hashedPassword = passwordService.HashPassword(Model.Password);
 
-        message = await userService.CreateUser(new CreateUserDto
+        var result = await userService.CreateUser(new CreateUserDto
+            {
+                Username = Model.Username,
+                Email = Model.Email,
+                Password = hashedPassword,
+                StakeholderRoleId = selectedRole
+            });
+
+        if (!result.IsSuccess)
         {
-            Username = Model.Username,
-            Email = Model.Email,
-            Password = hashedPassword,
-            StakeholderRoleId = selectedRole
-        });
+            _message = result.Message;
+            return;
+        }
 
         await Task.Delay(1500);
         Navigation.NavigateTo("account/login");

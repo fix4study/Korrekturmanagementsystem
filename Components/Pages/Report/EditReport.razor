@@ -12,13 +12,13 @@
     <h3 class="mb-4">Meldung bearbeiten</h3>
 
     <ReportForm Model="@_viewModel"
-                IsEdit="true"
-                ShowAttachments="@_showAttachments"
-                OnToggleAttachments="ToggleAttachmentVisibility"
-                OnImageLoaded="OnImageLoaded"
-                ShowMessage="@_message"
-                OnValidSubmit="HandleValidSubmit"
-                SelectedTagsChanged="HandleSelectedTagsChanged"/>
+    IsEdit="true"
+    ShowAttachments="@_showAttachments"
+    OnToggleAttachments="ToggleAttachmentVisibility"
+    OnImageLoaded="OnImageLoaded"
+    ShowMessage="@_message"
+    OnValidSubmit="HandleValidSubmit"
+    SelectedTagsChanged="HandleSelectedTagsChanged"/>
 
 
     <FileUploadPanel OnFilesChanged="files => selectedFiles = files.ToList()" />
@@ -55,6 +55,11 @@
         var result = await ReportService.UpdateReportAsync(_viewModel, selectedFiles);
 
         _message = result.Message ?? "Unbekannter Fehler.";
+
+        if (result.IsSuccess)
+        {
+            _viewModel = await ReportService.BuildEditReportViewModelAsync(Id);
+        }
     }
 
     private void OnImageLoaded(string fileName)
