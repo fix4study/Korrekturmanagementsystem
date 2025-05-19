@@ -1,20 +1,92 @@
 ﻿@page "/"
-@rendermode InteractiveServer
+@using Korrekturmanagementsystem.Components.Pages.Report.Overview
+@using Korrekturmanagementsystem.Dtos.Report
+@using Korrekturmanagementsystem.Models
+@using Korrekturmanagementsystem.Services.Interfaces
 @using Microsoft.AspNetCore.Components.Authorization
+@inject IReportService ReportService
+@inject AuthenticationStateProvider AuthStateProvider
+@rendermode InteractiveServer
 
-<h1>Willkommen im Korrekturmanagementsystem!</h1>
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="text-center mb-4">
+                <h1 class="display-5 fw-bold">Willkommen im Korrekturmanagementsystem @UserName !</h1>
+            </div>
+        </div>
+    </div>
+    <div class="row g-4">
+        <div class="col-12 col-lg-5">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <p>
+                        Du kannst jetzt Meldungen einsehen, neue Fehlerberichte erstellen und den Status deiner bisherigen Tickets verfolgen.
+                    </p>
+                </div>
+            </div>
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <span class="fw-semibold"><i class="bi bi-lightbulb me-2"></i>Schnellzugriff</span>
+                </div>
+                <div class="card-body text-center">
+                    <p class="mb-4 text-muted">Starte direkt mit einer neuen Meldung oder gehe zur Übersicht deiner Tickets.</p>
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <NavLink class="btn btn-outline-primary btn-lg d-flex align-items-center px-4" href="/meldungen">
+                            <i class="bi bi-list-task me-2"></i> Zur Übersicht
+                        </NavLink>
+                        <NavLink class="btn btn-success btn-lg d-flex align-items-center px-4" href="/meldungen/neu">
+                            <i class="bi bi-plus-lg me-2"></i> Neue Meldung
+                        </NavLink>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-<AuthorizeView>
-    <Authorized>
-        <p>Du bist angemeldet als <strong>@context.User.Identity?.Name</strong>.</p>
-        <p>
-            Du kannst jetzt Meldungen einsehen, neue Fehlerberichte erstellen und den Status deiner bisherigen Tickets verfolgen.
-        </p>
-        <a href="/meldungen" class="btn btn-primary mt-2">Zur Übersicht der Meldungen</a>
-    </Authorized>
-    <NotAuthorized>
-        <p>Du bist nicht eingeloggt.</p>
-        <p>Bitte melde dich an, um Fehler zu melden oder deinen Bearbeitungsstatus zu verfolgen.</p>
-        <a href="/login" class="btn btn-outline-primary mt-2">Zur Anmeldung</a>
-    </NotAuthorized>
-</AuthorizeView>
+        <div class="col-12 col-lg-7">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white d-flex align-items-center">
+                    <i class="bi bi-ticket-detailed me-2"></i>
+                    <span class="fw-semibold">Deine aktuellen Tickets</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="report-list">
+                        @if (AllReports != null && AllReports.Any())
+                        {
+                            @foreach (var report in CurrentPageReports)
+                            {
+                                <ReportCard Report="report" />
+                            }
+                            <div class="p-3">
+                                <Pagination TotalPages="@Paging.TotalPages" CurrentPage="@Paging.CurrentPage" OnPageChange="Paging.SetPage" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="p-3 text-muted">Derzeit gibt es keine Meldungen</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+    private List<ReportOverviewDto> AllReports { get; set; } = new();
+    private PagingModel Paging { get; set; } = new();
+    private string? UserName;
+
+    private IEnumerable<ReportOverviewDto> CurrentPageReports => Paging.Paginate(AllReports);
+
+    protected override async Task OnInitializedAsync()
+    {
+        AllReports = (await ReportService.GetAllReportByUserIdAsync()).ToList();
+        Paging.TotalItems = AllReports.Count();
+
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        UserName = authState.User.Identity?.Name;
+    }
+}

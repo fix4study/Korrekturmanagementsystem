@@ -42,12 +42,17 @@ public class ReportHistoryProvider : IReportHistoryProvider
     {
         var userId = _currentUserService.GetCurrentUserId();
 
+        if (userId is null)
+        {
+            return;
+        }
+
         var reportHistory = new ReportHistory
         {
             Id = Guid.NewGuid(),
             ReportId = history.ReportId,
             StatusId = history.StatusId,
-            ChangedById = userId,
+            ChangedById = userId.Value,
             ChangedAt = DateTime.UtcNow,
             Note = history.Note
         };

@@ -2,7 +2,7 @@
 
 public interface ICurrentUserService
 {
-    Guid GetCurrentUserId();
+    Guid? GetCurrentUserId();
     string? GetCurrentUserName();
     bool IsAuthenticated { get; }
 }

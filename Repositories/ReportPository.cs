@@ -25,4 +25,13 @@ public class ReportRepository : BaseRepository<Report>, IReportRepository
     {
         await context.SaveChangesAsync();
     }
+
+    public async Task<IEnumerable<Report>> GetAllByUserIdAsync(Guid userId)
+        => await context.Reports.Include(r => r.Status)
+        .Include(r => r.Priority)
+        .Include(r => r.MaterialType)
+        .Include(r => r.ReportType)
+        .Include(r => r.Course)
+        .Include(r => r.CreatedBy)
+        .Where(x => x.CreatedById == userId).ToListAsync();
 }

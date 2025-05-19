@@ -5,7 +5,7 @@
 @using Korrekturmanagementsystem.Models.Enums
 @using Korrekturmanagementsystem.Services.Interfaces
 @using Microsoft.AspNetCore.WebUtilities
-@inject IReportProvider ReportService
+@inject IReportService ReportService
 @inject NavigationManager Navigation
 @rendermode InteractiveServer
 
@@ -70,7 +70,8 @@
     protected override async Task OnInitializedAsync()
     {
         SetMessage();
-        AllReports = (await ReportService.GetReportsOverviewAsync()).ToList();
+        AllReports = (await ReportService.GetAllReportsAsync()).ToList();
+        Paging.TotalItems = FilteredReports.Count();
         Filter.OnChanged = () => { Paging.CurrentPage = 1; StateHasChanged(); };
     }
 

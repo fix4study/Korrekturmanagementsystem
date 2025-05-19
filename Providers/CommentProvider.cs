@@ -44,10 +44,15 @@ public class CommentProvider : ICommentProvider
     {
         var userId = _currentUserService.GetCurrentUserId();
 
+        if (userId is null)
+        {
+            return;
+        }
+
         var newComment = new Comment
         {
             Id = new Guid(),
-            AuthorId = userId,
+            AuthorId = userId.Value,
             Content = content,
             ReportId = reportId,
             CreatedAt = DateTime.UtcNow

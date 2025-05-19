@@ -16,13 +16,15 @@ public class ReportService : IReportService
     private readonly IReportTagProvider _reportTagProvider;
     private readonly IFileUploadProvider _fileUploadProvider;
     private readonly IReportHistoryProvider _reportHistoryProvider;
+    private readonly ICurrentUserService _currentUserService;
     private readonly IHttpContextAccessor _httpContextAccessor;
     public ReportService(IReportProvider reportProvider,
         IReportTagProvider reportTagProvider,
         IAttachmentProvider attachmentProvider,
         IFileUploadProvider fileUploadProvider,
         IHttpContextAccessor httpContextAccessor,
-        IReportHistoryProvider reportHistoryProvider)
+        IReportHistoryProvider reportHistoryProvider,
+        ICurrentUserService currentUserService)
     {
         _reportProvider = reportProvider;
         _reportTagProvider = reportTagProvider;
@@ -30,6 +32,7 @@ public class ReportService : IReportService
         _fileUploadProvider = fileUploadProvider;
         _httpContextAccessor = httpContextAccessor;
         _reportHistoryProvider = reportHistoryProvider;
+        _currentUserService = currentUserService;
     }
 
     public async Task<ReportModel> BuildEditReportViewModelAsync(Guid reportId)
@@ -131,7 +134,14 @@ public class ReportService : IReportService
             CourseId = reportDto.CourseId,
         };
 
-        var reportId = await _reportProvider.AddReportAsync(report);
+        var userId = _currentUserService.GetCurrentUserId();
+
+        if (userId is null)
+        {
+            return Result.Failure("Etwas ist bei der Authentifzierung schief gelaufen");
+        }
+
+        var reportId = await _reportProvider.AddReportAsync(report, userId.Value);
 
         if (reportId is null)
         {
@@ -225,4 +235,18 @@ public class ReportService : IReportService
         }
     }
 
+    public async Task<IEnumerable<ReportOverviewDto>> GetAllReportsAsync()
+        => await _reportProvider.GetReportsOverviewAsync();
+
+    public async Task<IEnumerable<ReportOverviewDto>> GetAllReportByUserIdAsync()
+    {
+        var userId = _currentUserService.GetCurrentUserId();
+
+        if (userId is null)
+        {
+            return Enumerable.Empty<ReportOverviewDto>();
+        }
+
+        return await _reportProvider.GetAllReportByUserIdAsync(userId.Value);
+    }
 }

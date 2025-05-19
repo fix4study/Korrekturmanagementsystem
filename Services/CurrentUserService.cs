@@ -12,13 +12,13 @@ public class CurrentUserService : ICurrentUserService
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public Guid GetCurrentUserId()
+    public Guid? GetCurrentUserId()
     {
         var userIdString = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         if (!Guid.TryParse(userIdString, out var userId))
         {
-            throw new UnauthorizedAccessException("Ungültige Benutzer-ID im Token.");
+            return null;
         }
 
         return userId;

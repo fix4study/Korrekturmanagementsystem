@@ -4,9 +4,7 @@ using Korrekturmanagementsystem.Dtos.Report;
 using Korrekturmanagementsystem.Repositories.Interfaces;
 using Korrekturmanagementsystem.Services.Interfaces;
 using Korrekturmanagementsystem.Shared;
-using Microsoft.Extensions.Azure;
 using System.Linq.Expressions;
-using System.Security.Claims;
 
 namespace Korrekturmanagementsystem.Services;
 
@@ -38,17 +36,10 @@ public class ReportProvider : IReportProvider
         _tagRepository = tagRepository;
     }
 
-    public async Task<Guid?> AddReportAsync(AddReportDto report)
+    public async Task<Guid?> AddReportAsync(AddReportDto report, Guid userId)
     {
         try
         {
-            var currentUser = GetCurrentUserId();
-
-            if (currentUser == Guid.Empty)
-            {
-                return null;
-            }
-
             var newReport = new Report
             {
                 Id = Guid.NewGuid(),
@@ -61,7 +52,7 @@ public class ReportProvider : IReportProvider
                 StatusId = (int)Models.Enums.Status.Eingereicht,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                CreatedById = currentUser
+                CreatedById = userId
             };
 
             await _reportRepository.InsertAsync(newReport);
@@ -116,13 +107,23 @@ public class ReportProvider : IReportProvider
         });
     }
 
+    public async Task<IEnumerable<ReportOverviewDto>> GetAllReportByUserIdAsync(Guid userId)
+    {
+        var reports = await _reportRepository.GetAllByUserIdAsync(userId);
+
+        return reports.Select(report => new ReportOverviewDto
+        {
+            Id = report.Id,
+            Title = report.Title,
+            StatusName = report.Status.Name,
+            PriorityName = report.Priority.Name,
+            CreatedAt = report.CreatedAt,
+            UpdatedAt = report.UpdatedAt
+        });
+    }
+
     public async Task<Result> UpdateReportByIdAsync(ReportDto reportToUpdate)
     {
-        if (!_httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false)
-        {
-            return Result.Failure("Sie sind nicht angemeldet. Bitte loggen Sie sich ein.");
-        }
-
         var report = await _reportRepository.GetByIdAsync(reportToUpdate.Id);
 
         if (report is null)
@@ -193,17 +194,5 @@ public class ReportProvider : IReportProvider
         };
 
         return reportDetails;
-    }
-
-    private Guid GetCurrentUserId()
-    {
-        var userIdString = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (!Guid.TryParse(userIdString, out var userId))
-        {
-            throw new UnauthorizedAccessException("Ungültige Benutzer-ID im Token.");
-        }
-
-        return userId;
     }
 }
