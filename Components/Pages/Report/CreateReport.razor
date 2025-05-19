@@ -37,11 +37,14 @@
     private async Task HandleValidSubmit()
     {
         var result = await ReportService.AddReportAsync(_model, _selectedTags, _selectedFiles);
-
         _message = result.Message ?? "Unbekannter Fehler.";
 
-        await Task.Delay(3500);
-        Navigation.NavigateTo("/meldungen");
+        if (result.IsSuccess)
+        {
+            _message = result.Message ?? "Meldung erfolgreich hinzugefügt.";
+            Navigation.NavigateTo($"/meldungen?msg={Uri.EscapeDataString(_message)}");
+            return;
+        }
     }
 
     private Task HandleSelectedTagsChanged(List<TagDto> tags)
