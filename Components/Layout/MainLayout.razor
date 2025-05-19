@@ -7,9 +7,13 @@
     </div>
 
     <main class="flex-grow-1 p-4">
-        <div class="d-flex justify-content-end mb-3">
-            <AuthorizeView>
+        <div class="d-flex justify-content-end align-items-center mb-3 gap-2">
+            <AuthorizeView Context="authState">
                 <Authorized>
+                    <span class="text-muted me-2">
+                        <i class="bi bi-person-circle me-1"></i>
+                        angemeldet als <strong>@authState.User.Identity?.Name</strong>
+                    </span>
                     <Logout />
                 </Authorized>
                 <NotAuthorized>
