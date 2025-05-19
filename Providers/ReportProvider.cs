@@ -116,7 +116,7 @@ public class ReportProvider : IReportProvider
         });
     }
 
-    public async Task<Result> UpdateReportByIdAsync(UpdateReportDto reportToUpdate)
+    public async Task<Result> UpdateReportByIdAsync(ReportDto reportToUpdate)
     {
         if (!_httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false)
         {
@@ -132,9 +132,9 @@ public class ReportProvider : IReportProvider
 
         report.Title = reportToUpdate.Title;
         report.Description = reportToUpdate.Description;
-        report.ReportTypeId = reportToUpdate.ReportTypeId;
-        report.PriorityId = reportToUpdate.PriorityId;
-        report.MaterialTypeId = reportToUpdate.MaterialTypeId;
+        report.ReportTypeId = reportToUpdate.ReportTypeId!.Value;
+        report.PriorityId = reportToUpdate.PriorityId!.Value;
+        report.MaterialTypeId = reportToUpdate.MaterialTypeId!.Value;
         report.CourseId = reportToUpdate.CourseId;
         report.StatusId = reportToUpdate.StatusId;
         report.UpdatedAt = DateTime.UtcNow;

@@ -3,10 +3,10 @@ using Korrekturmanagementsystem.Dtos;
 
 namespace Korrekturmanagementsystem.Models;
 
-public class EditReportModel
+public class ReportModel
 {
     public string StatusNote { get; set; } = string.Empty;
-    public UpdateReportDto Report { get; set; } = new();
+    public ReportDto Report { get; set; } = new();
     public ReportFormOptionsDto Options { get; set; } = new();
     public List<AttachmentDto> Attachments { get; set; } = new();
     public List<TagDto> SelectedTags { get; set; } = new();

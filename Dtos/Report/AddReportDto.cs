@@ -1,8 +1,11 @@
 ﻿namespace Korrekturmanagementsystem.Dtos.Report;
 
-public class AddReportDto : BaseReportDto
+public class AddReportDto
 {
-    public List<IFormFile>? Attachments { get; set; }
-    public List<int>? TagIds { get; set; }
-
+    public string Title { get; set; } = default!;
+    public string Description { get; set; } = default!;
+    public int ReportTypeId { get; set; }
+    public int PriorityId { get; set; }
+    public int MaterialTypeId { get; set; }
+    public Guid? CourseId { get; set; }
 }

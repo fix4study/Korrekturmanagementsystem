@@ -9,5 +9,5 @@ public interface IReportProvider
     Task<IEnumerable<ReportOverviewDto>> GetReportsOverviewAsync();
     Task<ReportFormOptionsDto> GetFormOptionsAsync();
     Task<ReportDetailsDto> GetReportDetailsByIdAsync(Guid id);
-    Task<Result> UpdateReportByIdAsync(UpdateReportDto reportToUpdate);
+    Task<Result> UpdateReportByIdAsync(ReportDto reportToUpdate);
 }

@@ -32,7 +32,7 @@ public class ReportService : IReportService
         _reportHistoryProvider = reportHistoryProvider;
     }
 
-    public async Task<EditReportModel> BuildEditReportViewModelAsync(Guid reportId)
+    public async Task<ReportModel> BuildEditReportViewModelAsync(Guid reportId)
     {
         var options = await _reportProvider.GetFormOptionsAsync();
         var details = await _reportProvider.GetReportDetailsByIdAsync(reportId);
@@ -44,7 +44,7 @@ public class ReportService : IReportService
             .Select(rt => new TagDto { Id = rt.TagId, Name = rt.TagName })
             .ToList();
 
-        var dto = new UpdateReportDto
+        var dto = new ReportDto
         {
             Id = reportId,
             Title = details.Title,
@@ -57,7 +57,7 @@ public class ReportService : IReportService
             TagIds = selectedTags.Select(t => t.Id).ToList(),
         };
 
-        return new EditReportModel
+        return new ReportModel
         {
             Report = dto,
             Options = options,
@@ -68,9 +68,18 @@ public class ReportService : IReportService
         };
     }
 
-    public async Task<Result> UpdateReportAsync(EditReportModel model, List<IBrowserFile> files)
+    public async Task<Result> UpdateReportAsync(ReportModel model, List<IBrowserFile> files)
     {
-        var updateResult = await _reportProvider.UpdateReportByIdAsync(model.Report);
+        var reportDto = model.Report;
+
+        var validationError = ValidateMandatoryFields(reportDto);
+
+        if (validationError is not null)
+        {
+            return new Result { IsSuccess = false, Message = validationError };
+        }
+
+        var updateResult = await _reportProvider.UpdateReportByIdAsync(reportDto);
 
         if (!updateResult.IsSuccess)
         {
@@ -79,13 +88,13 @@ public class ReportService : IReportService
 
         await AddReportHistoryEntry(model, model.StatusNote);
 
-        await _reportTagProvider.UpdateReportTagsAsync(model.Report.Id, model.SelectedTags);
+        await _reportTagProvider.UpdateReportTagsAsync(reportDto.Id, model.SelectedTags);
 
         var message = new StringBuilder("Meldung erfolgreich aktualisiert. ");
 
         if (files?.Count > 0)
         {
-            var uploadResult = await _fileUploadProvider.UploadAsync(model.Report.Id, files);
+            var uploadResult = await _fileUploadProvider.UploadAsync(reportDto.Id, files);
 
             message.Append(uploadResult.Message ?? "Unbekannter Fehler.");
         }
@@ -96,21 +105,30 @@ public class ReportService : IReportService
     public async Task<ReportFormOptionsDto> GetFormOptionsAsync()
         => await _reportProvider.GetFormOptionsAsync();
 
-    public async Task<Result> AddReportAsync(EditReportModel model, List<TagDto> selectedTags, List<IBrowserFile> files)
+    public async Task<Result> AddReportAsync(ReportModel model, List<TagDto> selectedTags, List<IBrowserFile> files)
     {
         if (!_httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false)
         {
             return new Result { IsSuccess = false, Message = "Sie sind nicht berechtigt eine Meldung zu erstellen." };
         }
 
+        var reportDto = model.Report;
+
+        var validationError = ValidateMandatoryFields(reportDto);
+
+        if (validationError is not null)
+        {
+            return new Result { IsSuccess = false, Message = validationError };
+        }
+
         var report = new AddReportDto
         {
-            Title = model.Report.Title,
-            Description = model.Report.Description,
-            ReportTypeId = model.Report.ReportTypeId,
-            PriorityId = model.Report.PriorityId,
-            MaterialTypeId = model.Report.MaterialTypeId,
-            CourseId = model.Report.CourseId,
+            Title = reportDto.Title,
+            Description = reportDto.Description,
+            ReportTypeId = reportDto.ReportTypeId!.Value,
+            PriorityId = reportDto.PriorityId!.Value,
+            MaterialTypeId = reportDto.MaterialTypeId!.Value,
+            CourseId = reportDto.CourseId,
         };
 
         var reportId = await _reportProvider.AddReportAsync(report);
@@ -143,7 +161,29 @@ public class ReportService : IReportService
         return new Result { IsSuccess = true, Message = message.ToString() ?? "Unbekannter Fehler" };
     }
 
-    private async Task AddReportHistoryEntry(EditReportModel model, string statusNote)
+    private string? ValidateMandatoryFields(ReportDto report)
+    {
+        if (string.IsNullOrWhiteSpace(report.Title))
+        {
+            return "Bitte geben Sie einen Titel an.";
+        }
+        if (report.ReportTypeId == null)
+        {
+            return "Bitte wählen Sie einen Meldungstyp.";
+        }
+        if (report.PriorityId == null)
+        {
+            return "Bitte wählen Sie eine Priorität.";
+        }
+        if (report.MaterialTypeId == null)
+        {
+            return "Bitte wählen Sie ein Material.";
+        }
+
+        return null;
+    }
+
+    private async Task AddReportHistoryEntry(ReportModel model, string statusNote)
     {
         var lastHistory = model.ReportHistory?
             .OrderByDescending(h => h.ChangedAt)
