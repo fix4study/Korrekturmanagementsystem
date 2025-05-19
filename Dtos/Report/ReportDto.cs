@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Korrekturmanagementsystem.Dtos.Report;
 
@@ -13,7 +12,7 @@ public class ReportDto
     public string Description { get; set; } = default!;
 
     [Required(ErrorMessage = "Bitte wählen Sie einen Meldungstyp.")]
-    public int? ReportTypeId { get; set; }
+    public int? ReportTypeId { get; set; } = null;
 
     [Required(ErrorMessage = "Bitte wählen Sie eine Priorität.")]
     public int? PriorityId { get; set; }
