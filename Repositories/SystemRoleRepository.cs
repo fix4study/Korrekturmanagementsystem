@@ -2,7 +2,6 @@
 using Korrekturmanagementsystem.Data.Entities;
 using Korrekturmanagementsystem.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Azure;
 
 namespace Korrekturmanagementsystem.Repositories;
 
@@ -17,5 +16,4 @@ public class SystemRoleRepository : BaseRepository<SystemRole>, ISystemRoleRepos
             .Select(role => (Guid?)role.Id)
             .FirstOrDefaultAsync();
     }
-
 }

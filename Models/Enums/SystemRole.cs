@@ -2,7 +2,7 @@
 
 public enum SystemRole
 {
-    Student,
+    Admin,
     Intern,
     User
 }

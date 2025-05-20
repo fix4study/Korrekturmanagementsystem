@@ -65,6 +65,17 @@ public class ReportProvider : IReportProvider
         }
     }
 
+    public async Task<Guid?> GetCreatorUserIdByReportIdAsync(Guid id)
+    {
+        var userId = await _reportRepository.GetCreatorIdByReportIdAsync(id);
+        if (userId == null)
+        {
+            return null;
+        }
+
+        return userId.Value;
+    }
+
     public async Task<ReportFormOptionsDto> GetFormOptionsAsync() =>
         new ReportFormOptionsDto
         {

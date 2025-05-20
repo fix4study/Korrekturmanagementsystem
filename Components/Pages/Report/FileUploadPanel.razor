@@ -8,7 +8,7 @@
         </div>
         <div class="card-body">
             <div class="mb-3">
-                <InputFile OnChange="HandleFileChange" multiple class="form-control" />
+                <InputFile OnChange="HandleFileChange" multiple class="form-control" disabled="@(!HasEditPermission)" />
                 <small class="text-muted">Mehrere Dateien können ausgewählt werden.</small>
             </div>
 
@@ -36,6 +36,7 @@
     private List<IBrowserFile> _selectedFiles = new();
 
     [Parameter] public EventCallback<List<IBrowserFile>> OnFilesChanged { get; set; }
+    [Parameter] public bool HasEditPermission { get; set; }
 
     private async Task HandleFileChange(InputFileChangeEventArgs e)
     {

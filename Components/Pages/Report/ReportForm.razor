@@ -14,18 +14,18 @@
                 <div class="card-body">
                     <div class="mb-3">
                         <label class="form-label">Titel *</label>
-                        <InputText class="form-control" @bind-Value="Model.Report.Title" />
+                        <InputText class="form-control" @bind-Value="Model.Report.Title" disabled="@(!HasEditPermission)" />
                         <ValidationMessage For="() => Model.Report.Title" />
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Beschreibung</label>
-                        <InputTextArea class="form-control" rows="4" @bind-Value="Model.Report.Description" />
+                        <InputTextArea class="form-control" rows="4" @bind-Value="Model.Report.Description" disabled="@(!HasEditPermission)" />
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Meldungstyp *</label>
-                        <InputSelect class="form-select" @bind-Value="Model.Report.ReportTypeId">
+                        <InputSelect class="form-select" @bind-Value="Model.Report.ReportTypeId" disabled="@(!HasEditPermission)">
                             <option value="">-- Bitte wählen --</option>
                             @foreach (var type in Model.Options.ReportTypes)
                             {
@@ -37,7 +37,7 @@
 
                     <div class="mb-3">
                         <label class="form-label">Materialtyp *</label>
-                        <InputSelect class="form-select" @bind-Value="Model.Report.MaterialTypeId">
+                        <InputSelect class="form-select" @bind-Value="Model.Report.MaterialTypeId" disabled="@(!HasEditPermission)">
                             <option value="">-- Bitte wählen --</option>
                             @foreach (var type in Model.Options.MaterialTypes)
                             {
@@ -50,7 +50,7 @@
 
                     <div class="mb-3">
                         <label class="form-label">Kurs</label>
-                        <InputSelect class="form-select" @bind-Value="Model.Report.CourseId">
+                        <InputSelect class="form-select" @bind-Value="Model.Report.CourseId" disabled="@(!HasEditPermission)">
                             <option value="">-- Kein Kurs --</option>
                             @foreach (var course in Model.Options.Courses)
                             {
@@ -158,7 +158,7 @@
 
                     <div class="mb-3">
                         <label class="form-label">Priorität *</label>
-                        <InputSelect class="form-select" @bind-Value="Model.Report.PriorityId">
+                        <InputSelect class="form-select" @bind-Value="Model.Report.PriorityId" disabled="@(!HasEditPermission)">
                             <option value="">-- Bitte wählen --</option>
                             @foreach (var priority in Model.Options.Priorities)
                             {
@@ -174,15 +174,19 @@
                         <label class="form-label">Tags</label>
                         <TagSelector AvailableTags="Model.Options.Tags"
                                      SelectedTags="Model.SelectedTags"
+                                     HasEditPermission="HasEditPermission"
                                      SelectedTagsChanged="SelectedTagsChanged" />
                     </div>
 
                 </div>
             </div>
 
-            <div style="position:fixed; bottom:20px; right:20px; z-index:1050;" class="shadow">
-                <button type="submit" class="btn btn-primary btn-lg">@(IsEdit ? "Speichern" : "Hinzufügen")</button>
-            </div>
+            @if (HasEditPermission)
+            {
+                <div style="position:fixed; bottom:20px; right:20px; z-index:1050;" class="shadow">
+                    <button type="submit" class="btn btn-primary btn-lg">@(IsEdit ? "Speichern" : "Hinzufügen")</button>
+                </div>
+            }
 
             @if (!string.IsNullOrEmpty(ShowMessage))
             {
@@ -201,6 +205,7 @@
     [Parameter] public EventCallback<string> OnImageLoaded { get; set; }
     [Parameter] public bool IsEdit { get; set; } = false;
     [Parameter] public EventCallback<List<TagDto>> SelectedTagsChanged { get; set; }
+    [Parameter] public bool HasEditPermission { get; set; }
 
     [Inject]
     public IFileUploadProvider FileUploadService { get; set; } = default!;

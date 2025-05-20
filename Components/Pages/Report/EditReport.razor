@@ -5,6 +5,7 @@
 @using Korrekturmanagementsystem.Services.Interfaces
 @using System.Text
 @inject IReportService ReportService
+@inject IAuthorizationService AuthorizationService
 @rendermode InteractiveServer
 
 @if (_viewModel != null)
@@ -12,16 +13,17 @@
     <h3 class="mb-4">Meldung bearbeiten</h3>
 
     <ReportForm Model="@_viewModel"
-                IsEdit="true"
-                ShowAttachments="@_showAttachments"
-                OnToggleAttachments="ToggleAttachmentVisibility"
-                OnImageLoaded="OnImageLoaded"
-                ShowMessage="@_message"
-                OnValidSubmit="HandleValidSubmit"
-                SelectedTagsChanged="HandleSelectedTagsChanged" />
+    IsEdit="true"
+    HasEditPermission="_hasEditPermission"
+    ShowAttachments="@_showAttachments"
+    OnToggleAttachments="ToggleAttachmentVisibility"
+    OnImageLoaded="OnImageLoaded"
+    ShowMessage="@_message"
+    OnValidSubmit="HandleValidSubmit"
+    SelectedTagsChanged="HandleSelectedTagsChanged" />
 
 
-    <FileUploadPanel OnFilesChanged="files => selectedFiles = files.ToList()" />
+    <FileUploadPanel OnFilesChanged="files => selectedFiles = files.ToList()" HasEditPermission="_hasEditPermission" />
 
     if (_viewModel.Report.Id != Guid.Empty)
     {
@@ -41,17 +43,26 @@
     private HashSet<string> _loadedImages = new();
     private string _message = "";
     private List<IBrowserFile> selectedFiles = new();
+    private bool _hasEditPermission;
+
 
     [Parameter]
     public Guid Id { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        _hasEditPermission = await AuthorizationService.HasEditReportPermissonAsync(Id);
         _viewModel = await ReportService.BuildEditReportViewModelAsync(Id);
     }
 
     private async Task HandleValidSubmit()
     {
+        if (_hasEditPermission)
+        {
+            _message = "Sie sind nicht zum Bearbeiten der Meldung berechtigt!";
+            return;
+        }
+
         var result = await ReportService.UpdateReportAsync(_viewModel, selectedFiles);
 
         _message = result.Message ?? "Unbekannter Fehler.";

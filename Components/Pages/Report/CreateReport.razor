@@ -15,11 +15,12 @@
 
     <ReportForm Model="@_model"
                 IsEdit="false"
+                HasEditPermission="true"
                 ShowMessage="@_message"
                 OnValidSubmit="HandleValidSubmit"
                 SelectedTagsChanged="HandleSelectedTagsChanged" />
 
-    <FileUploadPanel OnFilesChanged="files => _selectedFiles = files.ToList()" />
+    <FileUploadPanel OnFilesChanged="files => _selectedFiles = files.ToList()" HasEditPermission="true" />
 }
 
 @code {

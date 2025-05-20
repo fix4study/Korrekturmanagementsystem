@@ -5,12 +5,12 @@
     {
         <span class="badge rounded-pill bg-primary d-flex align-items-center">
             @tag.Name
-            <button type="button" class="btn-close btn-close-white btn-sm ms-2"
+            <button type="button" class="btn-close btn-close-white btn-sm ms-2" disabled="@(!HasEditPermission)"
                     @onclick="() => RemoveTag(tag.Id)" aria-label="Tag entfernen"></button>
         </span>
     }
 
-    <select class="form-select form-select-sm w-auto" @onchange="OnTagSelected">
+    <select class="form-select form-select-sm w-auto" @onchange="OnTagSelected" disabled="@(!HasEditPermission)">
         <option value="">+ Tag hinzufügen</option>
         @foreach (var tag in AvailableTags.Where(t => !SelectedTags.Any(s => s.Id == t.Id)))
         {
@@ -22,6 +22,7 @@
 @code {
     [Parameter] public List<TagDto> AvailableTags { get; set; } = new();
     [Parameter] public List<TagDto> SelectedTags { get; set; } = new();
+    [Parameter] public bool HasEditPermission { get; set; }
     [Parameter] public EventCallback<List<TagDto>> SelectedTagsChanged { get; set; }
 
     private async Task OnTagSelected(ChangeEventArgs e)

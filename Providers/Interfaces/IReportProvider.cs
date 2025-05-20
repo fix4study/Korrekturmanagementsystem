@@ -11,4 +11,5 @@ public interface IReportProvider
     Task<ReportDetailsDto> GetReportDetailsByIdAsync(Guid id);
     Task<Result> UpdateReportByIdAsync(ReportDto reportToUpdate);
     Task<IEnumerable<ReportOverviewDto>> GetAllReportByUserIdAsync(Guid userId);
+    Task<Guid?> GetCreatorUserIdByReportIdAsync(Guid id);
 }

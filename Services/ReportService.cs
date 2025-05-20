@@ -169,6 +169,21 @@ public class ReportService : IReportService
         return new Result { IsSuccess = true, Message = message.ToString() ?? "Unbekannter Fehler" };
     }
 
+    public async Task<IEnumerable<ReportOverviewDto>> GetAllReportsAsync()
+        => await _reportProvider.GetReportsOverviewAsync();
+
+    public async Task<IEnumerable<ReportOverviewDto>> GetAllReportByUserIdAsync()
+    {
+        var userId = _currentUserService.GetCurrentUserId();
+
+        if (userId is null)
+        {
+            return Enumerable.Empty<ReportOverviewDto>();
+        }
+
+        return await _reportProvider.GetAllReportByUserIdAsync(userId.Value);
+    }
+
     private string? ValidateMandatoryFields(ReportDto report)
     {
         if (string.IsNullOrWhiteSpace(report.Title))
@@ -226,20 +241,5 @@ public class ReportService : IReportService
         {
             await _reportHistoryProvider.AddReportHistoryAsync(reportHistoryEntry);
         }
-    }
-
-    public async Task<IEnumerable<ReportOverviewDto>> GetAllReportsAsync()
-        => await _reportProvider.GetReportsOverviewAsync();
-
-    public async Task<IEnumerable<ReportOverviewDto>> GetAllReportByUserIdAsync()
-    {
-        var userId = _currentUserService.GetCurrentUserId();
-
-        if (userId is null)
-        {
-            return Enumerable.Empty<ReportOverviewDto>();
-        }
-
-        return await _reportProvider.GetAllReportByUserIdAsync(userId.Value);
     }
 }

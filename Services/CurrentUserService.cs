@@ -25,9 +25,10 @@ public class CurrentUserService : ICurrentUserService
     }
 
     public string? GetCurrentUserName()
-    {
-        return _httpContextAccessor.HttpContext?.User.Identity?.Name;
-    }
+        => _httpContextAccessor.HttpContext?.User.Identity?.Name;
+
+    public string? GetCurrentUserRole()
+        => _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Role);
 
     public bool IsAuthenticated => _httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false;
 }
