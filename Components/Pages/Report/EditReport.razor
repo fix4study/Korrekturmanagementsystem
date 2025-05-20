@@ -57,7 +57,7 @@
 
     private async Task HandleValidSubmit()
     {
-        if (_hasEditPermission)
+        if (!_hasEditPermission)
         {
             _message = "Sie sind nicht zum Bearbeiten der Meldung berechtigt!";
             return;
