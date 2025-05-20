@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.AspNetCore.Components.Forms;
 using Korrekturmanagementsystem.Shared;
 using Korrekturmanagementsystem.Providers.Interfaces;
+using Korrekturmanagementsystem.Models.Enums;
 
 namespace Korrekturmanagementsystem.Services;
 
@@ -110,11 +111,6 @@ public class ReportService : IReportService
 
     public async Task<Result> AddReportAsync(ReportModel model, List<TagDto> selectedTags, List<IBrowserFile> files)
     {
-        if (!_httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false)
-        {
-            return new Result { IsSuccess = false, Message = "Sie sind nicht berechtigt eine Meldung zu erstellen." };
-        }
-
         var reportDto = model.Report;
 
         var validationError = ValidateMandatoryFields(reportDto);
@@ -147,6 +143,8 @@ public class ReportService : IReportService
         {
             return new Result { IsSuccess = false, Message = "Fehler beim Erstellen der Meldung." };
         }
+
+        await AddInitialReportHistoryEntry(reportId.Value);
 
         if (selectedTags?.Count > 0)
         {
@@ -193,7 +191,19 @@ public class ReportService : IReportService
         return null;
     }
 
-    private async Task AddReportHistoryEntry(ReportModel model, string statusNote)
+    private async Task AddInitialReportHistoryEntry(Guid reportId)
+    {
+        var entry = new CreateReportHistoryDto
+        {
+            ReportId = reportId,
+            StatusId = (int)Status.Eingereicht,
+            Note = string.Empty,
+        };
+
+        await _reportHistoryProvider.AddReportHistoryAsync(entry);
+    }
+
+    private async Task AddReportHistoryEntry(ReportModel model, string? statusNote = "")
     {
         var lastHistory = model.ReportHistory?
             .OrderByDescending(h => h.ChangedAt)
@@ -206,30 +216,13 @@ public class ReportService : IReportService
             Note = string.IsNullOrWhiteSpace(statusNote) ? null : statusNote
         };
 
-        bool shouldAddHistory = false;
+        var lastHistoryStatusId = model.Options.Statuses
+            .FirstOrDefault(x => x.Name == lastHistory.StatusName)?.Id ?? 0;
 
-        if (lastHistory is null)
-        {
-            if (!string.IsNullOrWhiteSpace(statusNote) || model.Report.StatusId != 0)
-            {
-                shouldAddHistory = true;
-            }
-        }
-        else
-        {
-            var lastHistoryStatusId = model.Options.Statuses
-                .FirstOrDefault(x => x.Name == lastHistory.StatusName)?.Id ?? 0;
+        bool statusChanged = model.Report.StatusId != lastHistoryStatusId;
+        bool noteAdded = !string.IsNullOrWhiteSpace(statusNote);
 
-            bool statusChanged = model.Report.StatusId != lastHistoryStatusId;
-            bool noteAdded = !string.IsNullOrWhiteSpace(statusNote);
-
-            if (statusChanged || noteAdded)
-            {
-                shouldAddHistory = true;
-            }
-        }
-
-        if (shouldAddHistory)
+        if (statusChanged || noteAdded)
         {
             await _reportHistoryProvider.AddReportHistoryAsync(reportHistoryEntry);
         }
