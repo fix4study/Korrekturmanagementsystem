@@ -3,15 +3,23 @@
 @using Korrekturmanagementsystem.Dtos
 @using Korrekturmanagementsystem.Dtos.Report
 @using Korrekturmanagementsystem.Models
+@using Korrekturmanagementsystem.Models.Enums
 @using Korrekturmanagementsystem.Services.Interfaces
 @using System.Text
+@using Microsoft.AspNetCore.WebUtilities
 @inject IReportService ReportService
 @inject IAuthorizationService AuthorizationService
+@inject NavigationManager Navigation
 @rendermode InteractiveServer
 
 @if (_viewModel != null)
 {
     <h3 class="mb-4">Meldung bearbeiten</h3>
+
+    <SuccessNotification Visible="@(!string.IsNullOrEmpty(_message))"
+                         OnClose="@(() => _message = "")"
+                         Message="@_message"
+                         Type="_notificationType" />
 
     <ReportForm Model="@_viewModel"
                 IsEdit="true"
@@ -19,9 +27,9 @@
                 ShowAttachments="@_showAttachments"
                 OnToggleAttachments="ToggleAttachmentVisibility"
                 OnImageLoaded="OnImageLoaded"
-                ShowMessage="@_message"
                 OnValidSubmit="HandleValidSubmit"
-                SelectedTagsChanged="HandleSelectedTagsChanged" />
+                SelectedTagsChanged="HandleSelectedTagsChanged"
+                IsSaved="@_isSaved" />
 
 
     <FileUploadPanel OnFilesChanged="files => selectedFiles = files.ToList()" HasEditPermission="_hasEditPermission" />
@@ -36,6 +44,8 @@
     <div class="mb-4">
         <ReportHistory HistoryEntries="_viewModel.ReportHistory" />
     </div>
+
+
 }
 
 @code {
@@ -45,13 +55,14 @@
     private string _message = "";
     private List<IBrowserFile> selectedFiles = new();
     private bool _hasEditPermission;
+    private bool _isSaved = false;
+    private NotificationType _notificationType = NotificationType.Success;
 
-
-    [Parameter]
-    public Guid Id { get; set; }
+    [Parameter] public Guid Id { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        SetMessage();
         _hasEditPermission = await AuthorizationService.HasEditReportPermissonAsync(Id);
         _viewModel = await ReportService.BuildEditReportViewModelAsync(Id);
     }
@@ -61,6 +72,7 @@
         if (!_hasEditPermission)
         {
             _message = "Sie sind nicht zum Bearbeiten der Meldung berechtigt!";
+            _notificationType = NotificationType.Warning;
             return;
         }
 
@@ -70,8 +82,18 @@
 
         if (result.IsSuccess)
         {
+            _notificationType = NotificationType.Success;
+
             _viewModel = await ReportService.BuildEditReportViewModelAsync(Id);
+            _isSaved = true;
+            StateHasChanged();
+
+            await Task.Delay(5000);
+            _isSaved = false;
+            return;
         }
+
+        _notificationType = NotificationType.Error;
     }
 
     private void OnImageLoaded(string fileName)
@@ -89,5 +111,16 @@
     {
         _viewModel.SelectedTags = tags;
         return Task.CompletedTask;
+    }
+
+    private void SetMessage()
+    {
+        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("msg", out var msg))
+        {
+            _message = msg;
+            _notificationType = NotificationType.Success;
+
+        }
     }
 }

@@ -1,0 +1,57 @@
+﻿@using Korrekturmanagementsystem.Models.Enums
+@if (Visible)
+{
+    <div class="alert @GetAlertClass() border-0 d-flex align-items-center shadow fade show px-4 py-3 rounded-3 position-relative"
+         style="font-size: 0.95rem;">
+        <i class="bi @GetIcon() me-2 fs-5 text-white" style="filter: drop-shadow(0 0 1px rgba(0,0,0,0.3));"></i>
+
+        <div class="flex-grow-1">
+            <strong>@GetTitle()</strong> @Message
+        </div>
+
+        <button type="button"
+                class="btn-close ms-3"
+                aria-label="Close"
+                @onclick="OnCloseClicked">
+        </button>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public string Message { get; set; } = "Die Aktion war erfolgreich.";
+    [Parameter] public NotificationType Type { get; set; } = NotificationType.Success;
+
+    private async Task OnCloseClicked()
+    {
+        await OnClose.InvokeAsync(null);
+    }
+
+    private string GetAlertClass() => Type switch
+    {
+        NotificationType.Success => "alert-success",
+        NotificationType.Error => "alert-danger",
+        NotificationType.Info => "alert-info",
+        NotificationType.Warning => "alert-warning",
+        _ => "alert-secondary"
+    };
+
+    private string GetIcon() => Type switch
+    {
+        NotificationType.Success => "bi-check-circle-fill",
+        NotificationType.Error => "bi-x-circle-fill",
+        NotificationType.Info => "bi-info-circle-fill",
+        NotificationType.Warning => "bi-exclamation-triangle-fill",
+        _ => "bi-question-circle-fill"
+    };
+
+    private string GetTitle() => Type switch
+    {
+        NotificationType.Success => "Erfolg!",
+        NotificationType.Error => "Fehler!",
+        NotificationType.Info => "Hinweis:",
+        NotificationType.Warning => "Warnung!",
+        _ => ""
+    };
+}

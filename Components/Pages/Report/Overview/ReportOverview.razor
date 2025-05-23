@@ -6,7 +6,6 @@
 @using Korrekturmanagementsystem.Services.Interfaces
 @using Microsoft.AspNetCore.WebUtilities
 @inject IReportService ReportService
-@inject NavigationManager Navigation
 @rendermode InteractiveServer
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -22,16 +21,8 @@
         <ReportFilter Filter="Filter" Statuses="DistinctStatuses" Priorities="DistinctPriorities" />
 
         <Sorting CurrentSortField="Sorting.CurrentSortField"
-        SortDescending="Sorting.SortDescending"
-        OnSortChanged="Sorting.SetSort" />
-
-        @if (!string.IsNullOrEmpty(_message))
-        {
-            <div class="alert alert-info alert-dismissible fade show mt-3" role="alert">
-                @_message
-                <button type="button" class="btn-close" aria-label="Close" @onclick="() => _message = string.Empty"></button>
-            </div>
-        }
+                 SortDescending="Sorting.SortDescending"
+                 OnSortChanged="Sorting.SetSort" />
 
         @foreach (var report in CurrentPageReports)
         {
@@ -69,18 +60,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-        SetMessage();
         AllReports = (await ReportService.GetAllReportsAsync()).ToList();
         Paging.TotalItems = FilteredReports.Count();
         Filter.OnChanged = () => { Paging.CurrentPage = 1; StateHasChanged(); };
     }
 
-    private void SetMessage()
-    {
-        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
-        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("msg", out var msg))
-        {
-            _message = msg;
-        }
-    }
+
 }

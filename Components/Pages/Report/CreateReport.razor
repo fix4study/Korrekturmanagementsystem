@@ -4,6 +4,7 @@
 @using Korrekturmanagementsystem.Dtos
 @using Korrekturmanagementsystem.Dtos.Report
 @using Korrekturmanagementsystem.Models
+@using Korrekturmanagementsystem.Models.Enums
 @using Korrekturmanagementsystem.Services.Interfaces
 @using Microsoft.AspNetCore.Components.Forms
 @inject IReportService ReportService
@@ -14,10 +15,14 @@
 {
     <h3 class="mb-4">Meldung hinzufügen</h3>
 
+    <SuccessNotification Visible="@(!string.IsNullOrEmpty(_message))"
+                         OnClose="@(() => _message = "")"
+                         Message="@_message"
+                         Type="_notificationType" />
+
     <ReportForm Model="@_model"
                 IsEdit="false"
                 HasEditPermission="true"
-                ShowMessage="@_message"
                 OnValidSubmit="HandleValidSubmit"
                 SelectedTagsChanged="HandleSelectedTagsChanged" />
 
@@ -30,6 +35,8 @@
     private List<IBrowserFile> _selectedFiles = new();
     private List<TagDto> _selectedTags = new();
     private string _message = "";
+    private NotificationType _notificationType = NotificationType.Success;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -40,12 +47,12 @@
     private async Task HandleValidSubmit()
     {
         var result = await ReportService.AddReportAsync(_model, _selectedTags, _selectedFiles);
+        _notificationType = NotificationType.Error;
         _message = result.Message ?? "Unbekannter Fehler.";
 
         if (result.IsSuccess)
         {
-            _message = result.Message ?? "Meldung erfolgreich hinzugefügt.";
-            Navigation.NavigateTo($"/meldungen?msg={Uri.EscapeDataString(_message)}");
+            Navigation.NavigateTo($"/meldungen/details/{result.Data}?msg={Uri.EscapeDataString(result.Message!)}");
             return;
         }
     }

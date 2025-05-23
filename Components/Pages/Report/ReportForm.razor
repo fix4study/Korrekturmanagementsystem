@@ -12,36 +12,39 @@
         <div class="col-md-8">
 
             <Details Options="Model.Options"
-                     Report="Model.Report"
-                     HasEditPermission="HasEditPermission" />
+            Report="Model.Report"
+            HasEditPermission="HasEditPermission" />
 
             @if (IsEdit)
             {
                 <Attachments AttachmentList="Model.Attachments"
-                             ShowAttachments="ShowAttachments"
-                             OnToggleAttachments="OnToggleAttachments"
-                             OnImageLoaded="OnImageLoaded" />
+                ShowAttachments="ShowAttachments"
+                OnToggleAttachments="OnToggleAttachments"
+                OnImageLoaded="OnImageLoaded" />
             }
         </div>
 
         <!-- Rechte Spalte -->
         <div class="col-md-4">
             <MetaData Model="Model"
-                      IsEdit="IsEdit"
-                      HasEditPermission="HasEditPermission"
-                      SelectedTagsChanged="SelectedTagsChanged" />
+            IsEdit="IsEdit"
+            HasEditPermission="HasEditPermission"
+            SelectedTagsChanged="SelectedTagsChanged" />
 
             @if (HasEditPermission)
             {
-                <div style="position:fixed; bottom:20px; right:20px; z-index:1050;" class="shadow">
-                    <button type="submit" class="btn btn-primary btn-lg">@(IsEdit ? "Speichern" : "Hinzufügen")</button>
+                <div class="position-fixed bottom-0 end-0 p-4 z-3">
+                    <button type="submit"
+                            class="btn btn-lg px-4 fw-semibold d-flex align-items-center gap-2 rounded-pill shadow
+                       @(IsSaved ? "btn-success" : "btn-primary")">
+                        <i class="bi @(IsSaved ? "bi-check-circle-fill" : "bi-save")"></i>
+                        @(IsEdit
+                            ? (IsSaved ? "Gespeichert" : "Speichern")
+                            : (IsSaved ? "Hinzugefügt" : "Hinzufügen"))
+                    </button>
                 </div>
             }
 
-            @if (!string.IsNullOrEmpty(ShowMessage))
-            {
-                <div class="alert alert-info mt-3">@ShowMessage</div>
-            }
         </div>
     </div>
 </EditForm>
@@ -49,11 +52,11 @@
 @code {
     [Parameter] public ReportModel Model { get; set; } = default!;
     [Parameter] public EventCallback OnValidSubmit { get; set; }
-    [Parameter] public string ShowMessage { get; set; } = string.Empty;
     [Parameter] public bool ShowAttachments { get; set; }
     [Parameter] public EventCallback OnToggleAttachments { get; set; }
     [Parameter] public EventCallback<string> OnImageLoaded { get; set; }
     [Parameter] public bool IsEdit { get; set; } = false;
     [Parameter] public EventCallback<List<TagDto>> SelectedTagsChanged { get; set; }
     [Parameter] public bool HasEditPermission { get; set; }
+    [Parameter] public bool IsSaved { get; set; }
 }

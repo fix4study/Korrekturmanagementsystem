@@ -109,15 +109,14 @@ public class ReportService : IReportService
     public async Task<ReportFormOptionsDto> GetFormOptionsAsync()
         => await _reportProvider.GetFormOptionsAsync();
 
-    public async Task<Result> AddReportAsync(ReportModel model, List<TagDto> selectedTags, List<IBrowserFile> files)
+    public async Task<Result<Guid>> AddReportAsync(ReportModel model, List<TagDto> selectedTags, List<IBrowserFile> files)
     {
         var reportDto = model.Report;
 
         var validationError = ValidateMandatoryFields(reportDto);
-
         if (validationError is not null)
         {
-            return new Result { IsSuccess = false, Message = validationError };
+            return Result<Guid>.Failure(validationError);
         }
 
         var report = new AddReportDto
@@ -131,43 +130,41 @@ public class ReportService : IReportService
         };
 
         var userId = _currentUserService.GetCurrentUserId();
-
         if (userId is null)
         {
-            return Result.Failure("Etwas ist bei der Authentifzierung schief gelaufen");
+            return Result<Guid>.Failure("Etwas ist bei der Authentifizierung schiefgelaufen.");
         }
 
         var reportId = await _reportProvider.AddReportAsync(report, userId.Value);
-
         if (reportId is null)
         {
-            return new Result { IsSuccess = false, Message = "Fehler beim Erstellen der Meldung." };
+            return Result<Guid>.Failure("Fehler beim Erstellen der Meldung.");
         }
 
         await AddInitialReportHistoryEntry(reportId.Value);
 
         if (selectedTags?.Count > 0)
         {
-            var resportTags = selectedTags.Select(x => new ReportTagDto
+            var reportTags = selectedTags.Select(x => new ReportTagDto
             {
                 ReportId = reportId.Value,
                 TagId = x.Id
             }).ToList();
 
-            await _reportTagProvider.InsertReportTagAsync(resportTags);
+            await _reportTagProvider.InsertReportTagAsync(reportTags);
         }
 
-        var message = new StringBuilder("Meldung erfolgreich gespeichert.");
+        var message = new StringBuilder("Meldung erfolgreich hinzugefügt.");
 
         if (selectedTags?.Count > 0)
         {
             var uploadResult = await _fileUploadProvider.UploadAsync(reportId.Value, files);
-
-            message.Append(uploadResult.Message ?? "Unbekannter Fehler.");
+            message.Append(uploadResult.Message ?? "Unbekannter Fehler beim Upload.");
         }
 
-        return new Result { IsSuccess = true, Message = message.ToString() ?? "Unbekannter Fehler" };
+        return Result<Guid>.Success(reportId.Value, message.ToString());
     }
+
 
     public async Task<IEnumerable<ReportOverviewDto>> GetAllReportsAsync()
         => await _reportProvider.GetReportsOverviewAsync();

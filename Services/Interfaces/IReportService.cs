@@ -10,7 +10,7 @@ public interface IReportService
 {
     Task<ReportModel> BuildEditReportViewModelAsync(Guid reportId);
     Task<Result> UpdateReportAsync(ReportModel model, List<IBrowserFile> files);
-    Task<Result> AddReportAsync(ReportModel model, List<TagDto> selectedTags, List<IBrowserFile> files);
+    Task<Result<Guid>> AddReportAsync(ReportModel model, List<TagDto> selectedTags, List<IBrowserFile> files);
     Task<ReportFormOptionsDto> GetFormOptionsAsync();
     Task<IEnumerable<ReportOverviewDto>> GetAllReportsAsync();
     Task<IEnumerable<ReportOverviewDto>> GetAllReportByUserIdAsync();
