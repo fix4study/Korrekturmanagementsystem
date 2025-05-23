@@ -16,7 +16,7 @@
 {
     <h3 class="mb-4">Meldung bearbeiten</h3>
 
-    <SuccessNotification Visible="@(!string.IsNullOrEmpty(_message))"
+    <Notification Visible="@(!string.IsNullOrEmpty(_message))"
                          OnClose="@(() => _message = "")"
                          Message="@_message"
                          Type="_notificationType" />
@@ -49,6 +49,8 @@
 }
 
 @code {
+    [Parameter] public Guid Id { get; set; }
+
     private ReportModel _viewModel = new();
     private bool _showAttachments = false;
     private HashSet<string> _loadedImages = new();
@@ -58,11 +60,9 @@
     private bool _isSaved = false;
     private NotificationType _notificationType = NotificationType.Success;
 
-    [Parameter] public Guid Id { get; set; }
-
     protected override async Task OnInitializedAsync()
     {
-        SetMessage();
+        SetMessageFromQuery();
         _hasEditPermission = await AuthorizationService.HasEditReportPermissonAsync(Id);
         _viewModel = await ReportService.BuildEditReportViewModelAsync(Id);
     }
@@ -71,29 +71,23 @@
     {
         if (!_hasEditPermission)
         {
-            _message = "Sie sind nicht zum Bearbeiten der Meldung berechtigt!";
-            _notificationType = NotificationType.Warning;
+            ShowMessage("Sie sind nicht zum Bearbeiten der Meldung berechtigt!", NotificationType.Warning);
             return;
         }
 
         var result = await ReportService.UpdateReportAsync(_viewModel, selectedFiles);
 
-        _message = result.Message ?? "Unbekannter Fehler.";
+        ShowMessage(result.Message ?? "Unbekannter Fehler.", result.IsSuccess ? NotificationType.Success : NotificationType.Error);
 
         if (result.IsSuccess)
         {
-            _notificationType = NotificationType.Success;
-
             _viewModel = await ReportService.BuildEditReportViewModelAsync(Id);
             _isSaved = true;
             StateHasChanged();
 
             await Task.Delay(5000);
             _isSaved = false;
-            return;
         }
-
-        _notificationType = NotificationType.Error;
     }
 
     private void OnImageLoaded(string fileName)
@@ -113,7 +107,7 @@
         return Task.CompletedTask;
     }
 
-    private void SetMessage()
+    private void SetMessageFromQuery()
     {
         var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
         if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("msg", out var msg))
@@ -122,5 +116,11 @@
             _notificationType = NotificationType.Success;
 
         }
+    }
+
+    private void ShowMessage(string message, NotificationType type)
+    {
+        _message = message;
+        _notificationType = type;
     }
 }

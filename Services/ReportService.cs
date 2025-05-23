@@ -165,7 +165,6 @@ public class ReportService : IReportService
         return Result<Guid>.Success(reportId.Value, message.ToString());
     }
 
-
     public async Task<IEnumerable<ReportOverviewDto>> GetAllReportsAsync()
         => await _reportProvider.GetReportsOverviewAsync();
 
@@ -181,6 +180,7 @@ public class ReportService : IReportService
         return await _reportProvider.GetAllReportByUserIdAsync(userId.Value);
     }
 
+    #region private
     private string? ValidateMandatoryFields(ReportDto report)
     {
         if (string.IsNullOrWhiteSpace(report.Title))
@@ -244,4 +244,5 @@ public class ReportService : IReportService
             await _reportHistoryProvider.AddReportHistoryAsync(reportHistoryEntry);
         }
     }
+    #endregion
 }

@@ -15,7 +15,7 @@
 {
     <h3 class="mb-4">Meldung hinzufügen</h3>
 
-    <SuccessNotification Visible="@(!string.IsNullOrEmpty(_message))"
+    <Notification Visible="@(!string.IsNullOrEmpty(_message))"
                          OnClose="@(() => _message = "")"
                          Message="@_message"
                          Type="_notificationType" />
@@ -47,14 +47,15 @@
     private async Task HandleValidSubmit()
     {
         var result = await ReportService.AddReportAsync(_model, _selectedTags, _selectedFiles);
-        _notificationType = NotificationType.Error;
-        _message = result.Message ?? "Unbekannter Fehler.";
-
+        
         if (result.IsSuccess)
         {
             Navigation.NavigateTo($"/meldungen/details/{result.Data}?msg={Uri.EscapeDataString(result.Message!)}");
             return;
         }
+
+        _notificationType = NotificationType.Error;
+        _message = result.Message ?? "Unbekannter Fehler.";
     }
 
     private Task HandleSelectedTagsChanged(List<TagDto> tags)
