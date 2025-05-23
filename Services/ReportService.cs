@@ -224,6 +224,11 @@ public class ReportService : IReportService
             .OrderByDescending(h => h.ChangedAt)
             .FirstOrDefault();
 
+        if (lastHistory is null)
+        {
+            return;
+        }
+
         var reportHistoryEntry = new CreateReportHistoryDto
         {
             ReportId = model.Report.Id,
