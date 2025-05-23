@@ -1,4 +1,5 @@
 ﻿@page "/Meldungen/Details/{Id:guid}"
+@using Korrekturmanagementsystem.Components.Pages.Report.FormParts
 @using Korrekturmanagementsystem.Dtos
 @using Korrekturmanagementsystem.Dtos.Report
 @using Korrekturmanagementsystem.Models
@@ -13,14 +14,14 @@
     <h3 class="mb-4">Meldung bearbeiten</h3>
 
     <ReportForm Model="@_viewModel"
-    IsEdit="true"
-    HasEditPermission="_hasEditPermission"
-    ShowAttachments="@_showAttachments"
-    OnToggleAttachments="ToggleAttachmentVisibility"
-    OnImageLoaded="OnImageLoaded"
-    ShowMessage="@_message"
-    OnValidSubmit="HandleValidSubmit"
-    SelectedTagsChanged="HandleSelectedTagsChanged" />
+                IsEdit="true"
+                HasEditPermission="_hasEditPermission"
+                ShowAttachments="@_showAttachments"
+                OnToggleAttachments="ToggleAttachmentVisibility"
+                OnImageLoaded="OnImageLoaded"
+                ShowMessage="@_message"
+                OnValidSubmit="HandleValidSubmit"
+                SelectedTagsChanged="HandleSelectedTagsChanged" />
 
 
     <FileUploadPanel OnFilesChanged="files => selectedFiles = files.ToList()" HasEditPermission="_hasEditPermission" />

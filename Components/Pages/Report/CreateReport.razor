@@ -1,5 +1,6 @@
 ﻿@page "/meldungen/neu"
 @using System.Text
+@using Korrekturmanagementsystem.Components.Pages.Report.FormParts
 @using Korrekturmanagementsystem.Dtos
 @using Korrekturmanagementsystem.Dtos.Report
 @using Korrekturmanagementsystem.Models
@@ -20,7 +21,8 @@
                 OnValidSubmit="HandleValidSubmit"
                 SelectedTagsChanged="HandleSelectedTagsChanged" />
 
-    <FileUploadPanel OnFilesChanged="files => _selectedFiles = files.ToList()" HasEditPermission="true" />
+    <FileUploadPanel OnFilesChanged="files => _selectedFiles = files.ToList()"
+                     HasEditPermission="true" />
 }
 
 @code {

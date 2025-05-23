@@ -1,0 +1,60 @@
+﻿@using Korrekturmanagementsystem.Dtos.Report
+@using Korrekturmanagementsystem.Models
+
+<div class="card mb-3 shadow-sm">
+    <div class="card-header fw-semibold">Details</div>
+    <div class="card-body">
+        <div class="mb-3">
+            <label class="form-label">Titel *</label>
+            <InputText class="form-control" @bind-Value="Report.Title" disabled="@(!HasEditPermission)" />
+            <ValidationMessage For="() => Report.Title" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Beschreibung</label>
+            <InputTextArea class="form-control" rows="4" @bind-Value="Report.Description" disabled="@(!HasEditPermission)" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Meldungstyp *</label>
+            <InputSelect class="form-select" @bind-Value="Report.ReportTypeId" disabled="@(!HasEditPermission)">
+                <option value="">-- Bitte wählen --</option>
+                @foreach (var type in Options.ReportTypes)
+                {
+                    <option value="@type.Id">@type.Name</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="() => Report.ReportTypeId" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Materialtyp *</label>
+            <InputSelect class="form-select" @bind-Value="Report.MaterialTypeId" disabled="@(!HasEditPermission)">
+                <option value="">-- Bitte wählen --</option>
+                @foreach (var type in Options.MaterialTypes)
+                {
+                    <option value="@type.Id">@type.Name</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="() => Report.MaterialTypeId" />
+
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Kurs</label>
+            <InputSelect class="form-select" @bind-Value="Report.CourseId" disabled="@(!HasEditPermission)">
+                <option value="">-- Kein Kurs --</option>
+                @foreach (var course in Options.Courses)
+                {
+                    <option value="@course.Id">@course.Name (@course.Code)</option>
+                }
+            </InputSelect>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public ReportFormOptionsDto Options { get; set; } = default!;
+    [Parameter] public ReportDto Report { get; set; } = default!;
+    [Parameter] public bool HasEditPermission { get; set; }
+}

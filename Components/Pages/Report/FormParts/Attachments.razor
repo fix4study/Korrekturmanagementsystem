@@ -1,0 +1,55 @@
+﻿@using Korrekturmanagementsystem.Dtos
+@using Korrekturmanagementsystem.Models
+@using Korrekturmanagementsystem.Services.Interfaces
+@inject IFileUploadProvider FileUploadService
+
+<div class="card mb-3 shadow-sm">
+    <div class="card-header fw-semibold">Anhänge</div>
+    <div class="card-body">
+
+        @if (AttachmentList?.Any() == true)
+        {
+            <button type="button" class="btn btn-sm btn-outline-secondary mb-3" @onclick="OnToggleAttachments">
+                @(ShowAttachments ? "Anhänge ausblenden" : "Anhänge anzeigen")
+            </button>
+
+            @if (ShowAttachments)
+            {
+                <div class="row g-2">
+                    @foreach (var attachment in AttachmentList)
+                    {
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <div class="border rounded p-2 text-center">
+                                @if (attachment.FileName.EndsWith(".png") || attachment.FileName.EndsWith(".jpg"))
+                                {
+                                    <img class="img-fluid rounded mb-1"
+                                         src="@FileUploadService.GenerateReadSasUrl(attachment.FileName, TimeSpan.FromHours(1))"
+                                         style="max-height: 120px; object-fit: cover;"
+                                         @onload="@(() => OnImageLoaded.InvokeAsync(attachment.FileName))" />
+                                }
+                                else
+                                {
+                                    <a href="@FileUploadService.GenerateReadSasUrl(attachment.FileName, TimeSpan.FromHours(1))"
+                                       target="_blank" class="text-decoration-none">
+                                        📄 @attachment.FileName
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-muted">Keine Anhänge vorhanden.</p>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public List<AttachmentDto> AttachmentList { get; set; } = default!;
+    [Parameter] public bool ShowAttachments { get; set; }
+    [Parameter] public EventCallback OnToggleAttachments { get; set; }
+    [Parameter] public EventCallback<string> OnImageLoaded { get; set; }
+}

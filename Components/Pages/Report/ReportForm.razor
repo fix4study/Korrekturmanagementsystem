@@ -1,4 +1,5 @@
-﻿@using Korrekturmanagementsystem.Dtos
+﻿@using Korrekturmanagementsystem.Components.Pages.Report.FormParts
+@using Korrekturmanagementsystem.Dtos
 @using Korrekturmanagementsystem.Dtos.Report
 @using Korrekturmanagementsystem.Models
 @using Korrekturmanagementsystem.Services.Interfaces
@@ -9,177 +10,26 @@
     <div class="row g-4">
         <!-- Linke Spalte -->
         <div class="col-md-8">
-            <div class="card mb-3 shadow-sm">
-                <div class="card-header fw-semibold">Details</div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label">Titel *</label>
-                        <InputText class="form-control" @bind-Value="Model.Report.Title" disabled="@(!HasEditPermission)" />
-                        <ValidationMessage For="() => Model.Report.Title" />
-                    </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Beschreibung</label>
-                        <InputTextArea class="form-control" rows="4" @bind-Value="Model.Report.Description" disabled="@(!HasEditPermission)" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Meldungstyp *</label>
-                        <InputSelect class="form-select" @bind-Value="Model.Report.ReportTypeId" disabled="@(!HasEditPermission)">
-                            <option value="">-- Bitte wählen --</option>
-                            @foreach (var type in Model.Options.ReportTypes)
-                            {
-                                <option value="@type.Id">@type.Name</option>
-                            }
-                        </InputSelect>
-                        <ValidationMessage For="() => Model.Report.ReportTypeId" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Materialtyp *</label>
-                        <InputSelect class="form-select" @bind-Value="Model.Report.MaterialTypeId" disabled="@(!HasEditPermission)">
-                            <option value="">-- Bitte wählen --</option>
-                            @foreach (var type in Model.Options.MaterialTypes)
-                            {
-                                <option value="@type.Id">@type.Name</option>
-                            }
-                        </InputSelect>
-                        <ValidationMessage For="() => Model.Report.MaterialTypeId" />
-
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Kurs</label>
-                        <InputSelect class="form-select" @bind-Value="Model.Report.CourseId" disabled="@(!HasEditPermission)">
-                            <option value="">-- Kein Kurs --</option>
-                            @foreach (var course in Model.Options.Courses)
-                            {
-                                <option value="@course.Id">@course.Name (@course.Code)</option>
-                            }
-                        </InputSelect>
-                    </div>
-                </div>
-            </div>
+            <Details Options="Model.Options"
+                     Report="Model.Report"
+                     HasEditPermission="HasEditPermission" />
 
             @if (IsEdit)
             {
-                <div class="card mb-3 shadow-sm">
-                    <div class="card-header fw-semibold">Anhänge</div>
-                    <div class="card-body">
-
-                        @if (Model.Attachments?.Any() == true)
-                        {
-                            <button type="button" class="btn btn-sm btn-outline-secondary mb-3" @onclick="OnToggleAttachments">
-                                @(ShowAttachments ? "Anhänge ausblenden" : "Anhänge anzeigen")
-                            </button>
-
-                            @if (ShowAttachments)
-                            {
-                                <div class="row g-2">
-                                    @foreach (var attachment in Model.Attachments)
-                                    {
-                                        <div class="col-6 col-sm-4 col-lg-3">
-                                            <div class="border rounded p-2 text-center">
-                                                @if (attachment.FileName.EndsWith(".png") || attachment.FileName.EndsWith(".jpg"))
-                                                {
-                                                    <img class="img-fluid rounded mb-1"
-                                                         src="@FileUploadService.GenerateReadSasUrl(attachment.FileName, TimeSpan.FromHours(1))"
-                                                         style="max-height: 120px; object-fit: cover;"
-                                                         @onload="@(() => OnImageLoaded.InvokeAsync(attachment.FileName))" />
-                                                }
-                                                else
-                                                {
-                                                    <a href="@FileUploadService.GenerateReadSasUrl(attachment.FileName, TimeSpan.FromHours(1))"
-                                                       target="_blank" class="text-decoration-none">
-                                                        📄 @attachment.FileName
-                                                    </a>
-                                                }
-                                            </div>
-                                        </div>
-                                    }
-                                </div>
-                            }
-                        }
-                        else
-                        {
-                            <p class="text-muted">Keine Anhänge vorhanden.</p>
-                        }
-                    </div>
-                </div>
+                <Attachments AttachmentList="Model.Attachments"
+                             ShowAttachments="ShowAttachments"
+                             OnToggleAttachments="OnToggleAttachments"
+                             OnImageLoaded="OnImageLoaded" />
             }
         </div>
 
         <!-- Rechte Spalte -->
         <div class="col-md-4">
-            <div class="card mb-3 shadow-sm">
-                <div class="card-header fw-semibold">Metadaten</div>
-                <div class="card-body">
-                    @if (IsEdit)
-                    {
-                        <div class="mb-3">
-                            <label class="form-label">Erstellt von</label>
-                            <p class="form-control-plaintext">@Model.CreatedByUsername</p>
-                        </div>
-
-                        <AuthorizeView Roles="Admin, Intern">
-                            <Authorized Context="authContext">
-                                <div class="card mb-3 border-info">
-                                    <div class="card-header bg-info bg-opacity-10 fw-semibold">
-                                        Status
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="mb-3">
-                                            <label class="form-label">Status</label>
-                                            <InputSelect class="form-select" @bind-Value="Model.Report.StatusId">
-                                                <option value="">-- Kein Status --</option>
-                                                @foreach (var status in Model.Options.Statuses)
-                                                {
-                                                    <option value="@status.Id">@status.Name</option>
-                                                }
-                                            </InputSelect>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Kommentar (optional)</label>
-                                            <InputTextArea class="form-control" rows="4" @bind-Value="Model.StatusNote" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </Authorized>
-                            <NotAuthorized Context="notAuthContext">
-                                <div class="mb-3">
-                                    <label class="form-label">Status</label>
-                                    <p class="form-control-plaintext">
-                                        @(Model.Options.Statuses.FirstOrDefault(s => s.Id == Model.Report.StatusId)?.Name ?? "–")
-                                    </p>
-                                </div>
-                            </NotAuthorized>
-                        </AuthorizeView>
-                    }
-
-                    <div class="mb-3">
-                        <label class="form-label">Priorität *</label>
-                        <InputSelect class="form-select" @bind-Value="Model.Report.PriorityId" disabled="@(!HasEditPermission)">
-                            <option value="">-- Bitte wählen --</option>
-                            @foreach (var priority in Model.Options.Priorities)
-                            {
-                                <option value="@priority.Id">@priority.Name</option>
-                            }
-                        </InputSelect>
-                        <ValidationMessage For="() => Model.Report.ReportTypeId" />
-
-                    </div>
-
-                    <!-- Tags Auswahl -->
-                    <div class="mb-3">
-                        <label class="form-label">Tags</label>
-                        <TagSelector AvailableTags="Model.Options.Tags"
-                                     SelectedTags="Model.SelectedTags"
-                                     HasEditPermission="HasEditPermission"
-                                     SelectedTagsChanged="SelectedTagsChanged" />
-                    </div>
-
-                </div>
-            </div>
+            <MetaData Model="Model"
+                      IsEdit="IsEdit"
+                      HasEditPermission="HasEditPermission"
+                      SelectedTagsChanged="SelectedTagsChanged" />
 
             @if (HasEditPermission)
             {
@@ -206,7 +56,4 @@
     [Parameter] public bool IsEdit { get; set; } = false;
     [Parameter] public EventCallback<List<TagDto>> SelectedTagsChanged { get; set; }
     [Parameter] public bool HasEditPermission { get; set; }
-
-    [Inject]
-    public IFileUploadProvider FileUploadService { get; set; } = default!;
 }
