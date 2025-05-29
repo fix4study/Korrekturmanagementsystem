@@ -42,11 +42,10 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseAntiforgery();
 
-app.MapLoginEndpoint();
 app.MapLogoutEndpoint();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode().DisableAntiforgery();
+    .AddInteractiveServerRenderMode();
 
 await app.RunAsync();

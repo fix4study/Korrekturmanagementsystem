@@ -1,6 +1,6 @@
-﻿namespace Korrekturmanagementsystem.Dtos;
+﻿namespace Korrekturmanagementsystem.Models;
 
-public class LoginDto
+public class LoginModel
 {
     public string Username { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;

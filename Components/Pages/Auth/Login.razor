@@ -1,13 +1,12 @@
 ﻿@page "/account/login"
+@using Korrekturmanagementsystem.Models
 @using Korrekturmanagementsystem.Services.Interfaces
 @using Korrekturmanagementsystem.Dtos
-@using System.Security.Claims
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authentication.Cookies
 @using Microsoft.AspNetCore.Authorization
 @using Korrekturmanagementsystem.Components.Layout
-
-@rendermode InteractiveServer
+@using System.Security.Claims
 @attribute [AllowAnonymous]
 @layout AuthLayout
 
@@ -18,17 +17,20 @@
                 <h1 class="fw-bold mb-0 fs-2">Mit Konto anmelden</h1>
             </div>
             <div class="modal-body p-5 pt-0">
-                <form method="post" action="/account/login">
+                <EditForm Model="this" OnValidSubmit="HandleLoginAsync" FormName="LoginForm">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
                     <div class="form-floating mb-3">
-                        <input name="username" type="text" class="form-control rounded-3" id="floatingInput">
+                        <InputText @bind-Value="loginModel.Username" class="form-control rounded-3" id="floatingInput" />
                         <label for="floatingInput">Benutzername</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input name="password" type="password" class="form-control rounded-3" id="floatingPassword">
+                        <InputText @bind-Value="loginModel.Password" type="password" class="form-control rounded-3" id="floatingPassword" />
                         <label for="floatingPassword">Passwort</label>
                     </div>
                     <button class="w-100 mb-2 btn btn-lg rounded-3 btn-dark" type="submit">Anmelden</button>
-                </form>
+                </EditForm>
 
                 @if (_showError)
                 {
@@ -44,17 +46,48 @@
 @code {
     private bool _showError;
 
-    [Inject] 
-    private NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] private IUserProvider UserProvider { get; set; } = default!;
+    [Inject] IPasswordService PasswordService { get; set; } = default!;
+    [Inject] private IHttpContextAccessor HttpContextAccessor { get; set; } = default!;
 
+    [SupplyParameterFromForm]
+    public LoginModel loginModel { get; set; } = new();
 
-    protected override void OnInitialized()
+    private async Task HandleLoginAsync()
     {
-        var uri = new Uri(NavigationManager.Uri);
-        var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
-        _showError = query.TryGetValue("error", out var value) && value == "true";
+        var user = await UserProvider.GetUserByUsernameAsync(loginModel.Username);
+
+        if (user is null || !PasswordService.VerifyPassword(user.HashedPassword, loginModel.Password))
+        {
+            _showError = true;
+            return;
+        }
+
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.Name, user.Username),
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(ClaimTypes.Role, user.SystemRoleName)
+        };
+
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(identity);
+
+        var httpContext = HttpContextAccessor.HttpContext;
+
+        if (httpContext is not null)
+        {
+            await httpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                principal,
+                new AuthenticationProperties
+                {
+                    IsPersistent = true,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(60)
+                });
+        }
+
+        NavigationManager.NavigateTo("/");
     }
-
 }
-
-
