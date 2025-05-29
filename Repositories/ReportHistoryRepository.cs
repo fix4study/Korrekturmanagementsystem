@@ -9,12 +9,10 @@ public class ReportHistoryRepository : BaseRepository<ReportHistory>, IReportHis
 {
     public ReportHistoryRepository(ApplicationDbContext context) : base(context) { }
 
-    public async Task<IEnumerable<ReportHistory>> GetReportHistoriesByReportIdAsync(Guid reportId)
-    {
-        return await context.ReportHistories
+    public async Task<IEnumerable<ReportHistory>> GetReportHistoriesByReportIdAsync(Guid reportId) =>
+        await context.ReportHistories
             .Where(x => x.ReportId == reportId)
             .Include(r => r.Status)
             .Include(r => r.ChangedBy)
             .ToListAsync();
-    }
 }

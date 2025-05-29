@@ -1,12 +1,12 @@
-﻿using Korrekturmanagementsystem.Dtos.Report;
-using Korrekturmanagementsystem.Dtos;
-using Korrekturmanagementsystem.Services.Interfaces;
+﻿using Korrekturmanagementsystem.Dtos;
+using Korrekturmanagementsystem.Dtos.Report;
 using Korrekturmanagementsystem.Models;
-using System.Text;
-using Microsoft.AspNetCore.Components.Forms;
-using Korrekturmanagementsystem.Shared;
-using Korrekturmanagementsystem.Providers.Interfaces;
 using Korrekturmanagementsystem.Models.Enums;
+using Korrekturmanagementsystem.Providers.Interfaces;
+using Korrekturmanagementsystem.Services.Interfaces;
+using Korrekturmanagementsystem.Shared;
+using Microsoft.AspNetCore.Components.Forms;
+using System.Text;
 
 namespace Korrekturmanagementsystem.Services;
 
@@ -18,12 +18,10 @@ public class ReportService : IReportService
     private readonly IFileUploadProvider _fileUploadProvider;
     private readonly IReportHistoryProvider _reportHistoryProvider;
     private readonly ICurrentUserService _currentUserService;
-    private readonly IHttpContextAccessor _httpContextAccessor;
     public ReportService(IReportProvider reportProvider,
         IReportTagProvider reportTagProvider,
         IAttachmentProvider attachmentProvider,
         IFileUploadProvider fileUploadProvider,
-        IHttpContextAccessor httpContextAccessor,
         IReportHistoryProvider reportHistoryProvider,
         ICurrentUserService currentUserService)
     {
@@ -31,7 +29,6 @@ public class ReportService : IReportService
         _reportTagProvider = reportTagProvider;
         _attachmentProvider = attachmentProvider;
         _fileUploadProvider = fileUploadProvider;
-        _httpContextAccessor = httpContextAccessor;
         _reportHistoryProvider = reportHistoryProvider;
         _currentUserService = currentUserService;
     }

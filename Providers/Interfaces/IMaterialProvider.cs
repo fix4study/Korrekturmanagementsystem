@@ -1,5 +1,4 @@
-﻿using Korrekturmanagementsystem.Data.Entities;
-using Korrekturmanagementsystem.Dtos;
+﻿using Korrekturmanagementsystem.Dtos;
 
 namespace Korrekturmanagementsystem.Services.Interfaces;
 

@@ -15,19 +15,9 @@ public class RoleProvider : IRoleProvider
         _systemRoleRepository = systemRoleRepository;
     }
 
-    public async Task<Guid?> GetSystemRoleIdByNameAsync(string name)
-    {
-        var id = await _systemRoleRepository.GetSystemRoleIdByNameAsync(name);
+    public async Task<Guid?> GetSystemRoleIdByNameAsync(string name) =>
+        await _systemRoleRepository.GetSystemRoleIdByNameAsync(name);
 
-        if (id is null)
-        {
-            return null;
-        }
-        else
-        {
-            return id;
-        }
-    }
 
     public async Task AddStakeholderRoleAsync(string name)
     {

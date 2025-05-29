@@ -27,6 +27,11 @@ public class CommentProvider : ICommentProvider
         {
             var user = await _userProvider.GetUserByIdAsync(comment.AuthorId);
 
+            if (user is null)
+            {
+                continue;
+            }
+
             comments.Add(new CommentDto
             {
                 Id = comment.Id,

@@ -7,16 +7,13 @@ public class AuthorizationService : IAuthorizationService
 {
     private readonly ICurrentUserService _currentUserService;
     private readonly IReportProvider _reportProvider;
-    private readonly IUserProvider _userProvider;
 
     public AuthorizationService(
         ICurrentUserService currentUserService,
-        IReportProvider reportProvider,
-        IUserProvider userProvider)
+        IReportProvider reportProvider)
     {
         _currentUserService = currentUserService;
         _reportProvider = reportProvider;
-        _userProvider = userProvider;
     }
 
     public async Task<bool> HasEditReportPermissonAsync(Guid reportId)
@@ -28,7 +25,7 @@ public class AuthorizationService : IAuthorizationService
         }
 
         var creatorUserId = await _reportProvider.GetCreatorUserIdByReportIdAsync(reportId);
-        if (creatorUserId == null)
+        if (creatorUserId is null)
         {
             return false;
         }

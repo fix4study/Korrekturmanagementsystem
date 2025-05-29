@@ -51,7 +51,7 @@ public class ReportTagProvider : IReportTagProvider
 
             await InsertReportTagAsync(reportTagToInsert);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             return;
         }

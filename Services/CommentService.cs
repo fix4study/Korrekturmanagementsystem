@@ -22,8 +22,7 @@ public class CommentService : ICommentService
         };
     }
 
-    public async Task AddCommentAsync(Guid reportId, string content)
-    {
+    public async Task AddCommentAsync(Guid reportId, string content) =>
         await _commentProvider.AddCommentAsync(reportId, content);
-    }
+    
 }

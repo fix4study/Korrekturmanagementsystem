@@ -15,13 +15,13 @@ public class UserProvider : IUserProvider
         _userRepository = userRepository;
     }
 
-    public async Task<UserDto> GetUserByIdAsync(Guid id)
+    public async Task<UserDto?> GetUserByIdAsync(Guid id)
     {
         var user = await _userRepository.GetUserByIdAsync(id);
 
-        if (user == null)
+        if (user is null)
         {
-            throw new KeyNotFoundException($"User with ID {id} not found.");
+            return null;
         }
 
         return new UserDto

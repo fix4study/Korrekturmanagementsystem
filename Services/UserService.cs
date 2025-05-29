@@ -3,6 +3,7 @@ using Korrekturmanagementsystem.Dtos;
 using Korrekturmanagementsystem.Models.Enums;
 using Korrekturmanagementsystem.Services.Interfaces;
 using Korrekturmanagementsystem.Shared;
+
 namespace Korrekturmanagementsystem.Services;
 
 public class UserService : IUserService
@@ -21,7 +22,7 @@ public class UserService : IUserService
 
         if (!roleResult.IsSuccess)
         {
-            return Result.Failure($"Registrierung fehlgeschlagen: { roleResult.ErrorMessage}");
+            return Result.Failure($"Registrierung fehlgeschlagen: {roleResult.ErrorMessage}");
         }
 
         var result = await _userProvider.CreateUser(user, roleResult.SystemRoleId!.Value);

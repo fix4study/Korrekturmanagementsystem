@@ -8,4 +8,5 @@ public interface IReportRepository : IBaseRepository<Report>
     Task UpdateAsync();
     Task<IEnumerable<Report>> GetAllByUserIdAsync(Guid userId);
     Task<Guid?> GetCreatorIdByReportIdAsync(Guid id);
+    Task<IEnumerable<Report>> GetAllAsync();
 }

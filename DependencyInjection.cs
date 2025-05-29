@@ -5,6 +5,7 @@ using Korrekturmanagementsystem.Repositories;
 using Korrekturmanagementsystem.Repositories.Interfaces;
 using Korrekturmanagementsystem.Services;
 using Korrekturmanagementsystem.Services.Interfaces;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace Korrekturmanagementsystem;
@@ -47,6 +48,12 @@ public static class DependencyInjection
         services.AddScoped<IReportTagRepository, ReportTagRepository>();
         services.AddScoped<IReportHistoryRepository, ReportHistoryRepository>();
         services.AddScoped<ISystemRoleRepository, SystemRoleRepository>();
+        services.AddScoped<ICourseRepository, CourseRepository>();
+        services.AddScoped<IMaterialTypeRepository, MaterialTypeRepository>();
+        services.AddScoped<IPriorityRepository, PriorityRepository>();
+        services.AddScoped<IStatusRepository, StatusRepository>();
+        services.AddScoped<ITagRepository, TagRepository>();
+        services.AddScoped<IReportTypeRepository, ReportTypeRepository>();
 
         return services;
     }

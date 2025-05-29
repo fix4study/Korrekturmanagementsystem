@@ -2,6 +2,7 @@
 using Korrekturmanagementsystem.Components;
 using Korrekturmanagementsystem.Endpoints;
 using Korrekturmanagementsystem.Extensions;
+
 using Microsoft.AspNetCore.Components.Server;
 
 var builder = WebApplication.CreateBuilder(args);

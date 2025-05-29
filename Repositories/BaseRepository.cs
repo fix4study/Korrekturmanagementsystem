@@ -39,10 +39,8 @@ public class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : 
     }
 
 
-    public virtual async Task<TEntity> GetByIdAsync(object id)
-    {
-        return await dbSet.FindAsync(id);
-    }
+    public virtual async Task<TEntity> GetByIdAsync(object id) =>
+        await dbSet.FindAsync(id);
 
     public virtual async Task InsertAsync(TEntity entity)
     {
@@ -60,6 +58,7 @@ public class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : 
     public virtual async Task DeleteAsync(object id)
     {
         var entity = await dbSet.FindAsync(id);
+
         if (entity != null)
         {
             await DeleteAsync(entity);
@@ -75,7 +74,6 @@ public class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : 
         dbSet.Remove(entity);
         await context.SaveChangesAsync();
     }
-
 }
 
 

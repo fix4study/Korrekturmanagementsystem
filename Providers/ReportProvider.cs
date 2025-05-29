@@ -4,30 +4,28 @@ using Korrekturmanagementsystem.Dtos.Report;
 using Korrekturmanagementsystem.Repositories.Interfaces;
 using Korrekturmanagementsystem.Services.Interfaces;
 using Korrekturmanagementsystem.Shared;
-using System.Linq.Expressions;
 
 namespace Korrekturmanagementsystem.Services;
 
 public class ReportProvider : IReportProvider
 {
     private readonly IReportRepository _reportRepository;
-    private readonly IBaseRepository<Priority> _priorityRepository;
-    private readonly IBaseRepository<MaterialType> _materialTypeRepository;
-    private readonly IBaseRepository<Course> _courseRepository;
-    private readonly IBaseRepository<ReportType> _reportTypeRepository;
-    private readonly IBaseRepository<Status> _statusRepository;
-    private readonly IBaseRepository<Tag> _tagRepository;
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IPriorityRepository _priorityRepository;
+    private readonly IMaterialTypeRepository _materialTypeRepository;
+    private readonly ICourseRepository _courseRepository;
+    private readonly IReportTypeRepository _reportTypeRepository;
+    private readonly IStatusRepository _statusRepository;
+    private readonly ITagRepository _tagRepository;
 
-    public ReportProvider(IReportRepository reportRepository, IHttpContextAccessor httpContextAccessor,
-        IBaseRepository<Priority> priorityRepository,
-        IBaseRepository<MaterialType> materialTypeRepositorym,
-        IBaseRepository<Course> courseRepository,
-        IBaseRepository<ReportType> reportTypeRepository,
-        IBaseRepository<Status> statusRepsoitory, IBaseRepository<Tag> tagRepository)
+    public ReportProvider(IReportRepository reportRepository,
+        IPriorityRepository priorityRepository,
+        IMaterialTypeRepository materialTypeRepositorym,
+        ICourseRepository courseRepository,
+        IReportTypeRepository reportTypeRepository,
+        IStatusRepository statusRepsoitory,
+        ITagRepository tagRepository)
     {
         _reportRepository = reportRepository;
-        _httpContextAccessor = httpContextAccessor;
         _priorityRepository = priorityRepository;
         _materialTypeRepository = materialTypeRepositorym;
         _courseRepository = courseRepository;
@@ -65,16 +63,8 @@ public class ReportProvider : IReportProvider
         }
     }
 
-    public async Task<Guid?> GetCreatorUserIdByReportIdAsync(Guid id)
-    {
-        var userId = await _reportRepository.GetCreatorIdByReportIdAsync(id);
-        if (userId == null)
-        {
-            return null;
-        }
-
-        return userId.Value;
-    }
+    public async Task<Guid?> GetCreatorUserIdByReportIdAsync(Guid id) =>
+        await _reportRepository.GetCreatorIdByReportIdAsync(id);
 
     public async Task<ReportFormOptionsDto> GetFormOptionsAsync() =>
         new ReportFormOptionsDto
@@ -100,12 +90,7 @@ public class ReportProvider : IReportProvider
 
     public async Task<IEnumerable<ReportOverviewDto>> GetReportsOverviewAsync()
     {
-        var reports = await _reportRepository.GetAllAsync(
-            includes: new Expression<Func<Report, object>>[]
-            {
-                kms => kms.Priority,
-                kms => kms.Status
-            });
+        var reports = await _reportRepository.GetAllAsync();
 
         return reports.Select(report => new ReportOverviewDto
         {

@@ -17,7 +17,7 @@ public class AttachmentProvider : IAttachmentProvider
     {
         var attachments = await _attachmentRepository.GetAttachmentsByReportId(reportId);
 
-        if(attachments == null || !attachments.Any())
+        if (attachments?.Any() != true)
         {
             return Enumerable.Empty<AttachmentDto>();
         }
@@ -36,7 +36,7 @@ public class AttachmentProvider : IAttachmentProvider
     {
         try
         {
-            if (attachment == null)
+            if (attachment is null)
             {
                 return false;
             }

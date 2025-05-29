@@ -1,7 +1,7 @@
 ﻿using Korrekturmanagementsystem.Data;
 using Korrekturmanagementsystem.Data.Entities;
 using Korrekturmanagementsystem.Repositories.Interfaces;
-using Korrekturmanagementsystem.Shared;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace Korrekturmanagementsystem.Repositories;
@@ -10,13 +10,12 @@ public class ReportTagRepository : BaseRepository<ReportTag>, IReportTagReposito
 {
     public ReportTagRepository(ApplicationDbContext context) : base(context) { }
 
-    public async Task<IEnumerable<ReportTag>> GetReportTagsByReportIdAsync(Guid reportId)
-    {
-        return await context.ReportTags
+    public async Task<IEnumerable<ReportTag>> GetReportTagsByReportIdAsync(Guid reportId) =>
+        await context.ReportTags
             .Include(rt => rt.Tag)
             .Where(rt => rt.ReportId == reportId)
             .ToListAsync();
-    }
+
 
     public async Task<bool> DeleteByReportIdAsync(Guid reportId)
     {
@@ -35,6 +34,4 @@ public class ReportTagRepository : BaseRepository<ReportTag>, IReportTagReposito
             return false;
         }
     }
-
-
 }

@@ -1,5 +1,5 @@
-﻿using Korrekturmanagementsystem.Dtos.Report;
-using Korrekturmanagementsystem.Dtos;
+﻿using Korrekturmanagementsystem.Dtos;
+using Korrekturmanagementsystem.Dtos.Report;
 
 namespace Korrekturmanagementsystem.Models;
 
