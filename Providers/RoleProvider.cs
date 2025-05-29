@@ -18,17 +18,6 @@ public class RoleProvider : IRoleProvider
     public async Task<Guid?> GetSystemRoleIdByNameAsync(string name) =>
         await _systemRoleRepository.GetSystemRoleIdByNameAsync(name);
 
-
-    public async Task AddStakeholderRoleAsync(string name)
-    {
-        var role = new StakeholderRole
-        {
-            Name = name
-        };
-
-        await _roleRepository.InsertAsync(role);
-    }
-
     public async Task<IEnumerable<RoleDto>> GetStakeholderRolesAsync()
     {
         var roles = await _roleRepository.GetAllAsync();

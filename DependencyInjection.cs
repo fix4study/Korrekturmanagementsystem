@@ -16,7 +16,6 @@ public static class DependencyInjection
     {
         services.AddScoped<IUserProvider, UserProvider>();
         services.AddScoped<IRoleProvider, RoleProvider>();
-        services.AddScoped<IMaterialProvider, MaterialProvider>();
         services.AddScoped<IReportProvider, ReportProvider>();
         services.AddScoped<IFileUploadProvider, FileUploadProvider>();
         services.AddScoped<IAttachmentProvider, AttachmentProvider>();
