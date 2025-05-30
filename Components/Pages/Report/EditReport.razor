@@ -17,9 +17,9 @@
     <h3 class="mb-4">Meldung bearbeiten</h3>
 
     <Notification Visible="@(!string.IsNullOrEmpty(_message))"
-                         OnClose="@(() => _message = "")"
-                         Message="@_message"
-                         Type="_notificationType" />
+                  OnClose="@(() => _message = "")"
+                  Message="@_message"
+                  Type="_notificationType" />
 
     <ReportForm Model="@_viewModel"
                 IsEdit="true"
@@ -64,7 +64,14 @@
     {
         SetMessageFromQuery();
         _hasEditPermission = await AuthorizationService.HasEditReportPermissonAsync(Id);
-        _viewModel = await ReportService.BuildEditReportViewModelAsync(Id);
+        var report = await ReportService.BuildEditReportViewModelAsync(Id);
+        if (report is null)
+        {
+            ShowMessage("Beim Laden der Meldung ist etwas schief gelaufen!", NotificationType.Warning);
+            return;
+        }
+
+        _viewModel = report;
     }
 
     private async Task HandleValidSubmit()
@@ -81,7 +88,14 @@
 
         if (result.IsSuccess)
         {
-            _viewModel = await ReportService.BuildEditReportViewModelAsync(Id);
+            var report = await ReportService.BuildEditReportViewModelAsync(Id);
+            if (report is null)
+            {
+                ShowMessage("Beim Laden der Meldung ist etwas schief gelaufen!", NotificationType.Warning);
+                return;
+            }
+
+            _viewModel = report;
             _isSaved = true;
             StateHasChanged();
 

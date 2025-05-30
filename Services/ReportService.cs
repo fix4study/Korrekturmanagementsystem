@@ -33,10 +33,15 @@ public class ReportService : IReportService
         _currentUserService = currentUserService;
     }
 
-    public async Task<ReportModel> BuildEditReportViewModelAsync(Guid reportId)
+    public async Task<ReportModel?> BuildEditReportViewModelAsync(Guid reportId)
     {
         var options = await _reportProvider.GetFormOptionsAsync();
         var details = await _reportProvider.GetReportDetailsByIdAsync(reportId);
+        if (details is null)
+        {
+            return null;
+        }
+
         var attachments = await _attachmentProvider.GetByReportIdAsync(reportId);
         var reportTags = await _reportTagProvider.GetReportTagsByReportIdAsync(reportId);
         var reportHistory = await _reportHistoryProvider.GetAllReportHistoriesByReportIdAsync(reportId);
@@ -75,7 +80,7 @@ public class ReportService : IReportService
 
         var validationError = ValidateMandatoryFields(reportDto);
 
-        if (validationError is not null)
+        if (!string.IsNullOrEmpty(validationError))
         {
             return new Result { IsSuccess = false, Message = validationError };
         }
@@ -84,23 +89,23 @@ public class ReportService : IReportService
 
         if (!updateResult.IsSuccess)
         {
-            return new Result { IsSuccess = false, Message = updateResult.Message ?? "Unbekannter Fehler" };
+            return new Result { IsSuccess = false, Message = updateResult.Message};
         }
 
         await AddReportHistoryEntry(model, model.StatusNote);
 
         await _reportTagProvider.UpdateReportTagsAsync(reportDto.Id, model.SelectedTags);
 
-        var message = new StringBuilder("Meldung erfolgreich aktualisiert. ");
+        var message = "Meldung erfolgreich aktualisiert.";
 
         if (files?.Count > 0)
         {
             var uploadResult = await _fileUploadProvider.UploadAsync(reportDto.Id, files);
 
-            message.Append(uploadResult.Message ?? "Unbekannter Fehler.");
+            message += $" {uploadResult.Message}";
         }
 
-        return new Result { IsSuccess = true, Message = message.ToString() ?? "Unbekannter Fehler" };
+        return new Result { IsSuccess = true, Message = message.ToString()};
     }
 
     public async Task<ReportFormOptionsDto> GetFormOptionsAsync()
@@ -111,7 +116,8 @@ public class ReportService : IReportService
         var reportDto = model.Report;
 
         var validationError = ValidateMandatoryFields(reportDto);
-        if (validationError is not null)
+
+        if (!string.IsNullOrEmpty(validationError))
         {
             return Result<Guid>.Failure(validationError);
         }
@@ -151,12 +157,12 @@ public class ReportService : IReportService
             await _reportTagProvider.InsertReportTagAsync(reportTags);
         }
 
-        var message = new StringBuilder("Meldung erfolgreich hinzugefügt.");
+        var message = "Meldung erfolgreich hinzugefügt.";
 
         if (selectedTags?.Count > 0)
         {
             var uploadResult = await _fileUploadProvider.UploadAsync(reportId.Value, files);
-            message.Append(uploadResult.Message ?? "Unbekannter Fehler beim Upload.");
+            message += $" {uploadResult.Message}";
         }
 
         return Result<Guid>.Success(reportId.Value, message.ToString());
@@ -178,7 +184,7 @@ public class ReportService : IReportService
     }
 
     #region private
-    private string? ValidateMandatoryFields(ReportDto report)
+    private static string ValidateMandatoryFields(ReportDto report)
     {
         if (string.IsNullOrWhiteSpace(report.Title))
         {
@@ -197,7 +203,7 @@ public class ReportService : IReportService
             return "Bitte wählen Sie ein Material.";
         }
 
-        return null;
+        return string.Empty;
     }
 
     private async Task AddInitialReportHistoryEntry(Guid reportId)

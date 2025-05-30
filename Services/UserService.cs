@@ -9,11 +9,11 @@ namespace Korrekturmanagementsystem.Services;
 public class UserService : IUserService
 {
     private readonly IUserProvider _userProvider;
-    private readonly IRoleProvider _roleProvider;
-    public UserService(IUserProvider userProvider, IRoleProvider roleProvider)
+    private readonly IRoleService _roleService;
+    public UserService(IUserProvider userProvider, IRoleService roleService)
     {
         _userProvider = userProvider;
-        _roleProvider = roleProvider;
+        _roleService = roleService;
     }
 
     public async Task<Result> CreateUser(CreateUserDto user)
@@ -54,7 +54,7 @@ public class UserService : IUserService
             role = SystemRole.User;
         }
 
-        var systemRoleId = await _roleProvider.GetSystemRoleIdByNameAsync(role.ToString());
+        var systemRoleId = await _roleService.GetSystemRoleIdByNameAsync(role.ToString());
 
         if (systemRoleId is null)
         {

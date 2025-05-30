@@ -62,7 +62,6 @@ public class FileUploadProvider : IFileUploadProvider
         {
             return Result.Failure("Es ist ein Fehler beim Hochladen aufgetreten");
         }
-
     }
 
     public string GenerateReadSasUrl(string fileName, TimeSpan validFor)

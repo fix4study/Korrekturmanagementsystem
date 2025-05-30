@@ -12,24 +12,24 @@
         <div class="col-md-8">
 
             <Details Options="Model.Options"
-            Report="Model.Report"
-            HasEditPermission="HasEditPermission" />
+                     Report="Model.Report"
+                     HasEditPermission="HasEditPermission" />
 
             @if (IsEdit)
             {
                 <Attachments AttachmentList="Model.Attachments"
-                ShowAttachments="ShowAttachments"
-                OnToggleAttachments="OnToggleAttachments"
-                OnImageLoaded="OnImageLoaded" />
+                             ShowAttachments="ShowAttachments"
+                             OnToggleAttachments="OnToggleAttachments"
+                             OnImageLoaded="OnImageLoaded" />
             }
         </div>
 
         <!-- Rechte Spalte -->
         <div class="col-md-4">
             <MetaData Model="Model"
-            IsEdit="IsEdit"
-            HasEditPermission="HasEditPermission"
-            SelectedTagsChanged="SelectedTagsChanged" />
+                      IsEdit="IsEdit"
+                      HasEditPermission="HasEditPermission"
+                      SelectedTagsChanged="SelectedTagsChanged" />
 
             @if (HasEditPermission)
             {
