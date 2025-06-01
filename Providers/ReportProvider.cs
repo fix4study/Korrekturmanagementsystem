@@ -44,10 +44,10 @@ public class ReportProvider : IReportProvider
                 Title = report.Title,
                 Description = report.Description,
                 ReportTypeId = report.ReportTypeId,
-                PriorityId = report.PriorityId,
+                PriorityId = (int)Models.Enums.Priority.Medium,
                 MaterialTypeId = report.MaterialTypeId,
                 CourseId = report.CourseId,
-                StatusId = (int)Models.Enums.Status.Eingereicht,
+                StatusId = (int)Models.Enums.Status.Submitted,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
                 CreatedById = userId

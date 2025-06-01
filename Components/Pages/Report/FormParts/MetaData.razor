@@ -1,72 +1,76 @@
 ﻿@using Korrekturmanagementsystem.Dtos
 @using Korrekturmanagementsystem.Models
 <div class="card mb-3 shadow-sm">
-    <div class="card-header fw-semibold">Metadaten</div>
+    <div class="card-header fw-semibold bg-light">Metadaten</div>
     <div class="card-body">
-        @if (IsEdit)
-        {
-            <div class="mb-3">
-                <label class="form-label">Erstellt von</label>
-                <p class="form-control-plaintext">@Model.CreatedByUsername</p>
+        <div class="row gy-3">
+            @if (IsEdit)
+            {
+
+                <!-- Erstellt von -->
+                <div class="col-12">
+                    <label class="form-label text-muted small">Erstellt von</label>
+                    <p class="mb-0">@Model.CreatedByUsername</p>
+                </div>
+
+                <!-- Status -->
+                <div class="col-12">
+                    <label class="form-label text-muted small">Status</label>
+                    <AuthorizeView Roles="Admin, Intern">
+                        <Authorized>
+                            <InputSelect class="form-select" @bind-Value="Model.Report.StatusId">
+                                <option value="">-- Kein Status --</option>
+                                @foreach (var status in Model.Options.Statuses)
+                                {
+                                    <option value="@status.Id">@status.Name</option>
+                                }
+                            </InputSelect>
+                            <label class="form-label mt-2">Kommentar (optional)</label>
+                            <InputTextArea class="form-control" rows="3" @bind-Value="Model.StatusNote" />
+                        </Authorized>
+                        <NotAuthorized>
+                            <p class="mb-0">
+                                @(
+                                    Model.Options.Statuses.FirstOrDefault(s => s.Id == Model.Report.StatusId)?.Name ?? "–"
+                                    )
+                            </p>
+                        </NotAuthorized>
+                    </AuthorizeView>
+                </div>
+
+                <!-- Priorität -->
+                <div class="col-12">
+                    <label class="form-label text-muted small">Priorität</label>
+                    <AuthorizeView Roles="Admin, Intern">
+                        <Authorized>
+                            <InputSelect class="form-select" @bind-Value="Model.Report.PriorityId" disabled="@(!HasEditPermission)">
+                                <option value="">-- Bitte wählen --</option>
+                                @foreach (var priority in Model.Options.Priorities)
+                                {
+                                    <option value="@priority.Id">@priority.Name</option>
+                                }
+                            </InputSelect>
+                        </Authorized>
+                        <NotAuthorized>
+                            <p class="mb-0">
+                                @(
+                                    Model.Options.Priorities.FirstOrDefault(p => p.Id == Model.Report.PriorityId)?.Name ?? "–"
+                                    )
+                            </p>
+                        </NotAuthorized>
+                    </AuthorizeView>
+                </div>
+            }
+
+            <!-- Tags -->
+            <div class="col-12">
+                <label class="form-label text-muted small">Tags</label>
+                <TagSelector AvailableTags="Model.Options.Tags"
+                             SelectedTags="Model.SelectedTags"
+                             HasEditPermission="HasEditPermission"
+                             SelectedTagsChanged="SelectedTagsChanged" />
             </div>
-
-            <AuthorizeView Roles="Admin, Intern">
-                <Authorized Context="authContext">
-                    <div class="card mb-3 border-info">
-                        <div class="card-header bg-info bg-opacity-10 fw-semibold">
-                            Status
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <label class="form-label">Status</label>
-                                <InputSelect class="form-select" @bind-Value="Model.Report.StatusId">
-                                    <option value="">-- Kein Status --</option>
-                                    @foreach (var status in Model.Options.Statuses)
-                                    {
-                                        <option value="@status.Id">@status.Name</option>
-                                    }
-                                </InputSelect>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Kommentar (optional)</label>
-                                <InputTextArea class="form-control" rows="4" @bind-Value="Model.StatusNote" />
-                            </div>
-                        </div>
-                    </div>
-                </Authorized>
-                <NotAuthorized Context="notAuthContext">
-                    <div class="mb-3">
-                        <label class="form-label">Status</label>
-                        <p class="form-control-plaintext">
-                            @(Model.Options.Statuses.FirstOrDefault(s => s.Id == Model.Report.StatusId)?.Name ?? "–")
-                        </p>
-                    </div>
-                </NotAuthorized>
-            </AuthorizeView>
-        }
-
-        <div class="mb-3">
-            <label class="form-label">Priorität *</label>
-            <InputSelect class="form-select" @bind-Value="Model.Report.PriorityId" disabled="@(!HasEditPermission)">
-                <option value="">-- Bitte wählen --</option>
-                @foreach (var priority in Model.Options.Priorities)
-                {
-                    <option value="@priority.Id">@priority.Name</option>
-                }
-            </InputSelect>
-            <ValidationMessage For="() => Model.Report.ReportTypeId" />
-
         </div>
-
-        <!-- Tags Auswahl -->
-        <div class="mb-3">
-            <label class="form-label">Tags</label>
-            <TagSelector AvailableTags="Model.Options.Tags"
-                         SelectedTags="Model.SelectedTags"
-                         HasEditPermission="HasEditPermission"
-                         SelectedTagsChanged="SelectedTagsChanged" />
-        </div>
-
     </div>
 </div>
 

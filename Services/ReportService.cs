@@ -127,7 +127,6 @@ public class ReportService : IReportService
             Title = reportDto.Title,
             Description = reportDto.Description,
             ReportTypeId = reportDto.ReportTypeId!.Value,
-            PriorityId = reportDto.PriorityId!.Value,
             MaterialTypeId = reportDto.MaterialTypeId!.Value,
             CourseId = reportDto.CourseId,
         };
@@ -194,10 +193,6 @@ public class ReportService : IReportService
         {
             return "Bitte wählen Sie einen Meldungstyp.";
         }
-        if (report.PriorityId == null)
-        {
-            return "Bitte wählen Sie eine Priorität.";
-        }
         if (report.MaterialTypeId == null)
         {
             return "Bitte wählen Sie ein Material.";
@@ -211,7 +206,7 @@ public class ReportService : IReportService
         var entry = new CreateReportHistoryDto
         {
             ReportId = reportId,
-            StatusId = (int)Status.Eingereicht,
+            StatusId = (int)Status.Submitted,
             Note = string.Empty,
         };
 

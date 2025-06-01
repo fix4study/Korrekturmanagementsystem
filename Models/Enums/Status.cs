@@ -2,10 +2,10 @@
 
 public enum Status
 {
-    Eingereicht = 1,
-    InPruefung = 2,
-    InBearbeitung = 3,
-    Umgesetzt = 4,
-    Abgelehnt = 5,
-    Geschlossen = 6
+    Submitted = 1,
+    UnderReview = 2,
+    InProgress = 3,
+    Implemented = 4,
+    Rejected = 5,
+    Closed = 6
 }

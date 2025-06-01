@@ -14,7 +14,6 @@ public class ReportDto
     [Required(ErrorMessage = "Bitte wählen Sie einen Meldungstyp.")]
     public int? ReportTypeId { get; set; } = null;
 
-    [Required(ErrorMessage = "Bitte wählen Sie eine Priorität.")]
     public int? PriorityId { get; set; }
 
     [Required(ErrorMessage = "Bitte wählen Sie ein Material.")]

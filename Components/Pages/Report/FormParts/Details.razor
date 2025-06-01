@@ -5,18 +5,18 @@
     <div class="card-header fw-semibold">Details</div>
     <div class="card-body">
         <div class="mb-3">
-            <label class="form-label">Titel *</label>
+            <label class="form-label text-muted small">Titel *</label>
             <InputText class="form-control" @bind-Value="Report.Title" disabled="@(!HasEditPermission)" />
             <ValidationMessage For="() => Report.Title" />
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Beschreibung</label>
+            <label class="form-label text-muted small">Beschreibung</label>
             <InputTextArea class="form-control" rows="4" @bind-Value="Report.Description" disabled="@(!HasEditPermission)" />
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Meldungstyp *</label>
+            <label class="form-label text-muted small">Meldungstyp *</label>
             <InputSelect class="form-select" @bind-Value="Report.ReportTypeId" disabled="@(!HasEditPermission)">
                 <option value="">-- Bitte wählen --</option>
                 @foreach (var type in Options.ReportTypes)
@@ -28,7 +28,7 @@
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Materialtyp *</label>
+            <label class="form-label text-muted small">Materialtyp *</label>
             <InputSelect class="form-select" @bind-Value="Report.MaterialTypeId" disabled="@(!HasEditPermission)">
                 <option value="">-- Bitte wählen --</option>
                 @foreach (var type in Options.MaterialTypes)
@@ -41,7 +41,7 @@
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Kurs</label>
+            <label class="form-label text-muted small">Kurs</label>
             <InputSelect class="form-select" @bind-Value="Report.CourseId" disabled="@(!HasEditPermission)">
                 <option value="">-- Kein Kurs --</option>
                 @foreach (var course in Options.Courses)
