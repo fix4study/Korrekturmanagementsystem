@@ -1,17 +1,16 @@
 ﻿using Korrekturmanagementsystem.Data.Entities;
 using Korrekturmanagementsystem.Dtos;
-using Korrekturmanagementsystem.Providers.Interfaces;
 using Korrekturmanagementsystem.Repositories.Interfaces;
 using Korrekturmanagementsystem.Services.Interfaces;
 
-namespace Korrekturmanagementsystem.Providers;
+namespace Korrekturmanagementsystem.Services;
 
-public class ReportHistoryProvider : IReportHistoryProvider
+public class ReportHistoryService : IReportHistoryService
 {
     private readonly IReportHistoryRepository _reportHistoryRepository;
     private readonly ICurrentUserService _currentUserService;
 
-    public ReportHistoryProvider(IReportHistoryRepository reportHistoryRepository, ICurrentUserService currentUserService)
+    public ReportHistoryService(IReportHistoryRepository reportHistoryRepository, ICurrentUserService currentUserService)
     {
         _reportHistoryRepository = reportHistoryRepository;
         _currentUserService = currentUserService;

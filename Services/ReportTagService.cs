@@ -5,10 +5,10 @@ using Korrekturmanagementsystem.Services.Interfaces;
 
 namespace Korrekturmanagementsystem.Services;
 
-public class ReportTagProvider : IReportTagProvider
+public class ReportTagService : IReportTagService
 {
     private readonly IReportTagRepository _reportTagRepository;
-    public ReportTagProvider(IReportTagRepository reportTagRepository)
+    public ReportTagService(IReportTagRepository reportTagRepository)
     {
         _reportTagRepository = reportTagRepository;
     }

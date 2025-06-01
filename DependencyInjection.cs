@@ -1,6 +1,4 @@
 ﻿using Korrekturmanagementsystem.Data;
-using Korrekturmanagementsystem.Providers;
-using Korrekturmanagementsystem.Providers.Interfaces;
 using Korrekturmanagementsystem.Repositories;
 using Korrekturmanagementsystem.Repositories.Interfaces;
 using Korrekturmanagementsystem.Services;
@@ -12,20 +10,6 @@ namespace Korrekturmanagementsystem;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApplicationProviders(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddScoped<IUserProvider, UserProvider>();
-        services.AddScoped<IRoleProvider, RoleProvider>();
-        services.AddScoped<IReportProvider, ReportProvider>();
-        services.AddScoped<IFileUploadProvider, FileUploadProvider>();
-        services.AddScoped<IAttachmentProvider, AttachmentProvider>();
-        services.AddScoped<IReportTagProvider, ReportTagProvider>();
-        services.AddScoped<ICommentProvider, CommentProvider>();
-        services.AddScoped<IReportHistoryProvider, ReportHistoryProvider>();
-
-        return services;
-    }
-
     public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IReportService, ReportService>();
@@ -35,6 +19,10 @@ public static class DependencyInjection
         services.AddScoped<IAuthorizationService, AuthorizationService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IRoleService, RoleService>();
+        services.AddScoped<IAttachmentService, AttachmentService>();
+        services.AddScoped<IReportTagService, ReportTagService>();
+        services.AddScoped<IReportHistoryService, ReportHistoryService>();
+        services.AddScoped<IFileUploadService, FileUploadService>();
 
         return services;
     }
