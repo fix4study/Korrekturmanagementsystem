@@ -2,6 +2,10 @@
 
 This repository contains a prototype of a Correction Management System developed as part of a study project at IU (Internationale Hochschule). The system is designed to support the management of corrections and improvements for various didactic materials used in distance learning, such as scripts, solution booklets, myCampus questions, vodcasts, tutorials, literature references, and more.
 
+## Status
+
+:construction: **This project is currently under active development. Features and documentation may change.**
+
 ## Project Goal
 
 The main objective is to analyze, design, and implement a prototype system that enables:
