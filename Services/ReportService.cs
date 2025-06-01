@@ -158,7 +158,7 @@ public class ReportService : IReportService
 
         var message = "Meldung erfolgreich hinzugefügt.";
 
-        if (selectedTags?.Count > 0)
+        if (files?.Count > 0)
         {
             var uploadResult = await _fileUploadProvider.UploadAsync(reportId.Value, files);
             message += $" {uploadResult.Message}";

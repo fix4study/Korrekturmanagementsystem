@@ -32,10 +32,16 @@ public class FileUploadProvider : IFileUploadProvider
     {
         try
         {
+            const long MaxFileSize = 5 * 1024 * 1024;
+
             foreach (var file in files)
             {
+                if (file.Size > MaxFileSize)
+                {
+                    return Result.Failure($"Datei '{file.Name}' ist zu groß. Maximal erlaubt: 5 MB.");
+                }
 
-                using var stream = file.OpenReadStream();
+                using var stream = file.OpenReadStream(MaxFileSize);
                 var blobServiceClient = new BlobServiceClient(_connectionString);
                 var containerClient = blobServiceClient.GetBlobContainerClient(_containerName);
                 await containerClient.CreateIfNotExistsAsync();
