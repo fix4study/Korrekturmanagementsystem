@@ -1,21 +1,21 @@
 ﻿using Korrekturmanagementsystem.Data.Entities;
 using Korrekturmanagementsystem.Dtos;
-using Korrekturmanagementsystem.Repositories.Interfaces;
 using Korrekturmanagementsystem.Services.Interfaces;
+using Korrekturmanagementsystem.UnitOfWork;
 
 namespace Korrekturmanagementsystem.Services;
 
-public class AttachmentProvider : IAttachmentProvider
+public class AttachmentService : IAttachmentService
 {
-    private readonly IAttachmentRepository _attachmentRepository;
-    public AttachmentProvider(IAttachmentRepository attachmentRepository)
+    private readonly IUnitOfWork _unitOfWork;
+    public AttachmentService(IUnitOfWork unitOfWork)
     {
-        _attachmentRepository = attachmentRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<IEnumerable<AttachmentDto>> GetByReportIdAsync(Guid reportId)
     {
-        var attachments = await _attachmentRepository.GetAttachmentsByReportId(reportId);
+        var attachments = await _unitOfWork.Attachments.GetAttachmentsByReportId(reportId);
 
         if (attachments?.Any() != true)
         {
@@ -50,7 +50,7 @@ public class AttachmentProvider : IAttachmentProvider
                 ReportId = attachment.ReportId
             };
 
-            await _attachmentRepository.InsertAsync(attachmentEntity);
+            await _unitOfWork.Attachments.InsertAsync(attachmentEntity);
 
             return true;
 

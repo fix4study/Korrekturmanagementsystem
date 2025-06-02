@@ -11,16 +11,15 @@ using Microsoft.AspNetCore.Components.Forms;
 
 namespace Korrekturmanagementsystem.Services;
 
-public class FileUploadProvider : IFileUploadProvider
+public class FileUploadService : IFileUploadService
 {
     private readonly string _connectionString;
     private readonly string _containerName = "uploads";
     private readonly string _accountName;
     private readonly string _accountKey;
-    private readonly IAttachmentProvider _attachmentService;
+    private readonly IAttachmentService _attachmentService;
 
-
-    public FileUploadProvider(IConfiguration configuration, IAttachmentProvider attachmentService)
+    public FileUploadService(IConfiguration configuration, IAttachmentService attachmentService)
     {
         _connectionString = configuration["AzureStorage:ConnectionString"]!;
         _accountName = configuration["AzureStorage:AccountName"]!;

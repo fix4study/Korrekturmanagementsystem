@@ -1,20 +1,31 @@
 ﻿using Korrekturmanagementsystem.Dtos;
+using Korrekturmanagementsystem.Repositories.Interfaces;
 using Korrekturmanagementsystem.Services.Interfaces;
 
 namespace Korrekturmanagementsystem.Services;
 
 public class RoleService : IRoleService
 {
-    private readonly IRoleProvider _roleProvider;
+    private readonly IStakeholderRoleRepository _stakeholderRoleRepository;
+    private readonly ISystemRoleRepository _systemRoleRepository;
 
-    public RoleService(IRoleProvider roleProvider)
+    public RoleService(IStakeholderRoleRepository stakeholderRoleRepository, ISystemRoleRepository systemRoleRepository)
     {
-        _roleProvider = roleProvider;
+        _stakeholderRoleRepository = stakeholderRoleRepository;
+        _systemRoleRepository = systemRoleRepository;
     }
 
-    public Task<IEnumerable<RoleDto>> GetStakeholderRolesAsync()
-        => _roleProvider.GetStakeholderRolesAsync();
+    public async Task<IEnumerable<RoleDto>> GetStakeholderRolesAsync()
+    {
+        var roles = await _stakeholderRoleRepository.GetAllAsync();
 
-    public Task<Guid?> GetSystemRoleIdByNameAsync(string name)
-        => _roleProvider.GetSystemRoleIdByNameAsync(name);
+        return roles.Select(role => new RoleDto
+        {
+            Id = role.Id,
+            Name = role.Name
+        });
+    }
+
+    public async Task<Guid?> GetSystemRoleIdByNameAsync(string name)
+        => await _systemRoleRepository.GetSystemRoleIdByNameAsync(name);
 }

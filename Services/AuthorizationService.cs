@@ -6,14 +6,14 @@ namespace Korrekturmanagementsystem.Services;
 public class AuthorizationService : IAuthorizationService
 {
     private readonly ICurrentUserService _currentUserService;
-    private readonly IReportProvider _reportProvider;
+    private readonly IReportService _reportService;
 
     public AuthorizationService(
         ICurrentUserService currentUserService,
-        IReportProvider reportProvider)
+        IReportService reportService)
     {
         _currentUserService = currentUserService;
-        _reportProvider = reportProvider;
+        _reportService = reportService;
     }
 
     public async Task<bool> HasEditReportPermissonAsync(Guid reportId)
@@ -24,7 +24,7 @@ public class AuthorizationService : IAuthorizationService
             return false;
         }
 
-        var creatorUserId = await _reportProvider.GetCreatorUserIdByReportIdAsync(reportId);
+        var creatorUserId = await _reportService.GetCreatorUserIdByReportIdAsync(reportId);
         if (creatorUserId is null)
         {
             return false;

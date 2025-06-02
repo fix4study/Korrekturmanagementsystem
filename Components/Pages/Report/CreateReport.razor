@@ -8,6 +8,7 @@
 @using Korrekturmanagementsystem.Services.Interfaces
 @using Microsoft.AspNetCore.Components.Forms
 @inject IReportService ReportService
+@inject IReportOptionsService ReportOptionsService
 @inject NavigationManager Navigation
 @rendermode InteractiveServer
 
@@ -40,7 +41,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var options = await ReportService.GetFormOptionsAsync();
+        var options = await ReportOptionsService.GetFormOptionsAsync();
         _model.Options = options;
     }
 

@@ -1,25 +1,26 @@
 ﻿using Korrekturmanagementsystem.Data.Entities;
 using Korrekturmanagementsystem.Dtos;
-using Korrekturmanagementsystem.Providers.Interfaces;
 using Korrekturmanagementsystem.Repositories.Interfaces;
 using Korrekturmanagementsystem.Services.Interfaces;
+using Korrekturmanagementsystem.Shared;
+using Korrekturmanagementsystem.UnitOfWork;
 
-namespace Korrekturmanagementsystem.Providers;
+namespace Korrekturmanagementsystem.Services;
 
-public class ReportHistoryProvider : IReportHistoryProvider
+public class ReportHistoryService : IReportHistoryService
 {
-    private readonly IReportHistoryRepository _reportHistoryRepository;
     private readonly ICurrentUserService _currentUserService;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public ReportHistoryProvider(IReportHistoryRepository reportHistoryRepository, ICurrentUserService currentUserService)
+    public ReportHistoryService(IUnitOfWork unitOfWork, ICurrentUserService currentUserService)
     {
-        _reportHistoryRepository = reportHistoryRepository;
+        _unitOfWork = unitOfWork;
         _currentUserService = currentUserService;
     }
 
     public async Task<IEnumerable<ReportHistoryDto>> GetAllReportHistoriesByReportIdAsync(Guid reportId)
     {
-        var histories = await _reportHistoryRepository.GetReportHistoriesByReportIdAsync(reportId);
+        var histories = await _unitOfWork.ReportHistories.GetReportHistoriesByReportIdAsync(reportId);
 
         var historyDtos = new List<ReportHistoryDto>();
         foreach (var history in histories)
@@ -38,13 +39,13 @@ public class ReportHistoryProvider : IReportHistoryProvider
         return historyDtos;
     }
 
-    public async Task AddReportHistoryAsync(CreateReportHistoryDto history)
+    public async Task<Result> AddReportHistoryAsync(CreateReportHistoryDto history)
     {
         var userId = _currentUserService.GetCurrentUserId();
 
         if (userId is null)
         {
-            return;
+            return Result.Failure("Fehler bei der Ermittlung des aktuellen Nutzers.");
         }
 
         var reportHistory = new ReportHistory
@@ -57,6 +58,10 @@ public class ReportHistoryProvider : IReportHistoryProvider
             Note = history.Note
         };
 
-        await _reportHistoryRepository.InsertAsync(reportHistory);
+        var insertResult = await _unitOfWork.ReportHistories.InsertAsync(reportHistory);
+
+        return insertResult.IsSuccess
+            ? Result.Success()
+            : Result.Failure("Das Hinzufügen der Historie ist fehlgeschlagen. Bitte versuchen Sie es erneut.");
     }
 }
