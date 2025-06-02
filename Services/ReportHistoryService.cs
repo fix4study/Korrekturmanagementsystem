@@ -1,9 +1,7 @@
 ﻿using Korrekturmanagementsystem.Data.Entities;
 using Korrekturmanagementsystem.Dtos;
-using Korrekturmanagementsystem.Repositories.Interfaces;
 using Korrekturmanagementsystem.Services.Interfaces;
 using Korrekturmanagementsystem.Shared;
-using Korrekturmanagementsystem.UnitOfWork;
 
 namespace Korrekturmanagementsystem.Services;
 
