@@ -19,7 +19,6 @@ public class FileUploadService : IFileUploadService
     private readonly string _accountKey;
     private readonly IAttachmentService _attachmentService;
 
-
     public FileUploadService(IConfiguration configuration, IAttachmentService attachmentService)
     {
         _connectionString = configuration["AzureStorage:ConnectionString"]!;

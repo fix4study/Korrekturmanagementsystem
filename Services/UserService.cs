@@ -4,16 +4,17 @@ using Korrekturmanagementsystem.Dtos;
 using Korrekturmanagementsystem.Repositories.Interfaces;
 using Korrekturmanagementsystem.Services.Interfaces;
 using Korrekturmanagementsystem.Shared;
+using Korrekturmanagementsystem.UnitOfWork;
 
 namespace Korrekturmanagementsystem.Services;
 
 public class UserService : IUserService
 {
-    private readonly IUserRepository _userRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IRoleService _roleService;
-    public UserService(IUserRepository userRepository, IRoleService roleService)
+    public UserService(IUnitOfWork unitOfWork, IRoleService roleService)
     {
-        _userRepository = userRepository;
+        _unitOfWork = unitOfWork;
         _roleService = roleService;
     }
 
@@ -45,7 +46,7 @@ public class UserService : IUserService
 
         try
         {
-            await _userRepository.InsertAsync(userEntity);
+            await _unitOfWork.Users.InsertAsync(userEntity);
             return Result.Success("Registrierung erfolgreich!");
         }
         catch (Exception ex)
@@ -56,7 +57,7 @@ public class UserService : IUserService
 
     public async Task<UserDto?> GetUserByUsernameAsync(string username)
     {
-        var user = await _userRepository.GetUserByUsernameAsync(username);
+        var user = await _unitOfWork.Users.GetUserByUsernameAsync(username);
 
         if (user is null)
         {
@@ -76,7 +77,7 @@ public class UserService : IUserService
 
     public async Task<UserDto?> GetUserByIdAsync(Guid id)
     {
-        var user = await _userRepository.GetUserByIdAsync(id);
+        var user = await _unitOfWork.Users.GetUserByIdAsync(id);
 
         if (user is null)
         {
@@ -128,13 +129,13 @@ public class UserService : IUserService
 
     private async Task<Result> CheckUserConflictsAsync(CreateUserDto user)
     {
-        var existingUserByUsername = await _userRepository.GetUserByUsernameAsync(user.Username);
+        var existingUserByUsername = await _unitOfWork.Users.GetUserByUsernameAsync(user.Username);
         if (existingUserByUsername is not null)
         {
             return Result.Failure("Der Benutzername ist bereits vergeben.");
         }
 
-        var existingEmail = await _userRepository.GetUserByEmailAsync(user.Email);
+        var existingEmail = await _unitOfWork.Users.GetUserByEmailAsync(user.Email);
         if (existingEmail is not null)
         {
             return Result.Failure("Die E-Mail-Adresse ist bereits vergeben.");

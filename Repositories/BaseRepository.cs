@@ -1,5 +1,6 @@
 ﻿using Korrekturmanagementsystem.Data;
 using Korrekturmanagementsystem.Repositories.Interfaces;
+using Korrekturmanagementsystem.Shared;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -42,10 +43,25 @@ public class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : 
     public virtual async Task<TEntity> GetByIdAsync(object id) =>
         await dbSet.FindAsync(id);
 
-    public virtual async Task InsertAsync(TEntity entity)
+    public async Task<Result<Guid>> InsertAsync(TEntity entity)
     {
-        await dbSet.AddAsync(entity);
-        await context.SaveChangesAsync();
+        try
+        {
+            await context.Set<TEntity>().AddAsync(entity);
+            await context.SaveChangesAsync();
+
+            var idProperty = entity.GetType().GetProperty("Id");
+            if (idProperty != null)
+            {
+                var id = (Guid)idProperty.GetValue(entity)!;
+                return Result<Guid>.Success(id, "Erfolgreich gespeichert.");
+            }
+            return Result<Guid>.Failure("Id konnte nicht ermittelt werden.");
+        }
+        catch (Exception ex)
+        {
+            return Result<Guid>.Failure("Fehler beim Speichern: " + ex.Message);
+        }
     }
 
     public virtual async Task UpdateAsync(TEntity entity)

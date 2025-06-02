@@ -2,7 +2,7 @@
 using Korrekturmanagementsystem.Components;
 using Korrekturmanagementsystem.Endpoints;
 using Korrekturmanagementsystem.Extensions;
-
+using Korrekturmanagementsystem.UnitOfWork;
 using Microsoft.AspNetCore.Components.Server;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +19,7 @@ builder.Services.Configure<CircuitOptions>(options =>
 
 var config = builder.Configuration;
 builder.Services
+    .AddScoped<IUnitOfWork, UnitOfWork>()
     .AddApplicationServices(config)
     .AddRepositories(config)
     .AddDatabase(config)

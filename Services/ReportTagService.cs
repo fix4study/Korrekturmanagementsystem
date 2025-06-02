@@ -1,39 +1,46 @@
 ﻿using Korrekturmanagementsystem.Data.Entities;
 using Korrekturmanagementsystem.Dtos;
-using Korrekturmanagementsystem.Repositories.Interfaces;
 using Korrekturmanagementsystem.Services.Interfaces;
+using Korrekturmanagementsystem.Shared;
 
 namespace Korrekturmanagementsystem.Services;
 
 public class ReportTagService : IReportTagService
 {
-    private readonly IReportTagRepository _reportTagRepository;
-    public ReportTagService(IReportTagRepository reportTagRepository)
+    private readonly IUnitOfWork _unitOfWork;
+    public ReportTagService(IUnitOfWork unitOfWork)
     {
-        _reportTagRepository = reportTagRepository;
+        _unitOfWork = unitOfWork;
     }
 
-    public async Task InsertReportTagAsync(IEnumerable<ReportTagDto> reportTags)
+    public async Task<Result> InsertReportTagAsync(IEnumerable<ReportTagDto> reportTags)
     {
         foreach (var reportTag in reportTags)
         {
-            await _reportTagRepository.InsertAsync(new ReportTag
+            var result = await _unitOfWork.ReportTags.InsertAsync(new ReportTag
             {
                 ReportId = reportTag.ReportId,
                 TagId = reportTag.TagId
             });
+
+            if (!result.IsSuccess) 
+            {
+                return Result.Failure("Beim Hinzufügen eines Tags ist ein Fehler aufgetreten");
+            }
         }
+
+        return Result.Success();
     }
 
-    public async Task UpdateReportTagsAsync(Guid reportId, List<TagDto> reportTags)
+    public async Task<Result> UpdateReportTagsAsync(Guid reportId, List<TagDto> reportTags)
     {
         try
         {
-            var success = await _reportTagRepository.DeleteByReportIdAsync(reportId);
+            var success = await _unitOfWork.ReportTags.DeleteByReportIdAsync(reportId);
 
             if (!success)
             {
-                return;
+                return Result.Failure("Bei der Aktualisierung der Tags ist ein Fehler aufgetreten");
             }
 
             var reportTagToInsert = reportTags
@@ -44,22 +51,22 @@ public class ReportTagService : IReportTagService
                 })
                 .ToList();
 
-            if (!reportTagToInsert.Any())
+            if (reportTagToInsert.Any())
             {
-                return;
+                await InsertReportTagAsync(reportTagToInsert);
             }
 
-            await InsertReportTagAsync(reportTagToInsert);
+            return Result.Success();
         }
         catch (Exception ex)
         {
-            return;
+            return Result.Failure("Beim Speichern der Tags ist ein Fehler aufgetreten.");
         }
     }
 
     public async Task<IEnumerable<ReportTagDto>> GetReportTagsByReportIdAsync(Guid reportId)
     {
-        var reportTags = await _reportTagRepository.GetReportTagsByReportIdAsync(reportId);
+        var reportTags = await _unitOfWork.ReportTags.GetReportTagsByReportIdAsync(reportId);
 
         return reportTags.Select(reportTag => new ReportTagDto
         {

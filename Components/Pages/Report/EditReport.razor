@@ -84,11 +84,11 @@
 
         var result = await ReportService.UpdateReportAsync(_viewModel, selectedFiles);
 
-        ShowMessage(result.Message ?? "Unbekannter Fehler.", result.IsSuccess ? NotificationType.Success : NotificationType.Error);
+        ShowMessage(result.Message!, result.IsSuccess ? NotificationType.Success : NotificationType.Error);
 
         if (result.IsSuccess)
         {
-            var report = await ReportService.BuildEditReportViewModelAsync(Id);
+            var report = await ReportService.BuildEditReportViewModelAsync(result.Data);
             if (report is null)
             {
                 ShowMessage("Beim Laden der Meldung ist etwas schief gelaufen!", NotificationType.Warning);

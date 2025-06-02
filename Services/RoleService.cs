@@ -1,6 +1,4 @@
-﻿using Korrekturmanagementsystem.Data.Entities;
-using Korrekturmanagementsystem.Dtos;
-using Korrekturmanagementsystem.Repositories;
+﻿using Korrekturmanagementsystem.Dtos;
 using Korrekturmanagementsystem.Repositories.Interfaces;
 using Korrekturmanagementsystem.Services.Interfaces;
 
@@ -8,18 +6,18 @@ namespace Korrekturmanagementsystem.Services;
 
 public class RoleService : IRoleService
 {
-    private readonly IBaseRepository<StakeholderRole> _roleRepository;
+    private readonly IStakeholderRoleRepository _stakeholderRoleRepository;
     private readonly ISystemRoleRepository _systemRoleRepository;
 
-    public RoleService(BaseRepository<StakeholderRole> repository, ISystemRoleRepository systemRoleRepository)
+    public RoleService(IStakeholderRoleRepository stakeholderRoleRepository, ISystemRoleRepository systemRoleRepository)
     {
-        _roleRepository = repository;
+        _stakeholderRoleRepository = stakeholderRoleRepository;
         _systemRoleRepository = systemRoleRepository;
     }
 
     public async Task<IEnumerable<RoleDto>> GetStakeholderRolesAsync()
     {
-        var roles = await _roleRepository.GetAllAsync();
+        var roles = await _stakeholderRoleRepository.GetAllAsync();
 
         return roles.Select(role => new RoleDto
         {

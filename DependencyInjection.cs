@@ -23,6 +23,7 @@ public static class DependencyInjection
         services.AddScoped<IReportTagService, ReportTagService>();
         services.AddScoped<IReportHistoryService, ReportHistoryService>();
         services.AddScoped<IFileUploadService, FileUploadService>();
+        services.AddScoped<IReportOptionsService, ReportOptionsService>();
 
         return services;
     }
@@ -42,6 +43,8 @@ public static class DependencyInjection
         services.AddScoped<IStatusRepository, StatusRepository>();
         services.AddScoped<ITagRepository, TagRepository>();
         services.AddScoped<IReportTypeRepository, ReportTypeRepository>();
+        services.AddScoped<ICommentRepository, CommentRepository>();
+        services.AddScoped<IStakeholderRoleRepository, StakeholderRoleRepository>();
 
         return services;
     }

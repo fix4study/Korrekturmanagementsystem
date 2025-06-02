@@ -2,12 +2,8 @@
 using Korrekturmanagementsystem.Dtos;
 using Korrekturmanagementsystem.Dtos.Report;
 using Korrekturmanagementsystem.Models;
-using Korrekturmanagementsystem.Models.Enums;
-using Korrekturmanagementsystem.Repositories;
-using Korrekturmanagementsystem.Repositories.Interfaces;
 using Korrekturmanagementsystem.Services.Interfaces;
 using Korrekturmanagementsystem.Shared;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 
 namespace Korrekturmanagementsystem.Services;
@@ -15,27 +11,28 @@ namespace Korrekturmanagementsystem.Services;
 public class ReportService : IReportService
 {
     private readonly IAttachmentService _attachmentService;
-    private readonly IReportRepository _reportRepository;
     private readonly IReportTagService _reportTagService;
     private readonly IFileUploadService _fileUploadService;
     private readonly IReportHistoryService _reportHistoryService;
     private readonly ICurrentUserService _currentUserService;
     private readonly IReportOptionsService _reportOptionsService;
-    public ReportService(IReportRepository reportRepository,
-        IReportTagService reportTagService,
+    private readonly IUnitOfWork _unitOfWork;
+
+    public ReportService(IReportTagService reportTagService,
         IAttachmentService attachmentService,
         IFileUploadService fileUploadService,
         IReportHistoryService reportHistoryService,
         ICurrentUserService currentUserService,
-        IReportOptionsService reportOptionsService)
+        IReportOptionsService reportOptionsService,
+        IUnitOfWork unitOfWork)
     {
-        _reportRepository = reportRepository;
         _reportTagService = reportTagService;
         _attachmentService = attachmentService;
         _fileUploadService = fileUploadService;
         _reportHistoryService = reportHistoryService;
         _currentUserService = currentUserService;
         _reportOptionsService = reportOptionsService;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<ReportModel?> BuildEditReportViewModelAsync(Guid reportId)
@@ -79,38 +76,54 @@ public class ReportService : IReportService
         };
     }
 
-    public async Task<Result> UpdateReportAsync(ReportModel model, List<IBrowserFile> files)
+    public async Task<Result<Guid>> UpdateReportAsync(ReportModel model, List<IBrowserFile> files)
     {
         var reportDto = model.Report;
 
         var validationError = ValidateMandatoryFields(reportDto);
-
         if (!string.IsNullOrEmpty(validationError))
         {
-            return new Result { IsSuccess = false, Message = validationError };
+            return Result<Guid>.Failure(validationError);
         }
 
-        var updateResult = await UpdateReportByIdAsync(reportDto);
-
-        if (!updateResult.IsSuccess)
+        try
         {
-            return new Result { IsSuccess = false, Message = updateResult.Message };
+            await _unitOfWork.BeginTransactionAsync();
+
+            var updateResult = await UpdateReportByIdAsync(reportDto);
+            if (!updateResult.IsSuccess)
+            {
+                return await RollbackWithFailure(updateResult.Message);
+            }
+
+            var historyResult = await AddReportHistoryEntry(model, model.StatusNote);
+            if (!historyResult.IsSuccess)
+            {
+                return await RollbackWithFailure(historyResult.Message);
+            }
+
+            var reportTagresult = await _reportTagService.UpdateReportTagsAsync(reportDto.Id, model.SelectedTags);
+            if (!reportTagresult.IsSuccess)
+            {
+                return await RollbackWithFailure(reportTagresult.Message);
+            }
+
+            if (files?.Count > 0)
+            {
+                var uploadResult = await _fileUploadService.UploadAsync(reportDto.Id, files);
+                if (!uploadResult.IsSuccess)
+                {
+                    return await RollbackWithFailure(uploadResult.Message);
+                }
+            }
+
+            await _unitOfWork.CommitTransactionAsync();
+            return Result<Guid>.Success(reportDto.Id, "Meldung erfolgreich aktualisiert.");
         }
-
-        await AddReportHistoryEntry(model, model.StatusNote);
-
-        await _reportTagService.UpdateReportTagsAsync(reportDto.Id, model.SelectedTags);
-
-        var message = "Meldung erfolgreich aktualisiert.";
-
-        if (files?.Count > 0)
+        catch (Exception ex)
         {
-            var uploadResult = await _fileUploadService.UploadAsync(reportDto.Id, files);
-
-            message += $" {uploadResult.Message}";
+            return await RollbackWithFailure("Bei der Aktualisierung der Meldung ist ein unerwarteter Fehler aufgetreten. Bitte probiere es erneut.");
         }
-
-        return new Result { IsSuccess = true, Message = message.ToString() };
     }
 
     public async Task<Result<Guid>> AddReportAsync(ReportModel model, List<TagDto> selectedTags, List<IBrowserFile> files)
@@ -148,35 +161,58 @@ public class ReportService : IReportService
             CreatedById = userId.Value
         };
 
-        await _reportRepository.InsertAsync(newReport);
-
-        await AddInitialReportHistoryEntry(newReport.Id);
-
-        if (selectedTags?.Count > 0)
+        try
         {
-            var reportTags = selectedTags.Select(x => new ReportTagDto
+            await _unitOfWork.BeginTransactionAsync();
+
+            var reportResult = await _unitOfWork.Reports.InsertAsync(newReport);
+            if (!reportResult.IsSuccess)
             {
-                ReportId = newReport.Id,
-                TagId = x.Id
-            }).ToList();
+                return await RollbackWithFailure(reportResult.Message);
+            }
 
-            await _reportTagService.InsertReportTagAsync(reportTags);
+            var historyResult = await AddInitialReportHistoryEntry(newReport.Id);
+            if (!historyResult.IsSuccess)
+            {
+                return await RollbackWithFailure(historyResult.Message);
+            }
+
+            if (selectedTags?.Count > 0)
+            {
+                var reportTags = selectedTags.Select(x => new ReportTagDto
+                {
+                    ReportId = newReport.Id,
+                    TagId = x.Id
+                }).ToList();
+
+                var reportTagResult = await _reportTagService.InsertReportTagAsync(reportTags);
+                if (!reportTagResult.IsSuccess)
+                {
+                    return await RollbackWithFailure(reportTagResult.Message);
+                }
+            }
+
+            if (files?.Count > 0)
+            {
+                var uploadResult = await _fileUploadService.UploadAsync(newReport.Id, files);
+                if (!uploadResult.IsSuccess)
+                {
+                    return await RollbackWithFailure(uploadResult.Message);
+                }
+            }
+
+            await _unitOfWork.CommitTransactionAsync();
+            return Result<Guid>.Success(newReport.Id, "Meldung erfolgreich hinzugefügt.");
         }
-
-        var message = "Meldung erfolgreich hinzugefügt.";
-
-        if (files?.Count > 0)
+        catch (Exception ex)
         {
-            var uploadResult = await _fileUploadService.UploadAsync(newReport.Id, files);
-            message += $" {uploadResult.Message}";
+            return await RollbackWithFailure("Beim Hinzufügen der Meldung ist ein unerwarteter Fehler aufgetreten. Bitte probiere es erneut.");
         }
-
-        return Result<Guid>.Success(newReport.Id, message.ToString());
     }
 
     public async Task<IEnumerable<ReportOverviewDto>> GetAllReportsAsync()
     {
-        var reports = await _reportRepository.GetAllAsync();
+        var reports = await _unitOfWork.Reports.GetAllAsync();
 
         return reports.Select(report => new ReportOverviewDto
         {
@@ -198,7 +234,7 @@ public class ReportService : IReportService
             return Enumerable.Empty<ReportOverviewDto>();
         }
 
-        var reports = await _reportRepository.GetAllByUserIdAsync(userId.Value);
+        var reports = await _unitOfWork.Reports.GetAllByUserIdAsync(userId.Value);
 
         return reports.Select(report => new ReportOverviewDto
         {
@@ -212,16 +248,23 @@ public class ReportService : IReportService
     }
 
     public async Task<Guid?> GetCreatorUserIdByReportIdAsync(Guid id)
-        => await _reportRepository.GetCreatorIdByReportIdAsync(id);
+        => await _unitOfWork.Reports.GetCreatorIdByReportIdAsync(id);
 
     #region private
+
+    private async Task<Result<Guid>> RollbackWithFailure(string? message)
+    {
+        await _unitOfWork.RollbackTransactionAsync();
+        return Result<Guid>.Failure(message ?? "Unbekannter Fehler");
+    }
+
     private async Task<Result> UpdateReportByIdAsync(ReportDto reportToUpdate)
     {
-        var report = await _reportRepository.GetByIdAsync(reportToUpdate.Id);
+        var report = await _unitOfWork.Reports.GetByIdAsync(reportToUpdate.Id);
 
         if (report is null)
         {
-            return Result.Failure("Meldung wurde nicht gefunden");
+            return Result.Failure("Meldung konnte nicht gefunden werden.");
         }
 
         report.Title = reportToUpdate.Title;
@@ -235,12 +278,12 @@ public class ReportService : IReportService
 
         try
         {
-            await _reportRepository.UpdateAsync();
+            await _unitOfWork.Reports.UpdateAsync();
             return Result.Success();
         }
         catch (Exception ex)
         {
-            return Result.Failure("Beim Speichern ist ein technischer Fehler aufgetreten");
+            return Result.Failure("Beim Aktualisieren der Meldung ist ein Fehler aufgetreten");
         }
     }
 
@@ -264,7 +307,7 @@ public class ReportService : IReportService
 
     private async Task<ReportDetailsDto> GetReportDetailsByIdAsync(Guid id)
     {
-        var report = await _reportRepository.GetByIdAsync(id);
+        var report = await _unitOfWork.Reports.GetByIdAsync(id);
 
         var reportDetails = new ReportDetailsDto
         {
@@ -307,7 +350,7 @@ public class ReportService : IReportService
         return reportDetails;
     }
 
-    private async Task AddInitialReportHistoryEntry(Guid reportId)
+    private async Task<Result> AddInitialReportHistoryEntry(Guid reportId)
     {
         var entry = new CreateReportHistoryDto
         {
@@ -316,10 +359,11 @@ public class ReportService : IReportService
             Note = string.Empty,
         };
 
-        await _reportHistoryService.AddReportHistoryAsync(entry);
+
+        return await _reportHistoryService.AddReportHistoryAsync(entry);
     }
 
-    private async Task AddReportHistoryEntry(ReportModel model, string? statusNote = "")
+    private async Task<Result> AddReportHistoryEntry(ReportModel model, string? statusNote = "")
     {
         var lastHistory = model.ReportHistory?
             .OrderByDescending(h => h.ChangedAt)
@@ -327,7 +371,7 @@ public class ReportService : IReportService
 
         if (lastHistory is null)
         {
-            return;
+            return Result.Success();
         }
 
         var reportHistoryEntry = new CreateReportHistoryDto
@@ -343,10 +387,9 @@ public class ReportService : IReportService
         bool statusChanged = model.Report.StatusId != lastHistoryStatusId;
         bool noteAdded = !string.IsNullOrWhiteSpace(statusNote);
 
-        if (statusChanged || noteAdded)
-        {
-            await _reportHistoryService.AddReportHistoryAsync(reportHistoryEntry);
-        }
+        return statusChanged || noteAdded
+            ? await _reportHistoryService.AddReportHistoryAsync(reportHistoryEntry)
+            : Result.Success();
     }
     #endregion
 }
