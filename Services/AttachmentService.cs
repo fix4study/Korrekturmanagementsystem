@@ -8,6 +8,7 @@ namespace Korrekturmanagementsystem.Services;
 public class AttachmentService : IAttachmentService
 {
     private readonly IUnitOfWork _unitOfWork;
+
     public AttachmentService(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
@@ -59,6 +60,5 @@ public class AttachmentService : IAttachmentService
         {
             return false;
         }
-
     }
 }

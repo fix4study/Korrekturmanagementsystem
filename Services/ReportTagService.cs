@@ -8,6 +8,7 @@ namespace Korrekturmanagementsystem.Services;
 public class ReportTagService : IReportTagService
 {
     private readonly IUnitOfWork _unitOfWork;
+
     public ReportTagService(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;

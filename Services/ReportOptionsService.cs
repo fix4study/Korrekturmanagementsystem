@@ -13,6 +13,7 @@ public class ReportOptionsService : IReportOptionsService
     private readonly IReportTypeRepository _reportTypeRepository;
     private readonly IStatusRepository _statusRepository;
     private readonly ITagRepository _tagRepository;
+
     public ReportOptionsService(IPriorityRepository priorityRepository,
         IMaterialTypeRepository materialTypeRepositorym,
         ICourseRepository courseRepository,

@@ -12,6 +12,7 @@ public class UserService : IUserService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IRoleService _roleService;
+
     public UserService(IUnitOfWork unitOfWork, IRoleService roleService)
     {
         _unitOfWork = unitOfWork;
@@ -20,11 +21,11 @@ public class UserService : IUserService
 
     public async Task<Result> CreateUser(CreateUserDto user)
     {
-        var roleResult = await GetSystemRoleIdForUser(user);
+        var systemRoleResult = await GetSystemRoleIdForUser(user);
 
-        if (!roleResult.IsSuccess)
+        if (!systemRoleResult.IsSuccess)
         {
-            return Result.Failure($"Registrierung fehlgeschlagen: {roleResult.ErrorMessage}");
+            return Result.Failure($"Registrierung fehlgeschlagen: {systemRoleResult.Message}");
         }
 
         var result = await CheckUserConflictsAsync(user);
@@ -40,7 +41,7 @@ public class UserService : IUserService
             Email = user.Email,
             Password = user.Password,
             StakeholderRoleId = user.StakeholderRoleId,
-            SystemRoleId = roleResult.SystemRoleId!.Value,
+            SystemRoleId = systemRoleResult.Data,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -93,7 +94,7 @@ public class UserService : IUserService
         };
     }
 
-    private async Task<RoleResolutionResult> GetSystemRoleIdForUser(CreateUserDto user)
+    private async Task<Result<Guid>> GetSystemRoleIdForUser(CreateUserDto user)
     {
         Models.Enums.SystemRole role = Models.Enums.SystemRole.User;
 
@@ -101,7 +102,7 @@ public class UserService : IUserService
         {
             if (!user.Email.EndsWith("@iu.org"))
             {
-                return RoleResolutionResult.Failure("Für IU-Mitarbeiter muss eine IU-E-Mail-Adresse angegeben werden.");
+                return Result<Guid>.Failure("Für IU-Mitarbeiter muss eine IU-E-Mail-Adresse angegeben werden.");
             }
 
             role = Models.Enums.SystemRole.Intern;
@@ -111,7 +112,7 @@ public class UserService : IUserService
         {
             if (!user.Email.EndsWith("@iu-study.org"))
             {
-                return RoleResolutionResult.Failure("Für Studierende muss eine @iu-study.org E-Mail-Adresse angegeben werden.");
+                return Result<Guid>.Failure("Für Studierende muss eine @iu-study.org E-Mail-Adresse angegeben werden.");
             }
 
             role = Models.Enums.SystemRole.User;
@@ -121,10 +122,10 @@ public class UserService : IUserService
 
         if (systemRoleId is null)
         {
-            return RoleResolutionResult.Failure("Systemrolle konnte nicht zugeordnet werden.");
+            return Result<Guid>.Failure("Systemrolle konnte nicht zugeordnet werden.");
         }
 
-        return RoleResolutionResult.Success(systemRoleId.Value);
+        return Result<Guid>.Success(systemRoleId.Value);
     }
 
     private async Task<Result> CheckUserConflictsAsync(CreateUserDto user)

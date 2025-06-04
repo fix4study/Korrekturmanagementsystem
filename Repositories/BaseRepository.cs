@@ -39,7 +39,6 @@ public class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : 
             : await query.ToListAsync();
     }
 
-
     public virtual async Task<TEntity> GetByIdAsync(object id) =>
         await dbSet.FindAsync(id);
 

@@ -128,13 +128,12 @@ public class ReportService : IReportService
 
     public async Task<Result<Guid>> AddReportAsync(ReportModel model, List<TagDto> selectedTags, List<IBrowserFile> files)
     {
-        if (model is null || model.Report is null || model.Report.ReportTypeId is null || model.Report.MaterialTypeId is null)
+        if (model?.Report is null || model.Report.ReportTypeId is null || model.Report.MaterialTypeId is null)
         {
             return Result<Guid>.Failure("Ungültiges Eingabe.");
         }
 
         var validationError = ValidateMandatoryFields(model.Report);
-
         if (!string.IsNullOrEmpty(validationError))
         {
             return Result<Guid>.Failure(validationError);
@@ -165,40 +164,11 @@ public class ReportService : IReportService
         {
             await _unitOfWork.BeginTransactionAsync();
 
-            var reportResult = await _unitOfWork.Reports.InsertAsync(newReport);
-            if (!reportResult.IsSuccess)
+            var result = await ExecuteAddReportWorkflow(newReport, selectedTags, files);
+            if (!result.IsSuccess)
             {
-                return await RollbackWithFailure(reportResult.Message);
-            }
-
-            var historyResult = await AddInitialReportHistoryEntry(newReport.Id);
-            if (!historyResult.IsSuccess)
-            {
-                return await RollbackWithFailure(historyResult.Message);
-            }
-
-            if (selectedTags?.Count > 0)
-            {
-                var reportTags = selectedTags.Select(x => new ReportTagDto
-                {
-                    ReportId = newReport.Id,
-                    TagId = x.Id
-                }).ToList();
-
-                var reportTagResult = await _reportTagService.InsertReportTagAsync(reportTags);
-                if (!reportTagResult.IsSuccess)
-                {
-                    return await RollbackWithFailure(reportTagResult.Message);
-                }
-            }
-
-            if (files?.Count > 0)
-            {
-                var uploadResult = await _fileUploadService.UploadAsync(newReport.Id, files);
-                if (!uploadResult.IsSuccess)
-                {
-                    return await RollbackWithFailure(uploadResult.Message);
-                }
+                await _unitOfWork.RollbackTransactionAsync();
+                return result;
             }
 
             await _unitOfWork.CommitTransactionAsync();
@@ -251,6 +221,46 @@ public class ReportService : IReportService
         => await _unitOfWork.Reports.GetCreatorIdByReportIdAsync(id);
 
     #region private
+    private async Task<Result<Guid>> ExecuteAddReportWorkflow(Report newReport, List<TagDto>? selectedTags, List<IBrowserFile>? files)
+    {
+        var reportResult = await _unitOfWork.Reports.InsertAsync(newReport);
+        if (!reportResult.IsSuccess)
+        {
+            return await RollbackWithFailure(reportResult.Message);
+        }
+
+        var historyResult = await AddInitialReportHistoryEntry(newReport.Id);
+        if (!historyResult.IsSuccess)
+        {
+            return await RollbackWithFailure(historyResult.Message);
+        }
+
+        if (selectedTags?.Count > 0)
+        {
+            var reportTags = selectedTags.Select(x => new ReportTagDto
+            {
+                ReportId = newReport.Id,
+                TagId = x.Id
+            }).ToList();
+
+            var reportTagResult = await _reportTagService.InsertReportTagAsync(reportTags);
+            if (!reportTagResult.IsSuccess)
+            {
+                return await RollbackWithFailure(reportTagResult.Message);
+            }
+        }
+
+        if (files?.Count > 0)
+        {
+            var uploadResult = await _fileUploadService.UploadAsync(newReport.Id, files);
+            if (!uploadResult.IsSuccess)
+            {
+                return await RollbackWithFailure(uploadResult.Message);
+            }
+        }
+
+        return Result<Guid>.Success(newReport.Id);
+    }
 
     private async Task<Result<Guid>> RollbackWithFailure(string? message)
     {
@@ -358,7 +368,6 @@ public class ReportService : IReportService
             StatusId = (int)Models.Enums.Status.Submitted,
             Note = string.Empty,
         };
-
 
         return await _reportHistoryService.AddReportHistoryAsync(entry);
     }

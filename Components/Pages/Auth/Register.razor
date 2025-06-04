@@ -108,7 +108,9 @@
             return;
         }
 
-        await Task.Delay(1500);
-        Navigation.NavigateTo("account/login");
+        _message = "Registrierung erfolgreich! Sie werden zur Anmeldung weitergeleitet...";
+        StateHasChanged();
+        await Task.Delay(2500);
+        Navigation.NavigateTo($"account/login");
     }
 }

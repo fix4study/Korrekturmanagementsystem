@@ -24,11 +24,11 @@ public class CurrentUserService : ICurrentUserService
         return userId;
     }
 
-    public string? GetCurrentUserName() => 
-        _httpContextAccessor.HttpContext?.User.Identity?.Name;
+    public string? GetCurrentUserName() 
+        => _httpContextAccessor.HttpContext?.User.Identity?.Name;
 
-    public string? GetCurrentUserRole() => 
-        _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Role);
+    public string? GetCurrentUserRole() 
+        => _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Role);
 
     public bool IsAuthenticated => _httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false;
 }
