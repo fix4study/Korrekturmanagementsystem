@@ -13,7 +13,8 @@ public static class ServiceExtensions
                 options.LoginPath = "/account/login";
                 options.AccessDeniedPath = "/access-denied";
                 options.Cookie.HttpOnly = true;
-                options.Cookie.SameSite = SameSiteMode.Lax;
+                options.SlidingExpiration = true;
+                options.Cookie.SameSite = SameSiteMode.Strict;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             });
 
