@@ -1,13 +1,26 @@
-﻿@using Korrekturmanagementsystem.Components.Pages.Auth
-@inherits LayoutComponentBase
+﻿@inherits LayoutComponentBase
+@using Korrekturmanagementsystem.Components.Pages.Auth
 
 <div class="d-flex">
-    <div class="sidebar p-3">
+    <button class="btn btn-dark d-md-none m-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
+        <i class="bi bi-list"></i>
+    </button>
+
+    <div class="sidebar p-3 d-none d-md-block">
         <NavMenu />
     </div>
 
-    <main class="flex-grow-1 p-4">
-        <div class="d-flex justify-content-end align-items-center mb-3 gap-2">
+    <div class="offcanvas offcanvas-start d-md-none" tabindex="-1" id="sidebarOffcanvas" aria-labelledby="sidebarOffcanvasLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="sidebarOffcanvasLabel">Menü</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <NavMenu />
+        </div>
+    </div>
+    <div class="flex-grow-1 p-4">
+        <div class="d-none d-md-flex d-flex justify-content-end align-items-center mb-3 gap-2">
             <AuthorizeView Context="authState">
                 <Authorized>
                     <span class="text-muted me-2">
@@ -22,9 +35,8 @@
                 </NotAuthorized>
             </AuthorizeView>
         </div>
-
-        <article class="content">
+        <main>
             @Body
-        </article>
-    </main>
+        </main>
+    </div>
 </div>
