@@ -1,4 +1,4 @@
-﻿using Korrekturmanagementsystem.Models.Enums;
+using Korrekturmanagementsystem.Models.Enums;
 using Korrekturmanagementsystem.Services.Interfaces;
 
 namespace Korrekturmanagementsystem.Services;

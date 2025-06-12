@@ -1,4 +1,4 @@
-﻿namespace Korrekturmanagementsystem.Dtos;
+namespace Korrekturmanagementsystem.Dtos;
 
 public class CommentDto
 {
@@ -8,4 +8,3 @@ public class CommentDto
     public string StakeholderRoleName { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
 }
-

@@ -1,4 +1,4 @@
-﻿using Korrekturmanagementsystem.Repositories.Interfaces;
+using Korrekturmanagementsystem.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore.Storage;
 
 public interface IUnitOfWork

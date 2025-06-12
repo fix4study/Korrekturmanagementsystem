@@ -1,4 +1,4 @@
-﻿using Korrekturmanagementsystem.Data;
+using Korrekturmanagementsystem.Data;
 using Korrekturmanagementsystem.Repositories;
 using Korrekturmanagementsystem.Repositories.Interfaces;
 using Korrekturmanagementsystem.Services;
@@ -10,7 +10,7 @@ namespace Korrekturmanagementsystem;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddScoped<IReportService, ReportService>();
         services.AddScoped<ICommentService, CommentService>();
@@ -28,7 +28,7 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddRepositories(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
         services.AddScoped<IUserRepository, UserRepository>();

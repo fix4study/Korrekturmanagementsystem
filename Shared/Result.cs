@@ -1,4 +1,4 @@
-﻿namespace Korrekturmanagementsystem.Shared;
+namespace Korrekturmanagementsystem.Shared;
 
 public class Result
 {

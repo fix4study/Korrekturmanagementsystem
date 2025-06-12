@@ -1,4 +1,4 @@
-﻿namespace Korrekturmanagementsystem.Data.Entities;
+namespace Korrekturmanagementsystem.Data.Entities;
 
 public class Priority
 {

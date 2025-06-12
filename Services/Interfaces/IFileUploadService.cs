@@ -1,4 +1,4 @@
-﻿using Korrekturmanagementsystem.Shared;
+using Korrekturmanagementsystem.Shared;
 
 using Microsoft.AspNetCore.Components.Forms;
 

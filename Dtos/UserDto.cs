@@ -1,4 +1,4 @@
-﻿namespace Korrekturmanagementsystem.Dtos;
+namespace Korrekturmanagementsystem.Dtos;
 
 public class UserDto
 {
@@ -9,4 +9,3 @@ public class UserDto
     public string StakeholderRoleName { get; set; } = default!;
     public string SystemRoleName { get; set; } = default!;
 }
-

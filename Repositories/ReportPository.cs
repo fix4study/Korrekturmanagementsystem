@@ -1,4 +1,4 @@
-﻿using Korrekturmanagementsystem.Data;
+using Korrekturmanagementsystem.Data;
 using Korrekturmanagementsystem.Data.Entities;
 using Korrekturmanagementsystem.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +22,7 @@ public class ReportRepository : BaseRepository<Report>, IReportRepository
 
     public async Task UpdateAsync() =>
         await context.SaveChangesAsync();
-    
+
 
     public async Task<Guid?> GetCreatorIdByReportIdAsync(Guid id) =>
         await context.Reports

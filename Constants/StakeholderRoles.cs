@@ -1,4 +1,4 @@
-﻿namespace Korrekturmanagementsystem.Constants;
+namespace Korrekturmanagementsystem.Constants;
 
 public static class StakeholderRoles
 {

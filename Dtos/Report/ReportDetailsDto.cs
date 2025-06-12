@@ -1,4 +1,4 @@
-﻿namespace Korrekturmanagementsystem.Dtos.Report;
+namespace Korrekturmanagementsystem.Dtos.Report;
 
 public class ReportDetailsDto
 {

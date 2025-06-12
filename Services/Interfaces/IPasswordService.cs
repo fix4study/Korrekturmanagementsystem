@@ -1,4 +1,4 @@
-﻿namespace Korrekturmanagementsystem.Services.Interfaces;
+namespace Korrekturmanagementsystem.Services.Interfaces;
 
 public interface IPasswordService
 {

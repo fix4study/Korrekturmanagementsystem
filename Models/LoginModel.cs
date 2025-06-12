@@ -1,4 +1,4 @@
-﻿namespace Korrekturmanagementsystem.Models;
+namespace Korrekturmanagementsystem.Models;
 
 public class LoginModel
 {

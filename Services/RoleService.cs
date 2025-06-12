@@ -1,4 +1,4 @@
-﻿using Korrekturmanagementsystem.Dtos;
+using Korrekturmanagementsystem.Dtos;
 using Korrekturmanagementsystem.Repositories.Interfaces;
 using Korrekturmanagementsystem.Services.Interfaces;
 

@@ -1,4 +1,4 @@
-﻿using Korrekturmanagementsystem.Dtos.Report;
+using Korrekturmanagementsystem.Dtos.Report;
 using Korrekturmanagementsystem.Models.Enums;
 
 namespace Korrekturmanagementsystem.Models;

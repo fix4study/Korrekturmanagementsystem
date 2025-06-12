@@ -1,5 +1,5 @@
-﻿using Korrekturmanagementsystem.Shared;
 using System.Linq.Expressions;
+using Korrekturmanagementsystem.Shared;
 
 namespace Korrekturmanagementsystem.Repositories.Interfaces
 {
@@ -11,7 +11,7 @@ namespace Korrekturmanagementsystem.Repositories.Interfaces
         params Expression<Func<TEntity, object>>[] includes);
 
         Task<TEntity> GetByIdAsync(object id);
-        Task <Result<Guid>> InsertAsync(TEntity entity);
+        Task<Result<Guid>> InsertAsync(TEntity entity);
         Task UpdateAsync(TEntity entity);
         Task DeleteAsync(object id);
         Task DeleteAsync(TEntity entity);

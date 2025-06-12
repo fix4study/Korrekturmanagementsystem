@@ -1,4 +1,4 @@
-﻿namespace Korrekturmanagementsystem.Dtos;
+namespace Korrekturmanagementsystem.Dtos;
 
 public class CreateAttachmentDto
 {
@@ -16,5 +16,3 @@ public class CreateAttachmentDto
 
     public DateTime UploadedAt { get; set; } = DateTime.UtcNow;
 }
-
-

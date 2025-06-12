@@ -1,4 +1,4 @@
-﻿namespace Korrekturmanagementsystem.Dtos;
+namespace Korrekturmanagementsystem.Dtos;
 
 public class RoleDto
 {

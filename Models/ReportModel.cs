@@ -1,4 +1,4 @@
-﻿using Korrekturmanagementsystem.Dtos;
+using Korrekturmanagementsystem.Dtos;
 using Korrekturmanagementsystem.Dtos.Report;
 
 namespace Korrekturmanagementsystem.Models;
@@ -13,4 +13,3 @@ public class ReportModel
     public string CreatedByUsername { get; set; } = string.Empty;
     public IEnumerable<ReportHistoryDto> ReportHistory { get; set; } = default!;
 }
-

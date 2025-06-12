@@ -1,4 +1,4 @@
-﻿using Korrekturmanagementsystem.Dtos;
+using Korrekturmanagementsystem.Dtos;
 using Korrekturmanagementsystem.Dtos.Report;
 using Korrekturmanagementsystem.Models;
 using Korrekturmanagementsystem.Shared;
@@ -11,7 +11,7 @@ public interface IReportService
 {
     Task<ReportModel?> BuildEditReportViewModelAsync(Guid reportId);
     Task<Result<Guid>> UpdateReportAsync(ReportModel model, List<IBrowserFile> files);
-        Task<Result<Guid>> AddReportAsync(ReportModel model, List<TagDto> selectedTags, List<IBrowserFile> files);
+    Task<Result<Guid>> AddReportAsync(ReportModel model, List<TagDto> selectedTags, List<IBrowserFile> files);
     Task<IEnumerable<ReportOverviewDto>> GetAllReportsAsync();
     Task<IEnumerable<ReportOverviewDto>> GetAllReportByUserIdAsync();
     Task<Guid?> GetCreatorUserIdByReportIdAsync(Guid id);

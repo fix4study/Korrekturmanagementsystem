@@ -1,4 +1,4 @@
-﻿using Korrekturmanagementsystem.Data.Entities;
+using Korrekturmanagementsystem.Data.Entities;
 using Korrekturmanagementsystem.Dtos;
 using Korrekturmanagementsystem.Services.Interfaces;
 using Korrekturmanagementsystem.Shared;
@@ -24,7 +24,7 @@ public class ReportTagService : IReportTagService
                 TagId = reportTag.TagId
             });
 
-            if (!result.IsSuccess) 
+            if (!result.IsSuccess)
             {
                 return Result.Failure("Beim Hinzufügen eines Tags ist ein Fehler aufgetreten");
             }

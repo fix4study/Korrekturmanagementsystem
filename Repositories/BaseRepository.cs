@@ -1,8 +1,8 @@
-﻿using Korrekturmanagementsystem.Data;
+using System.Linq.Expressions;
+using Korrekturmanagementsystem.Data;
 using Korrekturmanagementsystem.Repositories.Interfaces;
 using Korrekturmanagementsystem.Shared;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace Korrekturmanagementsystem.Repositories;
 
@@ -90,5 +90,3 @@ public class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : 
         await context.SaveChangesAsync();
     }
 }
-
-

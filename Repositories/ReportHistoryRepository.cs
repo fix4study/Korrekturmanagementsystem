@@ -1,4 +1,4 @@
-﻿using Korrekturmanagementsystem.Data;
+using Korrekturmanagementsystem.Data;
 using Korrekturmanagementsystem.Data.Entities;
 using Korrekturmanagementsystem.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;

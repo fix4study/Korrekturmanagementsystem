@@ -1,5 +1,5 @@
-﻿using Korrekturmanagementsystem.Services.Interfaces;
 using System.Security.Claims;
+using Korrekturmanagementsystem.Services.Interfaces;
 
 namespace Korrekturmanagementsystem.Services;
 
@@ -24,10 +24,10 @@ public class CurrentUserService : ICurrentUserService
         return userId;
     }
 
-    public string? GetCurrentUserName() 
+    public string? GetCurrentUserName()
         => _httpContextAccessor.HttpContext?.User.Identity?.Name;
 
-    public string? GetCurrentUserRole() 
+    public string? GetCurrentUserRole()
         => _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Role);
 
     public bool IsAuthenticated => _httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false;

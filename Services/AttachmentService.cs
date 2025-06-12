@@ -1,4 +1,4 @@
-﻿using Korrekturmanagementsystem.Data.Entities;
+using Korrekturmanagementsystem.Data.Entities;
 using Korrekturmanagementsystem.Dtos;
 using Korrekturmanagementsystem.Services.Interfaces;
 using Korrekturmanagementsystem.UnitOfWork;

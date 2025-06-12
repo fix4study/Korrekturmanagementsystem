@@ -1,4 +1,4 @@
-﻿using Korrekturmanagementsystem.Constants;
+using Korrekturmanagementsystem.Constants;
 using Korrekturmanagementsystem.Data.Entities;
 using Korrekturmanagementsystem.Dtos;
 using Korrekturmanagementsystem.Repositories.Interfaces;

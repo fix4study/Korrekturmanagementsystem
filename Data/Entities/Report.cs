@@ -1,4 +1,4 @@
-﻿namespace Korrekturmanagementsystem.Data.Entities;
+namespace Korrekturmanagementsystem.Data.Entities;
 
 public class Report
 {
@@ -25,4 +25,3 @@ public class Report
     public ICollection<Attachment> Attachments { get; set; } = default!;
     public ICollection<ReportTag> ReportTags { get; set; } = default!;
 }
-

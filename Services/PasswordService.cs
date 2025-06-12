@@ -1,4 +1,4 @@
-﻿using Korrekturmanagementsystem.Services.Interfaces;
+using Korrekturmanagementsystem.Services.Interfaces;
 
 using Microsoft.AspNetCore.Identity;
 

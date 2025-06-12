@@ -1,4 +1,4 @@
-﻿using Korrekturmanagementsystem;
+using Korrekturmanagementsystem;
 using Korrekturmanagementsystem.Components;
 using Korrekturmanagementsystem.Endpoints;
 using Korrekturmanagementsystem.Extensions;
@@ -20,8 +20,8 @@ builder.Services.Configure<CircuitOptions>(options =>
 var config = builder.Configuration;
 builder.Services
     .AddScoped<IUnitOfWork, UnitOfWork>()
-    .AddApplicationServices(config)
-    .AddRepositories(config)
+    .AddApplicationServices()
+    .AddRepositories()
     .AddDatabase(config)
     .AddAuthenticationSetup()
     .AddHttpClients(config);

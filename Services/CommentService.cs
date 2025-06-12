@@ -1,4 +1,4 @@
-﻿using Korrekturmanagementsystem.Data.Entities;
+using Korrekturmanagementsystem.Data.Entities;
 using Korrekturmanagementsystem.Dtos;
 using Korrekturmanagementsystem.Models;
 using Korrekturmanagementsystem.Repositories.Interfaces;
@@ -12,8 +12,8 @@ public class CommentService : ICommentService
     private readonly IUserService _userService;
     private readonly ICurrentUserService _currentUserService;
 
-    public CommentService(ICommentRepository commentRepository, 
-        IUserService userProvider, 
+    public CommentService(ICommentRepository commentRepository,
+        IUserService userProvider,
         ICurrentUserService currentUserService)
     {
         _commentRepository = commentRepository;
@@ -70,5 +70,5 @@ public class CommentService : ICommentService
         };
 
         await _commentRepository.InsertAsync(newComment);
-    }   
+    }
 }
