@@ -24,7 +24,7 @@ jobs:
           dotnet-version: '9.0'
           
       - name: Format
-        run: dotnet format --verify-no-changes
+        run: dotnet format ./Korrekturmanagementsystem.sln --verify-no-changes
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
