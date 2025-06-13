@@ -1,36 +1,35 @@
-﻿@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Forms
 @inherits OwningComponentBase
 
-<AuthorizeView Roles="Admin">
-    <div class="card border-secondary mb-3 shadow-sm">
-        <div class="card-header bg-light fw-semibold">
-            <i class="bi bi-upload me-1"></i> Dateien hochladen (nur Admins)
-        </div>
-        <div class="card-body">
-            <div class="mb-3">
-                <InputFile OnChange="HandleFileChange" multiple class="form-control" disabled="@(!HasEditPermission)" />
-                <small class="text-muted">Maximale Dateigröße: 5 MB. Mehrere Dateien können ausgewählt werden.</small>
-            </div>
 
-            @if (_selectedFiles.Any())
-            {
-                <ul class="list-group list-group-flush">
-                    @foreach (var file in _selectedFiles)
-                    {
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span><i class="bi bi-file-earmark me-2"></i>@file.Name</span>
-                            <span class="badge bg-secondary rounded-pill">@($"{file.Size / 1024} KB")</span>
-                        </li>
-                    }
-                </ul>
-            }
-            else
-            {
-                <p class="text-muted">Noch keine Datei ausgewählt.</p>
-            }
-        </div>
+<div class="card border-secondary mb-3 shadow-sm">
+    <div class="card-header bg-light fw-semibold">
+        <i class="bi bi-upload me-1"></i> Dateien hochladen
     </div>
-</AuthorizeView>
+    <div class="card-body">
+        <div class="mb-3">
+            <InputFile OnChange="HandleFileChange" multiple class="form-control" disabled="@(!HasEditPermission)" />
+            <small class="text-muted">Maximale Dateigröße: 5 MB. Mehrere Dateien können ausgewählt werden.</small>
+        </div>
+
+        @if (_selectedFiles.Any())
+        {
+            <ul class="list-group list-group-flush">
+                @foreach (var file in _selectedFiles)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-file-earmark me-2"></i>@file.Name</span>
+                        <span class="badge bg-secondary rounded-pill">@($"{file.Size / 1024} KB")</span>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p class="text-muted">Noch keine Datei ausgewählt.</p>
+        }
+    </div>
+</div>
 
 @code {
     private List<IBrowserFile> _selectedFiles = new();
