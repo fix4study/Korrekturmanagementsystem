@@ -1,4 +1,4 @@
-﻿@page "/meldungen/details/{Id:guid}"
+@page "/meldungen/details/{Id:guid}"
 @using Korrekturmanagementsystem.Components.Pages.Report.FormParts
 @using Korrekturmanagementsystem.Dtos
 @using Korrekturmanagementsystem.Dtos.Report
@@ -24,8 +24,6 @@
     <ReportForm Model="@_viewModel"
                 IsEdit="true"
                 HasEditPermission="_hasEditPermission"
-                ShowAttachments="@_showAttachments"
-                OnToggleAttachments="ToggleAttachmentVisibility"
                 OnImageLoaded="OnImageLoaded"
                 OnValidSubmit="HandleValidSubmit"
                 SelectedTagsChanged="HandleSelectedTagsChanged"
@@ -44,15 +42,12 @@
     <div class="mb-4">
         <ReportHistory HistoryEntries="_viewModel.ReportHistory" />
     </div>
-
-
 }
 
 @code {
     [Parameter] public Guid Id { get; set; }
 
     private ReportModel _viewModel = new();
-    private bool _showAttachments = false;
     private HashSet<string> _loadedImages = new();
     private string _message = "";
     private List<IBrowserFile> selectedFiles = new();
@@ -108,11 +103,6 @@
     {
         _loadedImages.Add(fileName);
         StateHasChanged();
-    }
-
-    private void ToggleAttachmentVisibility()
-    {
-        _showAttachments = !_showAttachments;
     }
 
     private Task HandleSelectedTagsChanged(List<TagDto> tags)

@@ -1,4 +1,4 @@
-﻿@using Korrekturmanagementsystem.Components.Pages.Report.FormParts
+@using Korrekturmanagementsystem.Components.Pages.Report.FormParts
 @using Korrekturmanagementsystem.Dtos
 @using Korrekturmanagementsystem.Dtos.Report
 @using Korrekturmanagementsystem.Models
@@ -18,8 +18,6 @@
             @if (IsEdit)
             {
                 <Attachments AttachmentList="Model.Attachments"
-                             ShowAttachments="ShowAttachments"
-                             OnToggleAttachments="OnToggleAttachments"
                              OnImageLoaded="OnImageLoaded" />
             }
         </div>
