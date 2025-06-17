@@ -1,7 +1,7 @@
 using Korrekturmanagementsystem.Data;
 using Korrekturmanagementsystem.Data.Entities;
 using Korrekturmanagementsystem.Repositories.Interfaces;
-
+using Korrekturmanagementsystem.Shared;
 using Microsoft.EntityFrameworkCore;
 
 namespace Korrekturmanagementsystem.Repositories;
@@ -32,6 +32,20 @@ public class ReportTagRepository : BaseRepository<ReportTag>, IReportTagReposito
         catch (Exception ex)
         {
             return false;
+        }
+    }
+
+    public async new Task<Result<Guid>> InsertAsync(ReportTag entity)
+    {
+        try
+        {
+            await context.ReportTags.AddAsync(entity);
+            await context.SaveChangesAsync();
+            return Result<Guid>.Success(entity.ReportId);
+        }
+        catch (Exception)
+        {
+            return Result<Guid>.Failure("Fehler beim Hinzufügen des Tags");
         }
     }
 }
