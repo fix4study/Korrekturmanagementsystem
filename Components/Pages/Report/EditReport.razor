@@ -1,4 +1,8 @@
 @page "/meldungen/details/{Id:guid}"
+@inject IReportService ReportService
+@inject IAuthorizationService AuthorizationService
+@inject NavigationManager Navigation
+
 @using Korrekturmanagementsystem.Components.Pages.Report.FormParts
 @using Korrekturmanagementsystem.Dtos
 @using Korrekturmanagementsystem.Dtos.Report
@@ -7,10 +11,6 @@
 @using Korrekturmanagementsystem.Services.Interfaces
 @using System.Text
 @using Microsoft.AspNetCore.WebUtilities
-@inject IReportService ReportService
-@inject IAuthorizationService AuthorizationService
-@inject NavigationManager Navigation
-@rendermode InteractiveServer
 
 @if (_viewModel != null)
 {

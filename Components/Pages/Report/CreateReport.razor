@@ -1,4 +1,4 @@
-﻿@page "/meldungen/neu"
+@page "/meldungen/neu"
 @using System.Text
 @using Korrekturmanagementsystem.Components.Pages.Report.FormParts
 @using Korrekturmanagementsystem.Dtos
@@ -10,7 +10,6 @@
 @inject IReportService ReportService
 @inject IReportOptionsService ReportOptionsService
 @inject NavigationManager Navigation
-@rendermode InteractiveServer
 
 @if (_model.Options != null)
 {
