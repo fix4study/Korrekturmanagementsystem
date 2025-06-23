@@ -20,8 +20,8 @@
         <ReportFilter Filter="Filter" Statuses="DistinctStatuses" Priorities="DistinctPriorities" />
 
         <Sorting CurrentSortField="Sorting.CurrentSortField"
-                 SortDescending="Sorting.SortDescending"
-                 OnSortChanged="Sorting.SetSort" />
+        SortDescending="Sorting.SortDescending"
+        OnSortChanged="Sorting.SetSort" />
 
         @foreach (var report in CurrentPageReports)
         {
@@ -60,9 +60,12 @@
     protected override async Task OnInitializedAsync()
     {
         AllReports = (await ReportService.GetAllReportsAsync()).ToList();
-        Paging.TotalItems = FilteredReports.Count();
-        Filter.OnChanged = () => { Paging.CurrentPage = 1; StateHasChanged(); };
+        Paging.OnPagingChanged += StateHasChanged;
+
+        Filter.OnChanged = () =>
+        {
+            Paging.CurrentPage = 1;
+            Paging.TotalItems = FilteredReports.Count();
+        };
     }
-
-
 }

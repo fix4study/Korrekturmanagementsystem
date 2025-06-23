@@ -2,9 +2,37 @@ namespace Korrekturmanagementsystem.Models;
 
 public class PagingModel
 {
+    private int _currentPage = 1;
+    private int _totalItems;
+
     public int PageSize { get; set; } = 5;
-    public int CurrentPage { get; set; } = 1;
-    public int TotalItems { get; set; }
+
+    public event Action? OnPagingChanged;
+
+    public int CurrentPage
+    {
+        get => _currentPage;
+        set
+        {
+            if (_currentPage != value)
+            {
+                _currentPage = value;
+                OnPagingChanged?.Invoke();
+            }
+        }
+    }
+    public int TotalItems
+    {
+        get => _totalItems;
+        set
+        {
+            if (_totalItems != value)
+            {
+                _totalItems = value;
+                OnPagingChanged?.Invoke();
+            }
+        }
+    }
 
     public int TotalPages => (int)Math.Ceiling((double)TotalItems / PageSize);
 
